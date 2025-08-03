@@ -1,55 +1,75 @@
 """
-Enhanced Logger Module
+Logger Utility
 File: app/utils/logger.py
 
-Professional logging configuration with structured output.
+Centralized logging configuration for the trading platform.
 """
 
 import logging
 import sys
 from pathlib import Path
-from datetime import datetime
+from typing import Optional
+
+try:
+    from loguru import logger as loguru_logger
+    LOGURU_AVAILABLE = True
+except ImportError:
+    LOGURU_AVAILABLE = False
 
 
 def setup_logger(name: str, level: str = "INFO") -> logging.Logger:
     """
-    Setup logger with enhanced formatting and file output.
+    Set up a logger with consistent formatting.
     
     Args:
         name: Logger name (usually __name__)
-        level: Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+        level: Logging level
         
     Returns:
         Configured logger instance
     """
+    if LOGURU_AVAILABLE:
+        # Use loguru if available
+        return LoguruWrapper(name)
+    
+    # Fallback to standard logging
     logger = logging.getLogger(name)
     
-    # Don't add handlers if they already exist
-    if logger.handlers:
-        return logger
-    
-    # Set log level
-    log_level = getattr(logging, level.upper(), logging.INFO)
-    logger.setLevel(log_level)
-    
-    # Create formatter
-    formatter = logging.Formatter(
-        '%(asctime)s [%(levelname)-5s] %(message)s [%(name)s]',
-        datefmt='%Y-%m-%dT%H:%M:%S'
-    )
-    
-    # Console handler
-    console_handler = logging.StreamHandler(sys.stdout)
-    console_handler.setLevel(log_level)
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-    
-    # Prevent propagation to root logger
-    logger.propagate = False
+    if not logger.handlers:
+        # Create handler
+        handler = logging.StreamHandler(sys.stdout)
+        
+        # Create formatter
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        )
+        handler.setFormatter(formatter)
+        
+        # Add handler to logger
+        logger.addHandler(handler)
+        logger.setLevel(getattr(logging, level.upper()))
     
     return logger
 
 
-def get_application_logger() -> logging.Logger:
-    """Get the main application logger."""
-    return setup_logger("dex_sniper")
+class LoguruWrapper:
+    """Wrapper to make loguru compatible with standard logging interface."""
+    
+    def __init__(self, name: str):
+        self.name = name
+        self.logger = loguru_logger
+    
+    def info(self, message: str, *args, **kwargs):
+        self.logger.info(f"[{self.name}] {message}", *args, **kwargs)
+    
+    def error(self, message: str, *args, **kwargs):
+        self.logger.error(f"[{self.name}] {message}", *args, **kwargs)
+    
+    def warning(self, message: str, *args, **kwargs):
+        self.logger.warning(f"[{self.name}] {message}", *args, **kwargs)
+    
+    def debug(self, message: str, *args, **kwargs):
+        self.logger.debug(f"[{self.name}] {message}", *args, **kwargs)
+    
+    def critical(self, message: str, *args, **kwargs):
+        self.logger.critical(f"[{self.name}] {message}", *args, **kwargs)

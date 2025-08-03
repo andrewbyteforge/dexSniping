@@ -1,329 +1,76 @@
 """
-Application Exceptions - Complete Version
+Core Exceptions
 File: app/core/exceptions.py
 
-All custom exception classes for the DEX Sniping Platform.
+Custom exceptions for the trading platform.
 """
 
-from typing import Dict, Any, Optional
 
-
-class DexSnipingException(Exception):
-    """Base exception for all DEX Sniping Platform errors."""
-    
-    def __init__(self, message: str, error_code: Optional[str] = None, details: Optional[Dict[str, Any]] = None):
-        self.message = message
-        self.error_code = error_code or "GENERAL_ERROR"
-        self.details = details or {}
-        super().__init__(self.message)
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert exception to dictionary."""
-        return {
-            "error": self.message,
-            "error_code": self.error_code,
-            "error_type": self.__class__.__name__,
-            "details": self.details
-        }
-
-
-# Validation Exceptions
-class ValidationError(DexSnipingException):
-    """Raised when validation fails."""
+class TradingError(Exception):
+    """Base exception for trading operations."""
     pass
 
 
-# Database Exceptions
-class DatabaseError(DexSnipingException):
-    """Raised when database operations fail."""
+class WalletError(TradingError):
+    """Wallet-related errors."""
     pass
 
 
-# Blockchain Exceptions
-class BlockchainError(DexSnipingException):
-    """Raised when blockchain operations fail."""
-    pass
-
-
-# Trading Exceptions
-class TradingError(DexSnipingException):
-    """Raised when trading operations fail."""
+class DEXError(TradingError):
+    """DEX integration errors."""
     pass
 
 
 class InsufficientFundsError(TradingError):
-    """Raised when insufficient funds for trading."""
+    """Insufficient funds for operation."""
     pass
 
 
-class InvalidOrderError(TradingError):
-    """Raised when order parameters are invalid."""
+class InvalidAddressError(WalletError):
+    """Invalid wallet address format."""
+    pass
+
+
+class TransactionError(TradingError):
+    """Transaction execution errors."""
+    pass
+
+
+class SecurityError(WalletError):
+    """Security-related errors."""
+    pass
+
+
+class RiskLimitExceededError(TradingError):
+    """Risk limit exceeded."""
+    pass
+
+
+class StrategyError(TradingError):
+    """Strategy execution errors."""
+    pass
+
+
+class PortfolioError(TradingError):
+    """Portfolio management errors."""
     pass
 
 
 class OrderExecutionError(TradingError):
-    """Raised when order execution fails."""
+    """Order execution errors."""
     pass
 
 
-# Portfolio Exceptions
-class PortfolioError(DexSnipingException):
-    """Raised when portfolio operations fail."""
+class InvalidOrderError(TradingError):
+    """Invalid order parameters."""
     pass
 
 
-class PositionError(PortfolioError):
-    """Raised when position operations fail."""
+class SlippageExceededError(TradingError):
+    """Slippage exceeded acceptable limits."""
     pass
 
 
-class RiskManagementError(PortfolioError):
-    """Raised when risk management operations fail."""
+class InsufficientLiquidityError(DEXError):
+    """Insufficient liquidity for trade."""
     pass
-
-
-# Configuration Exceptions
-class ConfigurationError(DexSnipingException):
-    """Raised when configuration is invalid."""
-    pass
-
-
-# AI and Analysis Exceptions
-class AIAnalysisError(DexSnipingException):
-    """Raised when AI analysis fails."""
-    pass
-
-
-class ContractAnalysisError(AIAnalysisError):
-    """Raised when smart contract analysis fails."""
-    pass
-
-
-class HoneypotDetectionError(AIAnalysisError):
-    """Raised when honeypot detection fails."""
-    pass
-
-
-class RiskAssessmentError(AIAnalysisError):
-    """Raised when risk assessment fails."""
-    pass
-
-
-# Network and Connectivity Exceptions
-class NetworkError(DexSnipingException):
-    """Raised when network operations fail."""
-    pass
-
-
-class ConnectionPoolError(NetworkError):
-    """Raised when connection pool operations fail."""
-    pass
-
-
-class WebSocketError(NetworkError):
-    """Raised when WebSocket operations fail."""
-    pass
-
-
-# DEX-specific Exceptions
-class DEXError(DexSnipingException):
-    """Raised when DEX operations fail."""
-    pass
-
-
-class LiquidityError(DEXError):
-    """Raised when liquidity operations fail."""
-    pass
-
-
-class PriceImpactError(DEXError):
-    """Raised when price impact is too high."""
-    pass
-
-
-class SlippageError(DEXError):
-    """Raised when slippage exceeds tolerance."""
-    pass
-
-
-# Token and Contract Exceptions
-class TokenError(DexSnipingException):
-    """Raised when token operations fail."""
-    pass
-
-
-class ContractError(TokenError):
-    """Raised when smart contract operations fail."""
-    pass
-
-
-class TokenDiscoveryError(TokenError):
-    """Raised when token discovery fails."""
-    pass
-
-
-# Market Data Exceptions
-class MarketDataError(DexSnipingException):
-    """Raised when market data operations fail."""
-    pass
-
-
-class PriceDataError(MarketDataError):
-    """Raised when price data operations fail."""
-    pass
-
-
-class VolumeDataError(MarketDataError):
-    """Raised when volume data operations fail."""
-    pass
-
-
-# Authentication and Authorization Exceptions
-class AuthenticationError(DexSnipingException):
-    """Raised when authentication fails."""
-    pass
-
-
-class AuthorizationError(DexSnipingException):
-    """Raised when authorization fails."""
-    pass
-
-
-# Rate Limiting Exceptions
-class RateLimitError(DexSnipingException):
-    """Raised when rate limits are exceeded."""
-    pass
-
-
-class APIQuotaExceededError(RateLimitError):
-    """Raised when API quota is exceeded."""
-    pass
-
-
-# Timeout Exceptions
-class TimeoutError(DexSnipingException):
-    """Raised when operations timeout."""
-    pass
-
-
-class BlockchainTimeoutError(TimeoutError):
-    """Raised when blockchain operations timeout."""
-    pass
-
-
-class APITimeoutError(TimeoutError):
-    """Raised when API calls timeout."""
-    pass
-
-
-# Data Processing Exceptions
-class DataProcessingError(DexSnipingException):
-    """Raised when data processing fails."""
-    pass
-
-
-class DataValidationError(DataProcessingError):
-    """Raised when data validation fails."""
-    pass
-
-
-class DataTransformationError(DataProcessingError):
-    """Raised when data transformation fails."""
-    pass
-
-
-# Cache Exceptions
-class CacheError(DexSnipingException):
-    """Raised when cache operations fail."""
-    pass
-
-
-class CacheTimeoutError(CacheError):
-    """Raised when cache operations timeout."""
-    pass
-
-
-class CacheInvalidationError(CacheError):
-    """Raised when cache invalidation fails."""
-    pass
-
-
-# Circuit Breaker Exceptions
-class CircuitBreakerError(DexSnipingException):
-    """Raised when circuit breaker operations fail."""
-    pass
-
-
-class CircuitOpenError(CircuitBreakerError):
-    """Raised when circuit breaker is open."""
-    pass
-
-
-# Monitoring and Alerting Exceptions
-class MonitoringError(DexSnipingException):
-    """Raised when monitoring operations fail."""
-    pass
-
-
-class AlertingError(MonitoringError):
-    """Raised when alerting operations fail."""
-    pass
-
-
-# Utility function to get HTTP status code for exceptions
-EXCEPTION_STATUS_CODES = {
-    ValidationError: 400,
-    AuthenticationError: 401,
-    AuthorizationError: 403,
-    RateLimitError: 429,
-    TimeoutError: 408,
-    DatabaseError: 500,
-    BlockchainError: 502,
-    NetworkError: 503,
-    ConfigurationError: 500,
-    AIAnalysisError: 500,
-    DEXError: 502,
-    TokenError: 500,
-    MarketDataError: 503,
-    DataProcessingError: 500,
-    CacheError: 500,
-    CircuitBreakerError: 503,
-    MonitoringError: 500,
-}
-
-
-def get_http_status_code(exception: Exception) -> int:
-    """
-    Get appropriate HTTP status code for an exception.
-    
-    Args:
-        exception: Exception instance
-        
-    Returns:
-        HTTP status code
-    """
-    for exception_type, status_code in EXCEPTION_STATUS_CODES.items():
-        if isinstance(exception, exception_type):
-            return status_code
-    return 500  # Default to internal server error
-
-
-def format_exception_response(exception: Exception) -> dict:
-    """
-    Format exception for API response.
-    
-    Args:
-        exception: Exception instance
-        
-    Returns:
-        Formatted exception dictionary
-    """
-    if isinstance(exception, DexSnipingException):
-        return exception.to_dict()
-    else:
-        return {
-            "error": str(exception),
-            "error_code": "INTERNAL_ERROR",
-            "error_type": type(exception).__name__,
-            "details": {}
-        }
