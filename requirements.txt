@@ -1,38 +1,62 @@
-# Phase 1 Core Dependencies
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-pydantic==2.5.0
-pydantic-settings==2.1.0
-python-dotenv==1.0.0
-structlog==23.2.0
+# DEX Sniper Pro - Essential Requirements for Testing
+# File: requirements.txt
 
-# Phase 2 Performance & Database Dependencies
-sqlalchemy[asyncio]==2.0.23
-aiosqlite==0.19.0
-asyncpg==0.29.0
-alembic==1.13.1
+# Core Framework (Essential)
+fastapi>=0.95.0
+uvicorn>=0.20.0
+pydantic>=1.10.0
+python-multipart>=0.0.5
 
-# Phase 2 Caching Dependencies (optional)
-# aioredis==2.0.1
+# Database (Essential) - sqlite3 is built into Python
+sqlalchemy>=1.4.0
 
-# Phase 2 Web3 & Blockchain Dependencies  
-web3==6.11.3
-eth-account==0.9.0
-# solana==0.30.2
+# HTTP & WebSocket (Essential)
+aiohttp>=3.8.0
+httpx>=0.24.0
 
-# Phase 2 API Enhancement Dependencies (compatible versions)
-httpx>=0.23.0,<0.24.0
-aiohttp==3.9.1
-websockets==12.0
+# Data Processing & ML (Essential for AI features)
+numpy>=1.21.0
+pandas>=1.5.0
+scikit-learn>=1.2.0
 
-# Development & Testing
-pytest==7.4.3
-pytest-asyncio==0.21.1
-black==23.11.0
-isort==5.12.0
-flake8==6.1.0
+# Testing (Essential)
+pytest>=7.0.0
+pytest-asyncio>=0.20.0
 
-# Phase 2A Performance Infrastructure (minimal additions)
-pydantic-settings==2.1.0
-sqlalchemy[asyncio]==2.0.23
-aiosqlite==0.19.0
+# Configuration (Essential)
+python-dotenv>=0.19.0
+
+# Optional but recommended packages
+# Uncomment if you need these features:
+
+# Advanced ML Libraries
+# tensorflow>=2.10.0
+# torch>=1.13.0
+
+# Text Processing
+# textblob>=0.17.1
+
+# Blockchain & Web3  
+# web3>=5.31.0
+
+# Caching & Performance
+# redis>=4.0.0
+
+# Development Tools
+# black>=22.0.0
+# flake8>=5.0.0
+
+# Additional Utilities
+# click>=8.0.0
+# rich>=12.0.0
+
+# Financial/Trading APIs
+# ccxt>=2.0.0
+
+# Social Media APIs
+# tweepy>=4.0.0
+# praw>=7.0.0
+
+# News APIs
+# newsapi-python>=0.2.6
+# feedparser>=6.0.8
