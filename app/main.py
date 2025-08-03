@@ -97,6 +97,15 @@ try:
     logger.info("✅ DEX API routes loaded")
 except ImportError as e:
     logger.warning(f"⚠️ DEX API not available: {e}")
+# Include WebSocket router
+try:
+    from app.api.v1.endpoints.websocket import router as websocket_router
+    app.include_router(websocket_router, prefix="/api/v1")
+    routers_loaded.append("websocket")
+    logger.info("✅ WebSocket API routes loaded")
+except ImportError as e:
+    logger.warning(f"⚠️ WebSocket API not available: {e}")
+
 
 
 @app.get("/", response_class=HTMLResponse)
