@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEX Sniping Platform - Professional Trading Dashboard</title>
+    
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    
+    <!-- Chart.js for trading charts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js"></script>
+    
+    <!-- Custom Styles -->
+    <style>
+        :root {
+            --bs-primary: #0d6efd;
+            --bs-secondary: #6c757d;
+            --bs-success: #198754;
+            --bs-danger: #dc3545;
+            --bs-warning: #ffc107;
+            --bs-info: #0dcaf0;
+            --bs-dark: #212529;
+            --sidebar-width: 280px;
+            --header-height: 70px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-brand {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin: 0.25rem 0;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-link i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        .top-nav {
+            background: white;
+            height: var(--header-height);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .content-area {
+            padding: 2rem;
+        }
+
+        /* Cards and Components */
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .positive { color: var(--bs-success); }
+        .negative { color: var(--bs-danger); }
+
+        /* Trading Panel */
+        .trading-panel {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .panel-header {
+            background: #f8f9fa;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: between;
+        }
+
+        .panel-body {
+            padding: 1.5rem;
+        }
+
+        /* Token Discovery Table */
+        .token-table {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .table td {
+            vertical-align: middle;
+            padding: 1rem 0.75rem;
+        }
+
+        /* Live Indicators */
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .live-indicator.active {
+            background: rgba(25, 135, 84, 0.1);
+            color: var(--bs-success);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--bs-success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Alerts */
+        .alert-item {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid;
+        }
+
+        .alert-item.success { border-left-color: var(--bs-success); }
+        .alert-item.warning { border-left-color: var(--bs-warning); }
+        .alert-item.danger { border-left-color: var(--bs-danger); }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .content-area {
+                padding: 1rem;
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Button Enhancements */
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            border: none;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%);
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="sidebar-brand">
+                <i class="bi bi-graph-up-arrow"></i>
+                DEX Sniper Pro
+            </a>
+        </div>
+        
+        <div class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#dashboard" data-section="dashboard">
+                        <i class="bi bi-speedometer2"></i>
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#discovery" data-section="discovery">
+                        <i class="bi bi-search"></i>
+                        Token Discovery
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#trading" data-section="trading">
+                        <i class="bi bi-graph-up"></i>
+                        Live Trading
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#portfolio" data-section="portfolio">
+                        <i class="bi bi-wallet2"></i>
+                        Portfolio
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#arbitrage" data-section="arbitrage">
+                        <i class="bi bi-arrow-left-right"></i>
+                        Arbitrage
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#analytics" data-section="analytics">
+                        <i class="bi bi-bar-chart"></i>
+                        Analytics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#settings" data-section="settings">
+                        <i class="bi bi-gear"></i>
+                        Settings
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <button class="btn btn-link d-md-none me-3" id="sidebarToggle">
+                <i class="bi bi-list fs-4"></i>
+            </button>
+            
+            <div class="me-auto">
+                <h5 class="mb-0">Professional Trading Dashboard</h5>
+                <small class="text-muted">Real-time DEX monitoring and trading</small>
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <div class="live-indicator active">
+                    <span class="pulse-dot"></span>
+                    Live
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i>
+                        Account
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Profile</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="content-section">
+                <!-- Stats Cards -->
+                <div class="row mb-4">
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-value text-primary" id="total-discovered">127</div>
+                            <div class="stat-label">Tokens Discovered</div>
+                            <div class="stat-change positive">
+                                <i class="bi bi-arrow-up"></i> +12 today
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-value text-success" id="active-trades">23</div>
+                            <div class="stat-label">Active Trades</div>
+                            <div class="stat-change positive">
+                                <i class="bi bi-arrow-up"></i> +5.2%
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-value text-info" id="arbitrage-opportunities">8</div>
+                            <div class="stat-label">Arbitrage Ops</div>
+                            <div class="stat-change positive">
+                                <i class="bi bi-arrow-up"></i> Live
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-3 col-md-6 mb-3">
+                        <div class="stat-card">
+                            <div class="stat-value text-warning" id="portfolio-value">$12,847</div>
+                            <div class="stat-label">Portfolio Value</div>
+                            <div class="stat-change positive">
+                                <i class="bi bi-arrow-up"></i> +3.8%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Dashboard Content -->
+                <div class="row">
+                    <!-- Live Token Discovery -->
+                    <div class="col-lg-8 mb-4">
+                        <div class="trading-panel">
+                            <div class="panel-header">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-search text-primary"></i>
+                                    Live Token Discovery
+                                </div>
+                                <div class="live-indicator active">
+                                    <span class="pulse-dot"></span>
+                                    Scanning
+                                </div>
+                            </div>
+                            <div class="panel-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Token</th>
+                                                <th>Network</th>
+                                                <th>Price</th>
+                                                <th>Liquidity</th>
+                                                <th>Risk Score</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="token-discovery-table">
+                                            <!-- Dynamic content will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Alerts -->
+                    <div class="col-lg-4 mb-4">
+                        <div class="trading-panel">
+                            <div class="panel-header">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-bell text-warning"></i>
+                                    Live Alerts
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div id="live-alerts">
+                                    <!-- Dynamic alerts will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Section -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="chart-container">
+                            <h6 class="mb-3">Portfolio Performance</h6>
+                            <canvas id="portfolioChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other sections will be hidden initially -->
+            <div id="discovery-section" class="content-section" style="display: none;">
+                <h3>Token Discovery</h3>
+                <p>Advanced token discovery features coming soon...</p>
+            </div>
+
+            <div id="trading-section" class="content-section" style="display: none;">
+                <h3>Live Trading</h3>
+                <p>Live trading interface coming soon...</p>
+            </div>
+
+            <div id="portfolio-section" class="content-section" style="display: none;">
+                <h3>Portfolio Management</h3>
+                <p>Portfolio management features coming soon...</p>
+            </div>
+
+            <div id="arbitrage-section" class="content-section" style="display: none;">
+                <h3>Arbitrage Opportunities</h3>
+                <p>Arbitrage detection and execution coming soon...</p>
+            </div>
+
+            <div id="analytics-section" class="content-section" style="display: none;">
+                <h3>Advanced Analytics</h3>
+                <p>Advanced analytics and reporting coming soon...</p>
+            </div>
+
+            <div id="settings-section" class="content-section" style="display: none;">
+                <h3>Settings</h3>
+                <p>Application settings and configuration coming soon...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5.3 JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        // Global application state
+        const DexSniperApp = {
+            apiBaseUrl: 'http://localhost:8001/api/v1',
+            isConnected: false,
+            websocket: null,
+            
+            // Initialize the application
+            init() {
+                this.setupNavigation();
+                this.setupSidebar();
+                this.loadInitialData();
+                this.startRealTimeUpdates();
+                this.setupChart();
+            },
+
+            // Setup navigation between sections
+            setupNavigation() {
+                document.querySelectorAll('.nav-link[data-section]').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const sectionId = e.target.getAttribute('data-section');
+                        this.showSection(sectionId);
+                        
+                        // Update active nav link
+                        document.querySelectorAll('.nav-link').forEach(nl => nl.classList.remove('active'));
+                        e.target.classList.add('active');
+                    });
+                });
+            },
+
+            // Setup sidebar toggle for mobile
+            setupSidebar() {
+                const sidebarToggle = document.getElementById('sidebarToggle');
+                const sidebar = document.getElementById('sidebar');
+                
+                if (sidebarToggle) {
+                    sidebarToggle.addEventListener('click', () => {
+                        sidebar.classList.toggle('show');
+                    });
+                }
+            },
+
+            // Show specific section
+            showSection(sectionId) {
+                document.querySelectorAll('.content-section').forEach(section => {
+                    section.style.display = 'none';
+                });
+                
+                const targetSection = document.getElementById(`${sectionId}-section`);
+                if (targetSection) {
+                    targetSection.style.display = 'block';
+                    targetSection.classList.add('fade-in');
+                }
+            },
+
+            // Load initial data from API
+            async loadInitialData() {
+                try {
+                    await this.updateStats();
+                    await this.loadTokenDiscovery();
+                    await this.loadLiveAlerts();
+                } catch (error) {
+                    console.error('Failed to load initial data:', error);
+                    this.showError('Failed to connect to API. Please check your connection.');
+                }
+            },
+
+            // Update dashboard statistics
+            async updateStats() {
+                try {
+                    // Simulate API call with mock data for now
+                    const stats = {
+                        tokensDiscovered: Math.floor(Math.random() * 50) + 100,
+                        activeTrades: Math.floor(Math.random() * 20) + 15,
+                        arbitrageOps: Math.floor(Math.random() * 10) + 5,
+                        portfolioValue: (Math.random() * 5000 + 10000).toFixed(0)
+                    };
+
+                    document.getElementById('total-discovered').textContent = stats.tokensDiscovered;
+                    document.getElementById('active-trades').textContent = stats.activeTrades;
+                    document.getElementById('arbitrage-opportunities').textContent = stats.arbitrageOps;
+                    document.getElementById('portfolio-value').textContent = `$${stats.portfolioValue}`;
+                } catch (error) {
+                    console.error('Failed to update stats:', error);
+                }
+            },
+
+            // Load token discovery data
+            async loadTokenDiscovery() {
+                const tbody = document.getElementById('token-discovery-table');
+                
+                // Mock data for demonstration
+                const mockTokens = [
+                    {
+                        symbol: 'NEWCOIN',
+                        name: 'New Coin Protocol',
+                        network: 'Ethereum',
+                        price: '$0.0234',
+                        liquidity: '$45.2K',
+                        riskScore: 7.2,
+                        address: '0x1234...5678'
+                    },
+                    {
+                        symbol: 'DEFI',
+                        name: 'DeFi Token',
+                        network: 'Polygon',
+                        price: '$1.24',
+                        liquidity: '$123.4K',
+                        riskScore: 8.5,
+                        address: '0xabcd...efgh'
+                    },
+                    {
+                        symbol: 'MOON',
+                        name: 'Moon Shot',
+                        network: 'BSC',
+                        price: '$0.0012',
+                        liquidity: '$12.8K',
+                        riskScore: 4.1,
+                        address: '0x9876...5432'
+                    }
+                ];
+
+                tbody.innerHTML = mockTokens.map(token => `
+                    <tr>
+                        <td>
+                            <div>
+                                <strong>${token.symbol}</strong>
+                                <br>
+                                <small class="text-muted">${token.name}</small>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge bg-primary">${token.network}</span>
+                        </td>
+                        <td class="text-success fw-bold">${token.price}</td>
+                        <td>${token.liquidity}</td>
+                        <td>
+                            <span class="badge ${this.getRiskScoreClass(token.riskScore)}">${token.riskScore}/10</span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-primary me-1" onclick="DexSniperApp.analyzeToken('${token.address}')">
+                                <i class="bi bi-search"></i>
+                            </button>
+                            <button class="btn btn-sm btn-success" onclick="DexSniperApp.quickTrade('${token.address}')">
+                                <i class="bi bi-lightning"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            },
+
+            // Load live alerts
+            async loadLiveAlerts() {
+                const alertsContainer = document.getElementById('live-alerts');
+                
+                const mockAlerts = [
+                    {
+                        type: 'success',
+                        title: 'Arbitrage Opportunity',
+                        message: 'USDC/ETH price difference detected: 0.3%',
+                        time: '2 minutes ago'
+                    },
+                    {
+                        type: 'warning',
+                        title: 'High Risk Token',
+                        message: 'NEWCOIN shows potential rug pull indicators',
+                        time: '5 minutes ago'
+                    },
+                    {
+                        type: 'success',
+                        title: 'Trade Executed',
+                        message: 'Successfully bought 1000 DEFI tokens',
+                        time: '8 minutes ago'
+                    }
+                ];
+
+                alertsContainer.innerHTML = mockAlerts.map(alert => `
+                    <div class="alert-item ${alert.type}">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>${alert.title}</strong>
+                                <div class="text-muted mt-1">${alert.message}</div>
+                            </div>
+                            <small class="text-muted">${alert.time}</small>
+                        </div>
+                    </div>
+                `).join('');
+            },
+
+            // Setup portfolio chart
+            setupChart() {
+                const ctx = document.getElementById('portfolioChart').getContext('2d');
+                
+                // Generate mock data for the last 30 days
+                const labels = [];
+                const data = [];
+                const baseValue = 10000;
+                
+                for (let i = 29; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    labels.push(date.toLocaleDateString());
+                    
+                    // Generate realistic portfolio value with some volatility
+                    const volatility = (Math.random() - 0.5) * 0.1;
+                    const growth = 1 + (0.002 * (30 - i)) + volatility;
+                    data.push(Math.round(baseValue * growth));
+                }
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Portfolio Value',
+                            data: data,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 0,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                display: true,
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                display: true,
+                                grid: {
+                                    color: '#f0f0f0'
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value.toLocaleString();
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    }
+                });
+            },
+
+            // Start real-time updates
+            startRealTimeUpdates() {
+                // Update stats every 10 seconds
+                setInterval(() => {
+                    this.updateStats();
+                }, 10000);
+
+                // Update token discovery every 30 seconds
+                setInterval(() => {
+                    this.loadTokenDiscovery();
+                }, 30000);
+
+                // Update alerts every 15 seconds
+                setInterval(() => {
+                    this.loadLiveAlerts();
+                }, 15000);
+            },
+
+            // Utility functions
+            getRiskScoreClass(score) {
+                if (score >= 8) return 'bg-success';
+                if (score >= 6) return 'bg-warning';
+                return 'bg-danger';
+            },
+
+            analyzeToken(address) {
+                alert(`Analyzing token: ${address}`);
+                // TODO: Implement token analysis modal
+            },
+
+            quickTrade(address) {
+                alert(`Quick trade for token: ${address}`);
+                // TODO: Implement quick trade modal
+            },
+
+            showError(message) {
+                console.error(message);
+                // TODO: Implement proper error notification system
+            }
+        };
+
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            DexSniperApp.init();
+        });
+    </script>
+</body>
+</html>
