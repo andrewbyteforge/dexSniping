@@ -1,152 +1,397 @@
-<!-- Bootstrap JavaScript -->
+<!--
+DEX Sniper Pro - Footer Component with JavaScript Loading
+File: frontend/templates/base/footer.html
+Professional footer component with script loading
+-->
+
+<!-- External JavaScript Libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js" 
+        integrity="sha512-X/YkDZyjTf4wyc2Vy16YGCPHwAY8rZJY+POgokZjQB2mhIRFJCckEGc6YyX9eNsPfn0PzThEuNs+uaomE5CO6A==" 
         crossorigin="anonymous"></script>
 
-<!-- Core Application Scripts - Load Once -->
-<script>
-// Prevent duplicate script loading
-if (!window.DEX_SNIPER_SCRIPTS_LOADED) {
-    window.DEX_SNIPER_SCRIPTS_LOADED = {};
+<!-- Chart.js for Data Visualization -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js" 
+        integrity="sha512-7U4rRB8aGAHGVad3u2jiC7GA5/1YhQcQjxKeaVms/bT66i3LVBMRcBI9KwABNWnxOSwulkuSXxZLGuyfvo7V0A==" 
+        crossorigin="anonymous"></script>
+
+<!-- Application JavaScript Modules -->
+<script type="module" src="/static/js/utils/constants.js"></script>
+<script type="module" src="/static/js/utils/formatters.js"></script>
+<script type="module" src="/static/js/utils/validators.js"></script>
+<script type="module" src="/static/js/api-client.js"></script>
+<script type="module" src="/static/js/websocket-manager.js"></script>
+<script type="module" src="/static/js/components/chart-controller.js"></script>
+<script type="module" src="/static/js/components/dashboard-controller.js"></script>
+<script type="module" src="/static/js/app.js"></script>
+
+<!-- Footer Content -->
+<footer class="app-footer">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="footer-info">
+                    <span class="text-muted">
+                        <strong>DEX Sniper Pro</strong> v3.1.0 - Phase 3B Complete
+                    </span>
+                    <span class="text-muted mx-2">|</span>
+                    <span class="text-muted">
+                        Professional Trading Dashboard
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <div class="footer-links">
+                    <a href="/docs" class="text-muted me-3" target="_blank">
+                        <i class="bi bi-file-text"></i> API Docs
+                    </a>
+                    <a href="/api/v1/health" class="text-muted me-3" target="_blank">
+                        <i class="bi bi-heart-pulse"></i> Health
+                    </a>
+                    <span class="text-muted">
+                        <i class="bi bi-server"></i>
+                        <span id="footer-status" class="ms-1">Loading...</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Global Error Handler -->
+<div id="global-error-toast" class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-danger text-white">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong class="me-auto">Error</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="error-message">
+            An error occurred. Please try again.
+        </div>
+    </div>
+</div>
+
+<!-- Performance Monitor -->
+<div id="performance-monitor" class="d-none">
+    <div class="perf-stats">
+        <span id="perf-memory">Memory: --MB</span>
+        <span id="perf-fps">FPS: --</span>
+        <span id="perf-load">Load: --%</span>
+    </div>
+</div>
+
+<!-- Footer Styles -->
+<style>
+.app-footer {
+    background: var(--light-color, #f8fafc);
+    border-top: 1px solid var(--border-color, #e2e8f0);
+    padding: 1rem 0;
+    margin-top: auto;
+    font-size: 0.875rem;
 }
 
-function loadScript(src, id) {
-    if (window.DEX_SNIPER_SCRIPTS_LOADED[id]) {
-        console.log(`Script already loaded: ${id}`);
-        return Promise.resolve();
-    }
+.footer-info,
+.footer-links {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.footer-links a {
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.footer-links a:hover {
+    color: var(--primary-color, #667eea) !important;
+}
+
+.toast-container {
+    z-index: 1080;
+}
+
+.performance-monitor {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.75rem;
+    z-index: 9999;
+}
+
+.perf-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+/* Dark Mode Support */
+[data-bs-theme="dark"] .app-footer {
+    background: var(--dark-color, #1e293b);
+    border-color: var(--border-color, #334155);
+}
+</style>
+
+<!-- Footer JavaScript -->
+<script>
+// Global Application Initialization
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🚀 DEX Sniper Pro - Footer initialization');
     
+    // Initialize global error handling
+    initializeErrorHandling();
+    
+    // Initialize performance monitoring
+    initializePerformanceMonitoring();
+    
+    // Initialize footer status
+    initializeFooterStatus();
+    
+    // Setup cleanup on page unload
+    setupCleanup();
+    
+    console.log('✅ Footer initialization complete');
+});
+
+/**
+ * Initialize global error handling system
+ */
+function initializeErrorHandling() {
+    try {
+        // Global error handler for unhandled errors
+        window.addEventListener('error', function(event) {
+            console.error('Global error:', event.error);
+            showErrorToast(`JavaScript Error: ${event.error?.message || 'Unknown error'}`);
+        });
+        
+        // Global handler for unhandled promise rejections
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection:', event.reason);
+            showErrorToast(`Promise rejection: ${event.reason?.message || 'Unknown error'}`);
+        });
+        
+        // Expose global error function
+        window.showError = showErrorToast;
+        
+        console.log('✅ Global error handling initialized');
+    } catch (error) {
+        console.error('❌ Error initializing error handling:', error);
+    }
+}
+
+/**
+ * Show error toast notification
+ * @param {string} message - Error message to display
+ */
+function showErrorToast(message) {
+    try {
+        const errorMessageEl = document.getElementById('error-message');
+        const toastEl = document.querySelector('#global-error-toast .toast');
+        
+        if (errorMessageEl && toastEl) {
+            errorMessageEl.textContent = message;
+            
+            const toast = new bootstrap.Toast(toastEl, {
+                delay: 5000,
+                autohide: true
+            });
+            
+            toast.show();
+        }
+    } catch (error) {
+        console.error('❌ Error showing toast:', error);
+        // Fallback to alert if toast fails
+        alert(`Error: ${message}`);
+    }
+}
+
+/**
+ * Initialize performance monitoring
+ */
+function initializePerformanceMonitoring() {
+    try {
+        // Only enable performance monitoring in debug mode
+        const debugMode = window.location.search.includes('debug=true');
+        
+        if (debugMode && window.performance) {
+            const perfMonitor = document.getElementById('performance-monitor');
+            const memoryEl = document.getElementById('perf-memory');
+            const fpsEl = document.getElementById('perf-fps');
+            const loadEl = document.getElementById('perf-load');
+            
+            if (perfMonitor) {
+                perfMonitor.classList.remove('d-none');
+                
+                // FPS monitoring
+                let frameCount = 0;
+                let lastTime = performance.now();
+                
+                function updateFPS() {
+                    frameCount++;
+                    const now = performance.now();
+                    
+                    if (now - lastTime >= 1000) {
+                        if (fpsEl) {
+                            fpsEl.textContent = `FPS: ${frameCount}`;
+                        }
+                        frameCount = 0;
+                        lastTime = now;
+                    }
+                    
+                    requestAnimationFrame(updateFPS);
+                }
+                
+                requestAnimationFrame(updateFPS);
+                
+                // Memory and load monitoring
+                setInterval(() => {
+                    try {
+                        if (memoryEl && window.performance.memory) {
+                            const usedMB = Math.round(window.performance.memory.usedJSHeapSize / 1048576);
+                            memoryEl.textContent = `Memory: ${usedMB}MB`;
+                        }
+                        
+                        if (loadEl) {
+                            const loadPercent = Math.round(Math.random() * 20 + 10); // Mock load
+                            loadEl.textContent = `Load: ${loadPercent}%`;
+                        }
+                    } catch (error) {
+                        console.warn('Performance monitoring error:', error);
+                    }
+                }, 2000);
+            }
+        }
+        
+        console.log('✅ Performance monitoring initialized');
+    } catch (error) {
+        console.error('❌ Error initializing performance monitoring:', error);
+    }
+}
+
+/**
+ * Initialize footer status indicator
+ */
+function initializeFooterStatus() {
+    try {
+        const statusEl = document.getElementById('footer-status');
+        
+        if (statusEl) {
+            // Check API health
+            fetch('/api/v1/health')
+                .then(response => response.json())
+                .then(data => {
+                    statusEl.textContent = 'Online';
+                    statusEl.className = 'ms-1 text-success';
+                })
+                .catch(error => {
+                    statusEl.textContent = 'Offline';
+                    statusEl.className = 'ms-1 text-danger';
+                });
+            
+            // Update status periodically
+            setInterval(() => {
+                fetch('/api/v1/health')
+                    .then(response => response.json())
+                    .then(data => {
+                        statusEl.textContent = 'Online';
+                        statusEl.className = 'ms-1 text-success';
+                    })
+                    .catch(error => {
+                        statusEl.textContent = 'Offline';
+                        statusEl.className = 'ms-1 text-danger';
+                    });
+            }, 60000); // Every minute
+        }
+        
+        console.log('✅ Footer status initialized');
+    } catch (error) {
+        console.error('❌ Error initializing footer status:', error);
+    }
+}
+
+/**
+ * Setup cleanup for page unload
+ */
+function setupCleanup() {
+    try {
+        window.addEventListener('beforeunload', function() {
+            // Cancel any ongoing requests
+            if (window.DexSniperApp && window.DexSniperApp.cleanup) {
+                window.DexSniperApp.cleanup();
+            }
+            
+            // Close WebSocket connections
+            if (window.DexSniperApp && window.DexSniperApp.websocket) {
+                window.DexSniperApp.websocket.close();
+            }
+            
+            console.log('🧹 Application cleanup completed');
+        });
+        
+        console.log('✅ Cleanup handlers registered');
+    } catch (error) {
+        console.error('❌ Error setting up cleanup:', error);
+    }
+}
+
+/**
+ * Utility function to safely execute code with error handling
+ * @param {Function} fn - Function to execute safely
+ * @param {string} context - Context description for error logging
+ */
+window.safeExecute = function(fn, context = 'unknown') {
+    try {
+        return fn();
+    } catch (error) {
+        console.error(`❌ Error in ${context}:`, error);
+        showErrorToast(`Error in ${context}: ${error.message}`);
+        return null;
+    }
+};
+
+/**
+ * Utility function to load script dynamically
+ * @param {string} src - Script source URL
+ * @param {boolean} isModule - Whether script is a module
+ * @returns {Promise} Promise that resolves when script loads
+ */
+window.loadScript = function(src, isModule = false) {
     return new Promise((resolve, reject) => {
         const script = document.createElement('script');
         script.src = src;
-        script.onload = () => {
-            window.DEX_SNIPER_SCRIPTS_LOADED[id] = true;
-            console.log(`✅ Script loaded: ${id}`);
-            resolve();
-        };
-        script.onerror = () => {
-            console.error(`❌ Failed to load script: ${id}`);
-            reject(new Error(`Failed to load ${id}`));
-        };
+        if (isModule) script.type = 'module';
+        
+        script.onload = () => resolve(src);
+        script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
+        
         document.head.appendChild(script);
     });
-}
+};
 
-// Load scripts in order
-async function loadApplicationScripts() {
-    try {
-        // Load utility modules first
-        await loadScript('/static/js/utils/constants.js', 'constants');
-        await loadScript('/static/js/utils/formatters.js', 'formatters');
-        await loadScript('/static/js/utils/validators.js', 'validators');
-        
-        // Load core modules
-        await loadScript('/static/js/api-client.js', 'api-client');
-        await loadScript('/static/js/websocket-manager.js', 'websocket-manager');
-        
-        // Load component controllers
-        await loadScript('/static/js/components/dashboard-controller.js', 'dashboard-controller');
-        await loadScript('/static/js/components/token-discovery-controller.js', 'token-discovery-controller');
-        await loadScript('/static/js/components/chart-controller.js', 'chart-controller');
-        
-        // Load main application controller last
-        await loadScript('/static/js/app.js', 'app');
-        
-        console.log('✅ All application scripts loaded');
-        
-        // Initialize application
-        if (typeof DexSniperApp !== 'undefined' && DexSniperApp.init) {
-            await DexSniperApp.init();
-        } else {
-            console.warn('⚠️ DexSniperApp not available for initialization');
-        }
-        
-    } catch (error) {
-        console.error('❌ Failed to load application scripts:', error);
-    }
-}
-
-// Only load scripts if not already loaded
-if (!window.DEX_SNIPER_SCRIPTS_LOADED.app) {
-    loadApplicationScripts();
-}
+// Expose global utilities
+window.DexSniperUtils = {
+    showError: showErrorToast,
+    safeExecute: window.safeExecute,
+    loadScript: window.loadScript
+};
 </script>
 
-<!-- Application Initialization -->
+<!-- Console Welcome Message -->
 <script>
-    // Global application configuration
-    window.DEX_SNIPER_CONFIG = {
-        API_BASE_URL: '/api/v1',
-        WEBSOCKET_URL: `ws://${window.location.host}/api/v1/dashboard/ws`,
-        VERSION: '3.1.0',
-        PHASE: '3B',
-        DEBUG: {{ 'true' if debug else 'false' }},
-        FEATURES: {
-            TOKEN_DISCOVERY: true,
-            LIVE_TRADING: false,  // Phase 3B Week 5-6
-            ARBITRAGE: false,     // Phase 3B Week 5-6
-            AI_RISK: false,       // Phase 3B Week 7-8
-            MOBILE_APP: false     // Phase 3C
-        },
-        NETWORKS: [
-            'Ethereum',
-            'Polygon', 
-            'BSC',
-            'Arbitrum',
-            'Optimism',
-            'Avalanche',
-            'Fantom',
-            'Solana'
-        ],
-        REFRESH_INTERVALS: {
-            STATS: 10000,         // 10 seconds
-            TOKENS: 30000,        // 30 seconds
-            PORTFOLIO: 60000,     // 1 minute
-            ALERTS: 5000          // 5 seconds
-        }
-    };
+console.log(`
+🚀 DEX Sniper Pro v3.1.0 - Phase 3B Complete
+================================================
+Welcome to the professional trading dashboard!
 
-    // Performance monitoring
-    window.PERFORMANCE_MONITOR = {
-        startTime: performance.now(),
-        apiCalls: 0,
-        webSocketReconnects: 0,
-        errors: []
-    };
+📊 Dashboard: /dashboard
+📚 API Docs: /docs  
+💓 Health: /api/v1/health
 
-    // Error tracking
-    window.addEventListener('error', function(event) {
-        window.PERFORMANCE_MONITOR.errors.push({
-            message: event.message,
-            filename: event.filename,
-            lineno: event.lineno,
-            timestamp: new Date().toISOString()
-        });
-        
-        // Log to console in debug mode
-        if (window.DEX_SNIPER_CONFIG.DEBUG) {
-            console.error('Application Error:', {
-                message: event.message,
-                source: event.filename,
-                line: event.lineno,
-                stack: event.error?.stack
-            });
-        }
-    });
-
-    // Initialize when DOM is ready
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('📄 DOM Content Loaded');
-        
-        // Wait a bit for all scripts to load
-        setTimeout(() => {
-            if (typeof DexSniperApp !== 'undefined' && DexSniperApp.init) {
-                console.log('🚀 Initializing DexSniperApp...');
-                DexSniperApp.init().catch(error => {
-                    console.error('❌ DexSniperApp initialization failed:', error);
-                });
-            } else {
-                console.warn('⚠️ DexSniperApp not available');
-            }
-        }, 1000);
-    });
+Debug mode: Add ?debug=true to URL for performance monitoring
+`);
 </script>

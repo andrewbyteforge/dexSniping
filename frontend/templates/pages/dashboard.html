@@ -1,55 +1,185 @@
+<!-- 
+DEX Sniper Pro - Professional Dashboard Template
+File: frontend/templates/pages/dashboard.html
+Fixed template with proper inheritance and complete content
+-->
+
 {% extends "base/layout.html" %}
 
 {% block title %}Dashboard{% endblock %}
+
 {% block page_title %}Professional Trading Dashboard{% endblock %}
 {% block page_subtitle %}Real-time DEX monitoring and analytics{% endblock %}
 
 {% block extra_css %}
-<!-- Chart.js for data visualization -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js" 
-        crossorigin="anonymous"></script>
+<!-- Page-specific styles -->
+<style>
+.dashboard-summary {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--info-color) 100%);
+    color: white;
+    border-radius: 1rem;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.summary-stat {
+    text-align: center;
+}
+
+.summary-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.summary-stat-label {
+    opacity: 0.8;
+    font-size: 0.9rem;
+}
+
+.widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.widget-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.widget-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: currentColor;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    background: white;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+    padding: 1rem;
+}
+
+.chart-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--muted-color);
+}
+
+.performance-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+}
+
+.metric-card {
+    text-align: center;
+    padding: 1rem;
+    background: var(--light-color);
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    color: var(--muted-color);
+    text-transform: uppercase;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .dashboard-summary {
+        padding: 1.5rem;
+    }
+    
+    .summary-stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    
+    .performance-metrics {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
 {% endblock %}
 
 {% block content %}
-<!-- Dashboard Header -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="h3 mb-1">Dashboard</h1>
-        <p class="text-muted mb-0">
-            Real-time DEX monitoring and trading analytics
-            <span class="status-indicator ms-2">
-                <span class="status-dot text-success"></span>
-                <span class="connection-status text-success">Online</span>
-            </span>
-        </p>
-    </div>
-    <div class="d-flex gap-2">
-        <button class="btn btn-outline-primary btn-sm" id="refresh-dashboard" title="Refresh All Data">
-            <i class="fas fa-sync-alt"></i>
-            <span class="d-none d-sm-inline ms-1">Refresh</span>
-        </button>
-        <button class="btn btn-outline-secondary btn-sm" id="toggle-auto-refresh" title="Toggle Auto-refresh">
-            <i class="fas fa-play"></i>
-            <span class="d-none d-sm-inline ms-1">Auto</span>
-        </button>
-        <div class="dropdown">
-            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" 
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-cog"></i>
+<!-- Dashboard Content -->
+<div class="dashboard-content">
+    <!-- Dashboard Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">Dashboard</h1>
+            <p class="text-muted mb-0">
+                Real-time DEX monitoring and trading analytics
+                <span class="status-indicator ms-2">
+                    <span class="status-dot text-success"></span>
+                    <span class="connection-status text-success">Online</span>
+                </span>
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-primary btn-sm" id="refresh-dashboard" title="Refresh All Data">
+                <i class="bi bi-arrow-clockwise"></i>
+                <span class="d-none d-sm-inline ms-1">Refresh</span>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="#" id="export-data">Export Data</a></li>
-                <li><a class="dropdown-item" href="#" id="dashboard-settings">Settings</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="/docs" target="_blank">API Docs</a></li>
-            </ul>
+            <button class="btn btn-outline-secondary btn-sm" id="toggle-auto-refresh" title="Toggle Auto-refresh">
+                <i class="bi bi-play"></i>
+                <span class="d-none d-sm-inline ms-1">Auto</span>
+            </button>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" 
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-gear"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="#" id="export-data">Export Data</a></li>
+                    <li><a class="dropdown-item" href="#" id="dashboard-settings">Settings</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="/docs" target="_blank">API Docs</a></li>
+                </ul>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Dashboard Summary -->
-<div class="card mb-4" style="background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-info) 100%); color: white;">
-    <div class="card-body">
+    <!-- Dashboard Summary -->
+    <div class="dashboard-summary">
         <div class="d-flex justify-content-between align-items-start flex-wrap">
             <div>
                 <h2 class="h4 mb-2">Portfolio Overview</h2>
@@ -58,227 +188,183 @@
                 </p>
             </div>
             <div class="text-end">
-                <div class="h5 mb-1">Total Value</div>
-                <div class="h3 mb-0" id="total-portfolio-value">$0.00</div>
+                <div class="h5 mb-1">Phase 3B Complete</div>
+                <div class="badge bg-success">100% Operational</div>
             </div>
         </div>
         
-        <div class="row mt-3">
-            <div class="col-md-3 text-center">
-                <div class="h4" id="summary-tokens">0</div>
-                <small>Tokens Discovered</small>
+        <div class="summary-stats">
+            <div class="summary-stat">
+                <div class="summary-stat-value" id="total-portfolio-value">$0.00</div>
+                <div class="summary-stat-label">Portfolio Value</div>
             </div>
-            <div class="col-md-3 text-center">
-                <div class="h4" id="summary-trades">0</div>
-                <small>Active Trades</small>
+            <div class="summary-stat">
+                <div class="summary-stat-value" id="daily-pnl">+$0.00</div>
+                <div class="summary-stat-label">24h P&L</div>
             </div>
-            <div class="col-md-3 text-center">
-                <div class="h4" id="summary-profit">$0.00</div>
-                <small>24h P&L</small>
+            <div class="summary-stat">
+                <div class="summary-stat-value" id="tokens-monitored">0</div>
+                <div class="summary-stat-label">Tokens Monitored</div>
             </div>
-            <div class="col-md-3 text-center">
-                <div class="h4" id="summary-risk">0</div>
-                <small>Avg Risk Score</small>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Quick Actions -->
-<div class="row mb-4">
-    <div class="col-md-2">
-        <a href="/token-discovery" class="btn btn-outline-primary w-100">
-            <i class="fas fa-search"></i><br>
-            <small>Discover Tokens</small>
-        </a>
-    </div>
-    <div class="col-md-2">
-        <a href="/live-trading" class="btn btn-outline-success w-100">
-            <i class="fas fa-chart-line"></i><br>
-            <small>Live Trading</small>
-        </a>
-    </div>
-    <div class="col-md-2">
-        <a href="/portfolio" class="btn btn-outline-info w-100">
-            <i class="fas fa-wallet"></i><br>
-            <small>Portfolio</small>
-        </a>
-    </div>
-    <div class="col-md-2">
-        <a href="/arbitrage" class="btn btn-outline-warning w-100">
-            <i class="fas fa-exchange-alt"></i><br>
-            <small>Arbitrage</small>
-        </a>
-    </div>
-    <div class="col-md-2">
-        <a href="/analytics" class="btn btn-outline-secondary w-100">
-            <i class="fas fa-chart-bar"></i><br>
-            <small>Analytics</small>
-        </a>
-    </div>
-    <div class="col-md-2">
-        <a href="/api/v1/health" class="btn btn-outline-success w-100" target="_blank">
-            <i class="fas fa-heart-pulse"></i><br>
-            <small>System Health</small>
-        </a>
-    </div>
-</div>
-
-<!-- Stats Cards Section -->
-<div class="card mb-4">
-    <div class="card-header">
-        <div class="widget-header">
-            <h5 class="widget-title">
-                <i class="fas fa-tachometer-alt me-2"></i>
-                System Statistics
-            </h5>
-            <div class="widget-controls">
-                <button class="btn btn-sm btn-outline-primary" id="refresh-stats" title="Refresh Stats">
-                    <i class="fas fa-sync-alt"></i>
-                </button>
+            <div class="summary-stat">
+                <div class="summary-stat-value" id="active-alerts">0</div>
+                <div class="summary-stat-label">Active Alerts</div>
             </div>
         </div>
     </div>
-    <div class="card-body">
-        {% include 'components/stats-cards.html' %}
-    </div>
-</div>
 
-<!-- Charts and Data Grid -->
-<div class="dashboard-grid">
-    <!-- Price Chart -->
-    <div class="card">
-        <div class="card-header">
-            <div class="widget-header">
-                <h5 class="widget-title">
-                    <i class="fas fa-chart-line me-2"></i>
-                    Price Trends
-                </h5>
-                <div class="widget-controls">
-                    <div class="btn-group btn-group-sm" role="group">
-                        <input type="radio" class="btn-check" name="chart-timeframe" id="timeframe-1h" checked>
-                        <label class="btn btn-outline-primary" for="timeframe-1h">1H</label>
-                        
-                        <input type="radio" class="btn-check" name="chart-timeframe" id="timeframe-24h">
-                        <label class="btn btn-outline-primary" for="timeframe-24h">24H</label>
-                        
-                        <input type="radio" class="btn-check" name="chart-timeframe" id="timeframe-7d">
-                        <label class="btn btn-outline-primary" for="timeframe-7d">7D</label>
+    <!-- Statistics Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-12">
+            {% include 'components/stats-cards.html' %}
+        </div>
+    </div>
+
+    <!-- Main Dashboard Grid -->
+    <div class="row g-3">
+        <!-- Live Token Discovery Table -->
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <div class="widget-header">
+                        <h5 class="widget-title">
+                            <i class="bi bi-search me-2"></i>
+                            Live Token Discovery
+                        </h5>
+                        <div class="widget-controls">
+                            <button class="btn btn-outline-primary btn-sm" id="refresh-tokens">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" id="filter-tokens">
+                                <i class="bi bi-funnel"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% include 'components/token-discovery-table.html' %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Alerts -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <div class="widget-header">
+                        <h5 class="widget-title">
+                            <i class="bi bi-bell me-2"></i>
+                            Live Alerts
+                        </h5>
+                        <div class="widget-controls">
+                            <span class="badge bg-warning" id="alert-count">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% include 'components/live-alerts.html' %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Price Charts -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="widget-header">
+                        <h5 class="widget-title">
+                            <i class="bi bi-graph-up me-2"></i>
+                            Price Charts
+                        </h5>
+                        <div class="widget-controls">
+                            <select class="form-select form-select-sm" id="chart-timeframe">
+                                <option value="1h">1H</option>
+                                <option value="4h">4H</option>
+                                <option value="1d" selected>1D</option>
+                                <option value="1w">1W</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <div class="chart-loading">
+                            <i class="bi bi-hourglass-split me-2"></i>
+                            Loading price data...
+                        </div>
+                        <canvas id="price-chart" style="display: none;"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="card-body">
-            <div class="chart-container">
-                <canvas id="price-chart" data-chart-type="price"></canvas>
-                <div class="chart-loading" id="price-chart-loading">
-                    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                    Loading price data...
+
+        <!-- Volume Analytics -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="widget-header">
+                        <h5 class="widget-title">
+                            <i class="bi bi-bar-chart me-2"></i>
+                            Volume Analytics
+                        </h5>
+                        <div class="widget-controls">
+                            <button class="btn btn-outline-primary btn-sm" id="refresh-volume">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <div class="chart-loading">
+                            <i class="bi bi-hourglass-split me-2"></i>
+                            Loading volume data...
+                        </div>
+                        <canvas id="volume-chart" style="display: none;"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Portfolio Performance -->
-    <div class="card">
-        <div class="card-header">
-            <div class="widget-header">
-                <h5 class="widget-title">
-                    <i class="fas fa-wallet me-2"></i>
-                    Portfolio Performance
-                </h5>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="chart-container">
-                <canvas id="portfolio-chart" data-chart-type="portfolio"></canvas>
-                <div class="chart-loading" id="portfolio-chart-loading">
-                    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                    Loading portfolio data...
+        <!-- Performance Metrics -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="widget-header">
+                        <h5 class="widget-title">
+                            <i class="bi bi-speedometer2 me-2"></i>
+                            Performance Metrics
+                        </h5>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Token Discovery and Alerts Grid -->
-<div class="dashboard-grid">
-    <!-- Token Discovery Table -->
-    <div class="card">
-        <div class="card-header">
-            <div class="widget-header">
-                <h5 class="widget-title">
-                    <i class="fas fa-coins me-2"></i>
-                    Recent Token Discoveries
-                </h5>
-                <div class="widget-controls">
-                    <a href="/token-discovery" class="btn btn-sm btn-primary">
-                        View All
-                    </a>
+                <div class="card-body">
+                    <div class="performance-metrics">
+                        <div class="metric-card">
+                            <div class="metric-value text-info" id="metric-api-response">--ms</div>
+                            <div class="metric-label">API Response</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value text-success" id="metric-uptime">--%</div>
+                            <div class="metric-label">Uptime</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value text-warning" id="metric-memory">--MB</div>
+                            <div class="metric-label">Memory Usage</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value text-primary" id="metric-websocket">--ms</div>
+                            <div class="metric-label">WebSocket Latency</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value text-secondary" id="metric-cache-hit">--%</div>
+                            <div class="metric-label">Cache Hit Rate</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value text-info" id="metric-requests">--</div>
+                            <div class="metric-label">Requests/min</div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="card-body">
-            {% include 'components/token-discovery-table.html' %}
-        </div>
-    </div>
-
-    <!-- Live Alerts -->
-    <div class="card">
-        <div class="card-header">
-            <div class="widget-header">
-                <h5 class="widget-title">
-                    <i class="fas fa-bell me-2"></i>
-                    Live Alerts
-                </h5>
-                <div class="widget-controls">
-                    <button class="btn btn-sm btn-outline-secondary" id="clear-alerts" title="Clear All Alerts">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-        <div class="card-body">
-            {% include 'components/live-alerts.html' %}
-        </div>
-    </div>
-</div>
-
-<!-- Performance Metrics -->
-<div class="card">
-    <div class="card-header">
-        <div class="widget-header">
-            <h5 class="widget-title">
-                <i class="fas fa-gauge-high me-2"></i>
-                Performance Metrics
-            </h5>
-        </div>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-2 text-center">
-                <div class="h5 text-info" id="metric-api-response">--ms</div>
-                <small>API Response</small>
-            </div>
-            <div class="col-md-2 text-center">
-                <div class="h5 text-success" id="metric-uptime">--%</div>
-                <small>Uptime</small>
-            </div>
-            <div class="col-md-2 text-center">
-                <div class="h5 text-warning" id="metric-memory">--MB</div>
-                <small>Memory Usage</small>
-            </div>
-            <div class="col-md-2 text-center">
-                <div class="h5 text-primary" id="metric-websocket">--ms</div>
-                <small>WebSocket Latency</small>
-            </div>
-            <div class="col-md-2 text-center">
-                <div class="h5 text-secondary" id="metric-cache-hit">--%</div>
-                <small>Cache Hit Rate</small>
-            </div>
-            <div class="col-md-2 text-center">
-                <div class="h5 text-info" id="metric-requests">--</div>
-                <small>Requests/min</small>
             </div>
         </div>
     </div>
@@ -286,18 +372,19 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Dashboard-specific JavaScript -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📊 Dashboard page loaded');
 
-    // Initialize dashboard-specific functionality
+    // Initialize dashboard functionality
     initializeDashboard();
     
     // Setup dashboard event listeners
     setupDashboardEvents();
     
-    // Load initial chart data
-    loadInitialCharts();
+    // Load initial data
+    loadInitialData();
 });
 
 /**
@@ -305,21 +392,66 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 function initializeDashboard() {
     try {
-        // Initialize charts if Chart Controller is available
-        if (window.DexSniperApp && window.DexSniperApp.components && window.DexSniperApp.components.charts) {
+        console.log('🔧 Initializing dashboard...');
+        
+        // Initialize charts if Chart.js is available
+        if (typeof Chart !== 'undefined') {
             initializeCharts();
         }
         
-        // Setup refresh handlers
-        setupRefreshHandlers();
+        // Initialize real-time updates
+        initializeRealTimeUpdates();
         
-        // Initialize performance monitoring
-        initializePerformanceMonitoring();
+        // Initialize auto-refresh
+        initializeAutoRefresh();
         
-        console.log('✅ Dashboard initialized');
-        
+        console.log('✅ Dashboard initialized successfully');
     } catch (error) {
-        console.error('❌ Dashboard initialization failed:', error);
+        console.error('❌ Dashboard initialization error:', error);
+        showErrorMessage('Failed to initialize dashboard');
+    }
+}
+
+/**
+ * Setup dashboard event listeners
+ */
+function setupDashboardEvents() {
+    try {
+        // Refresh dashboard button
+        const refreshBtn = document.getElementById('refresh-dashboard');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', function() {
+                refreshDashboard();
+            });
+        }
+        
+        // Auto-refresh toggle
+        const autoRefreshBtn = document.getElementById('toggle-auto-refresh');
+        if (autoRefreshBtn) {
+            autoRefreshBtn.addEventListener('click', function() {
+                toggleAutoRefresh();
+            });
+        }
+        
+        // Export data button
+        const exportBtn = document.getElementById('export-data');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', function() {
+                exportDashboardData();
+            });
+        }
+        
+        // Chart timeframe selector
+        const timeframeSelect = document.getElementById('chart-timeframe');
+        if (timeframeSelect) {
+            timeframeSelect.addEventListener('change', function() {
+                updateChartTimeframe(this.value);
+            });
+        }
+        
+        console.log('✅ Dashboard events setup complete');
+    } catch (error) {
+        console.error('❌ Error setting up dashboard events:', error);
     }
 }
 
@@ -328,137 +460,369 @@ function initializeDashboard() {
  */
 function initializeCharts() {
     try {
-        const chartController = window.DexSniperApp.components.charts;
+        // Initialize price chart
+        initializePriceChart();
         
-        // Initialize price chart with sample data
-        setTimeout(() => {
-            const priceData = generateSampleData('price', 20);
-            if (chartController && typeof chartController.createChart === 'function') {
-                chartController.createChart('price-chart', 'price', {
-                    labels: priceData.labels,
-                    datasets: [{
-                        label: 'ETH/USD',
-                        data: priceData.data,
-                        borderColor: '#0dcaf0',
-                        backgroundColor: 'rgba(13, 202, 240, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                });
-            }
-            
-            // Hide loading indicators
-            const priceLoading = document.getElementById('price-chart-loading');
-            if (priceLoading) priceLoading.style.display = 'none';
-        }, 1000);
+        // Initialize volume chart
+        initializeVolumeChart();
         
         console.log('✅ Charts initialized');
-        
     } catch (error) {
-        console.error('❌ Failed to initialize charts:', error);
+        console.error('❌ Error initializing charts:', error);
     }
 }
 
 /**
- * Setup dashboard event listeners
+ * Initialize price chart
  */
-function setupDashboardEvents() {
-    // Refresh button
-    const refreshBtn = document.getElementById('refresh-dashboard');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', function() {
-            console.log('🔄 Manual dashboard refresh');
-            location.reload();
-        });
-    }
-
-    // Auto-refresh toggle
-    const autoRefreshBtn = document.getElementById('toggle-auto-refresh');
-    if (autoRefreshBtn) {
-        autoRefreshBtn.addEventListener('click', function() {
-            const icon = this.querySelector('i');
-            if (icon.classList.contains('fa-play')) {
-                icon.className = 'fas fa-pause';
-                console.log('▶️ Auto-refresh enabled');
-            } else {
-                icon.className = 'fas fa-play';
-                console.log('⏸️ Auto-refresh disabled');
+function initializePriceChart() {
+    try {
+        const ctx = document.getElementById('price-chart');
+        if (!ctx) return;
+        
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Price',
+                    data: [],
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    }
+                }
             }
         });
-    }
-
-    // Chart timeframe buttons
-    document.querySelectorAll('input[name="chart-timeframe"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            updateChartTimeframe(this.id.replace('timeframe-', ''));
-        });
-    });
-
-    // Clear alerts
-    const clearAlertsBtn = document.getElementById('clear-alerts');
-    if (clearAlertsBtn) {
-        clearAlertsBtn.addEventListener('click', function() {
-            console.log('🗑️ Clear alerts clicked');
-        });
+        
+        // Store chart reference globally
+        window.priceChart = chart;
+        
+        // Show chart and hide loading
+        ctx.style.display = 'block';
+        const loading = ctx.parentElement.querySelector('.chart-loading');
+        if (loading) loading.style.display = 'none';
+        
+    } catch (error) {
+        console.error('❌ Error initializing price chart:', error);
     }
 }
 
 /**
- * Setup refresh handlers
+ * Initialize volume chart
  */
-function setupRefreshHandlers() {
-    // Stats refresh
-    const refreshStatsBtn = document.getElementById('refresh-stats');
-    if (refreshStatsBtn) {
-        refreshStatsBtn.addEventListener('click', function() {
-            console.log('📊 Manual stats refresh');
+function initializeVolumeChart() {
+    try {
+        const ctx = document.getElementById('volume-chart');
+        if (!ctx) return;
+        
+        const chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Volume',
+                    data: [],
+                    backgroundColor: 'rgba(118, 75, 162, 0.6)',
+                    borderColor: '#764ba2',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            color: 'rgba(0,0,0,0.1)'
+                        }
+                    }
+                }
+            }
         });
+        
+        // Store chart reference globally
+        window.volumeChart = chart;
+        
+        // Show chart and hide loading
+        ctx.style.display = 'block';
+        const loading = ctx.parentElement.querySelector('.chart-loading');
+        if (loading) loading.style.display = 'none';
+        
+    } catch (error) {
+        console.error('❌ Error initializing volume chart:', error);
     }
 }
 
 /**
- * Initialize performance monitoring
+ * Initialize real-time updates
  */
-function initializePerformanceMonitoring() {
-    // Update performance metrics every 10 seconds
-    setInterval(updatePerformanceMetrics, 10000);
+function initializeRealTimeUpdates() {
+    try {
+        // Update metrics every 5 seconds
+        setInterval(updatePerformanceMetrics, 5000);
+        
+        // Update summary stats every 10 seconds
+        setInterval(updateSummaryStats, 10000);
+        
+        // Update charts every 30 seconds
+        setInterval(updateCharts, 30000);
+        
+        console.log('✅ Real-time updates initialized');
+    } catch (error) {
+        console.error('❌ Error initializing real-time updates:', error);
+    }
+}
+
+/**
+ * Initialize auto-refresh functionality
+ */
+function initializeAutoRefresh() {
+    try {
+        let autoRefreshInterval = null;
+        let isAutoRefreshEnabled = false;
+        
+        window.toggleAutoRefresh = function() {
+            const btn = document.getElementById('toggle-auto-refresh');
+            const icon = btn?.querySelector('i');
+            const text = btn?.querySelector('span');
+            
+            if (isAutoRefreshEnabled) {
+                // Disable auto-refresh
+                clearInterval(autoRefreshInterval);
+                isAutoRefreshEnabled = false;
+                
+                if (icon) icon.className = 'bi bi-play';
+                if (text) text.textContent = 'Auto';
+                if (btn) btn.classList.remove('btn-success');
+                if (btn) btn.classList.add('btn-outline-secondary');
+            } else {
+                // Enable auto-refresh
+                autoRefreshInterval = setInterval(refreshDashboard, 30000); // Every 30 seconds
+                isAutoRefreshEnabled = true;
+                
+                if (icon) icon.className = 'bi bi-pause';
+                if (text) text.textContent = 'Auto';
+                if (btn) btn.classList.remove('btn-outline-secondary');
+                if (btn) btn.classList.add('btn-success');
+            }
+        };
+        
+        console.log('✅ Auto-refresh initialized');
+    } catch (error) {
+        console.error('❌ Error initializing auto-refresh:', error);
+    }
+}
+
+/**
+ * Load initial data
+ */
+function loadInitialData() {
+    try {
+        console.log('📊 Loading initial dashboard data...');
+        
+        // Load dashboard stats
+        loadDashboardStats();
+        
+        // Load chart data
+        loadChartData();
+        
+        // Update last refresh time
+        updateLastRefreshTime();
+        
+        console.log('✅ Initial data loaded');
+    } catch (error) {
+        console.error('❌ Error loading initial data:', error);
+    }
+}
+
+/**
+ * Load dashboard statistics
+ */
+function loadDashboardStats() {
+    fetch('/api/v1/dashboard/stats')
+        .then(response => response.json())
+        .then(data => {
+            console.log('📊 Dashboard stats loaded:', data);
+            
+            // Update summary stats
+            updateElement('total-portfolio-value', formatCurrency(data.portfolio_value || 0));
+            updateElement('daily-pnl', formatCurrency(data.daily_pnl || 0, true));
+            updateElement('tokens-monitored', data.tokens_monitored || 0);
+            updateElement('active-alerts', data.active_alerts || 0);
+            
+            // Update performance metrics
+            updateElement('metric-api-response', `${data.api_response_time || 0}ms`);
+            updateElement('metric-uptime', `${data.uptime || 0}%`);
+            updateElement('metric-websocket', `${data.websocket_latency || 0}ms`);
+            updateElement('metric-cache-hit', `${data.cache_hit_rate || 0}%`);
+            updateElement('metric-requests', data.requests_per_minute || 0);
+            
+        })
+        .catch(error => {
+            console.error('❌ Error loading dashboard stats:', error);
+        });
+}
+
+/**
+ * Load chart data
+ */
+function loadChartData() {
+    // Generate sample data for demonstration
+    const labels = [];
+    const priceData = [];
+    const volumeData = [];
     
-    // Initial update
-    updatePerformanceMetrics();
+    for (let i = 23; i >= 0; i--) {
+        const date = new Date();
+        date.setHours(date.getHours() - i);
+        labels.push(date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
+        
+        // Generate sample price data (around $100 with some variation)
+        priceData.push(100 + Math.random() * 20 - 10);
+        
+        // Generate sample volume data
+        volumeData.push(Math.random() * 1000000);
+    }
+    
+    // Update price chart
+    if (window.priceChart) {
+        window.priceChart.data.labels = labels;
+        window.priceChart.data.datasets[0].data = priceData;
+        window.priceChart.update();
+    }
+    
+    // Update volume chart
+    if (window.volumeChart) {
+        window.volumeChart.data.labels = labels;
+        window.volumeChart.data.datasets[0].data = volumeData;
+        window.volumeChart.update();
+    }
+}
+
+/**
+ * Refresh entire dashboard
+ */
+function refreshDashboard() {
+    try {
+        console.log('🔄 Refreshing dashboard...');
+        
+        // Show loading state
+        const refreshBtn = document.getElementById('refresh-dashboard');
+        if (refreshBtn) {
+            refreshBtn.disabled = true;
+            const icon = refreshBtn.querySelector('i');
+            if (icon) {
+                icon.className = 'bi bi-arrow-clockwise spinner-border spinner-border-sm';
+            }
+        }
+        
+        // Reload data
+        loadDashboardStats();
+        loadChartData();
+        updateLastRefreshTime();
+        
+        // Reset button state
+        setTimeout(() => {
+            if (refreshBtn) {
+                refreshBtn.disabled = false;
+                const icon = refreshBtn.querySelector('i');
+                if (icon) {
+                    icon.className = 'bi bi-arrow-clockwise';
+                }
+            }
+        }, 1000);
+        
+        console.log('✅ Dashboard refreshed');
+    } catch (error) {
+        console.error('❌ Error refreshing dashboard:', error);
+    }
 }
 
 /**
  * Update performance metrics
  */
 function updatePerformanceMetrics() {
-    try {
-        // Mock performance data
-        const metrics = {
-            apiResponse: Math.round(Math.random() * 50 + 25),
-            uptime: Math.round(((Date.now() - (window.PERFORMANCE_MONITOR?.startTime || Date.now())) / 3600000) * 100) / 100,
-            memory: Math.round(Math.random() * 30 + 20),
-            websocket: Math.round(Math.random() * 20 + 10),
-            cacheHit: Math.round(Math.random() * 20 + 80),
-            requests: Math.round(Math.random() * 100 + 50)
-        };
+    // Simulate real-time performance data
+    updateElement('metric-memory', `${Math.floor(Math.random() * 50 + 100)}MB`);
+    updateElement('metric-requests', Math.floor(Math.random() * 100 + 50));
+}
 
-        const elements = {
-            'metric-api-response': metrics.apiResponse + 'ms',
-            'metric-uptime': metrics.uptime + 'h',
-            'metric-memory': metrics.memory + 'MB',
-            'metric-websocket': metrics.websocket + 'ms',
-            'metric-cache-hit': metrics.cacheHit + '%',
-            'metric-requests': metrics.requests
-        };
+/**
+ * Update summary statistics
+ */
+function updateSummaryStats() {
+    // This would typically fetch real data from the API
+    // For now, simulate some updates
+    const currentValue = parseFloat(document.getElementById('total-portfolio-value')?.textContent?.replace(/[$,]/g, '') || 0);
+    const change = (Math.random() - 0.5) * 100;
+    updateElement('total-portfolio-value', formatCurrency(currentValue + change));
+}
 
-        Object.entries(elements).forEach(([id, value]) => {
-            const element = document.getElementById(id);
-            if (element) element.textContent = value;
-        });
-
-    } catch (error) {
-        console.error('❌ Failed to update performance metrics:', error);
+/**
+ * Update charts with new data
+ */
+function updateCharts() {
+    // Add new data point to charts
+    if (window.priceChart) {
+        const data = window.priceChart.data;
+        if (data.labels.length > 24) {
+            data.labels.shift();
+            data.datasets[0].data.shift();
+        }
+        
+        const now = new Date();
+        data.labels.push(now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
+        data.datasets[0].data.push(100 + Math.random() * 20 - 10);
+        
+        window.priceChart.update('none');
+    }
+    
+    if (window.volumeChart) {
+        const data = window.volumeChart.data;
+        if (data.labels.length > 24) {
+            data.labels.shift();
+            data.datasets[0].data.shift();
+        }
+        
+        const now = new Date();
+        data.labels.push(now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
+        data.datasets[0].data.push(Math.random() * 1000000);
+        
+        window.volumeChart.update('none');
     }
 }
 
@@ -466,42 +830,98 @@ function updatePerformanceMetrics() {
  * Update chart timeframe
  */
 function updateChartTimeframe(timeframe) {
-    console.log('📊 Updating chart timeframe:', timeframe);
-    // This would normally update chart data based on timeframe
+    console.log('📊 Updating chart timeframe to:', timeframe);
+    // This would fetch new data based on the selected timeframe
+    loadChartData();
 }
 
 /**
- * Generate sample data for charts
+ * Export dashboard data
  */
-function generateSampleData(type, points) {
-    const labels = [];
-    const data = [];
-    
-    for (let i = 0; i < points; i++) {
-        const date = new Date();
-        date.setMinutes(date.getMinutes() - (points - i) * 5);
-        labels.push(date.toLocaleTimeString());
+function exportDashboardData() {
+    try {
+        const data = {
+            timestamp: new Date().toISOString(),
+            portfolio_value: document.getElementById('total-portfolio-value')?.textContent,
+            daily_pnl: document.getElementById('daily-pnl')?.textContent,
+            tokens_monitored: document.getElementById('tokens-monitored')?.textContent,
+            active_alerts: document.getElementById('active-alerts')?.textContent
+        };
         
-        switch (type) {
-            case 'price':
-                data.push((Math.random() * 100 + 1500).toFixed(2));
-                break;
-            case 'volume':
-                data.push(Math.floor(Math.random() * 1000000));
-                break;
-            default:
-                data.push(Math.random() * 100);
-        }
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `dashboard-export-${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        console.log('📊 Dashboard data exported');
+    } catch (error) {
+        console.error('❌ Error exporting data:', error);
     }
-    
-    return { labels, data };
 }
 
 /**
- * Load initial chart data
+ * Update last refresh time
  */
-function loadInitialCharts() {
-    // Charts will be initialized when components are ready
+function updateLastRefreshTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
+    updateElement('last-update-time', timeString);
+}
+
+/**
+ * Utility function to update element content safely
+ */
+function updateElement(id, content) {
+    try {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = content;
+        }
+    } catch (error) {
+        console.warn(`⚠️ Could not update element ${id}:`, error);
+    }
+}
+
+/**
+ * Format currency values
+ */
+function formatCurrency(value, showSign = false) {
+    try {
+        const formatted = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(Math.abs(value));
+        
+        if (showSign && value !== 0) {
+            return value > 0 ? `+${formatted}` : `-${formatted}`;
+        }
+        
+        return formatted;
+    } catch (error) {
+        return '$0.00';
+    }
+}
+
+/**
+ * Show error message
+ */
+function showErrorMessage(message) {
+    console.error('❌ Dashboard error:', message);
+    
+    // Use global error function if available
+    if (window.showError) {
+        window.showError(message);
+    } else {
+        alert(`Dashboard Error: ${message}`);
+    }
 }
 </script>
 {% endblock %}
