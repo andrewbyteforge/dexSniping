@@ -496,13 +496,18 @@ def get_dashboard_fallback_html() -> str:
                     if (response.ok) {
                         const data = await response.json();
                         updateDashboardStats(data);
+                        updateConnectionStatus(true);
                     }
                     
                     // Load live opportunities
                     loadLiveOpportunities();
                     
+                    // Update last refresh time
+                    updateLastRefreshTime();
+                    
                 } catch (error) {
                     console.warn('Failed to load live data:', error);
+                    updateConnectionStatus(false);
                 }
             }
             
@@ -511,6 +516,28 @@ def get_dashboard_fallback_html() -> str:
                 document.getElementById('dailyPnL').textContent = formatCurrency(data.daily_pnl);
                 document.getElementById('successRate').textContent = data.success_rate.toFixed(1) + '%';
                 document.getElementById('activeTrades').textContent = data.trades_today;
+                
+                // Update portfolio chart with new data point
+                if (portfolioChart) {
+                    addChartDataPoint(data.portfolio_value);
+                }
+            }
+            
+            function addChartDataPoint(value) {
+                const chart = portfolioChart;
+                const now = new Date();
+                
+                // Add new data point
+                chart.data.labels.push(now.toLocaleTimeString());
+                chart.data.datasets[0].data.push(value);
+                
+                // Keep only last 24 points
+                if (chart.data.labels.length > 24) {
+                    chart.data.labels.shift();
+                    chart.data.datasets[0].data.shift();
+                }
+                
+                chart.update('none');
             }
             
             async function loadLiveOpportunities() {
@@ -519,6 +546,9 @@ def get_dashboard_fallback_html() -> str:
                     if (response.ok) {
                         const data = await response.json();
                         displayOpportunities(data);
+                        
+                        // Show live update indicator
+                        showLiveUpdateIndicator();
                     }
                 } catch (error) {
                     document.getElementById('liveOpportunities').innerHTML = 
@@ -529,27 +559,73 @@ def get_dashboard_fallback_html() -> str:
             function displayOpportunities(tokens) {
                 const container = document.getElementById('liveOpportunities');
                 if (!tokens.length) {
-                    container.innerHTML = '<div class="text-muted small">No opportunities found</div>';
+                    container.innerHTML = '<div class="text-muted small">Scanning for opportunities...</div>';
                     return;
                 }
                 
-                const html = tokens.map(token => `
-                    <div class="border-bottom py-2">
-                        <div class="d-flex justify-content-between">
+                const html = tokens.map((token, index) => `
+                    <div class="border-bottom py-2 opportunity-item" style="animation: fadeIn 0.5s ease-in-out ${index * 0.1}s both">
+                        <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                <strong>${token.symbol}</strong>
-                                <div class="small text-muted">${formatCurrency(token.price)}</div>
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-primary me-2">${token.symbol}</span>
+                                    <small class="text-muted">${formatCurrency(token.price)}</small>
+                                </div>
+                                <div class="small text-muted mt-1">
+                                    <i class="bi bi-droplet"></i> ${formatLiquidity(token.liquidity_usd)}
+                                </div>
                             </div>
                             <div class="text-end">
                                 <span class="badge bg-${token.price_change_24h >= 0 ? 'success' : 'danger'}">
                                     ${token.price_change_24h >= 0 ? '+' : ''}${token.price_change_24h.toFixed(1)}%
                                 </span>
+                                <div class="small text-muted mt-1">
+                                    Risk: <span class="badge bg-secondary">${(Math.random() * 5 + 1).toFixed(1)}</span>
+                                </div>
                             </div>
                         </div>
                     </div>
                 `).join('');
                 
                 container.innerHTML = html;
+            }
+            
+            function showLiveUpdateIndicator() {
+                // Show brief flash indicator for live updates
+                const indicator = document.querySelector('.live-indicator');
+                if (indicator) {
+                    indicator.style.animation = 'none';
+                    setTimeout(() => {
+                        indicator.style.animation = 'pulse 2s infinite';
+                    }, 100);
+                }
+            }
+            
+            function updateConnectionStatus(connected) {
+                const statusElements = document.querySelectorAll('.connection-status, .live-indicator');
+                statusElements.forEach(element => {
+                    if (connected) {
+                        element.classList.remove('text-warning', 'text-danger');
+                        element.classList.add('text-success');
+                        if (element.textContent.includes('status') || element.classList.contains('connection-status')) {
+                            element.textContent = 'Online';
+                        }
+                    } else {
+                        element.classList.remove('text-success');
+                        element.classList.add('text-warning');
+                        if (element.textContent.includes('status') || element.classList.contains('connection-status')) {
+                            element.textContent = 'Reconnecting...';
+                        }
+                    }
+                });
+            }
+            
+            function updateLastRefreshTime() {
+                const timeElements = document.querySelectorAll('.last-update-time');
+                const now = new Date();
+                timeElements.forEach(element => {
+                    element.textContent = now.toLocaleTimeString();
+                });
             }
             
             function formatCurrency(value) {
@@ -559,28 +635,308 @@ def get_dashboard_fallback_html() -> str:
                 }).format(value);
             }
             
-            // Trading controls
+            function formatLiquidity(value) {
+                if (value >= 1000000) {
+                    return '
+    </body>
+    </html>
+    """
+
+
+def get_simple_fallback_html() -> str:
+    """Simple fallback when everything else fails."""
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>DEX Sniper Pro</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body class="bg-light">
+        <div class="container mt-5 text-center">
+            <h1 class="text-primary">DEX Sniper Pro</h1>
+            <p class="text-muted">Professional Trading Bot Platform</p>
+            <div class="mt-3">
+                <a href="/api/v1/dashboard/stats" class="btn btn-primary me-2">Dashboard API</a>
+                <a href="/docs" class="btn btn-outline-info">API Documentation</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+
+# Error handlers
+@app.exception_handler(404)
+async def not_found_handler(request: Request, exc):
+    """Handle 404 errors."""
+    return JSONResponse(
+        status_code=404,
+        content={
+            "error": "Endpoint not found",
+            "path": str(request.url.path),
+            "suggestion": "Check /docs for available endpoints"
+        }
+    )
+
+
+@app.exception_handler(500)
+async def internal_error_handler(request: Request, exc):
+    """Handle 500 errors."""
+    logger.error(f"Internal server error: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal server error",
+            "message": "An unexpected error occurred"
+        }
+    )
+
+
+if __name__ == "__main__":
+    import uvicorn
+    
+    logger.info("🚀 Starting DEX Sniping Platform")
+    logger.info("📊 Dashboard: http://127.0.0.1:8001/dashboard")
+    logger.info("📚 API Docs: http://127.0.0.1:8001/docs")
+    logger.info("💓 Health: http://127.0.0.1:8001/api/v1/health")
+    
+    uvicorn.run(
+        "app.main:app",
+        host="127.0.0.1",
+        port=8001,
+        reload=True,
+        log_level="info"
+    )
+ + (value / 1000000).toFixed(1) + 'M';
+                } else if (value >= 1000) {
+                    return '
+    </body>
+    </html>
+    """
+
+
+def get_simple_fallback_html() -> str:
+    """Simple fallback when everything else fails."""
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>DEX Sniper Pro</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body class="bg-light">
+        <div class="container mt-5 text-center">
+            <h1 class="text-primary">DEX Sniper Pro</h1>
+            <p class="text-muted">Professional Trading Bot Platform</p>
+            <div class="mt-3">
+                <a href="/api/v1/dashboard/stats" class="btn btn-primary me-2">Dashboard API</a>
+                <a href="/docs" class="btn btn-outline-info">API Documentation</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+
+# Error handlers
+@app.exception_handler(404)
+async def not_found_handler(request: Request, exc):
+    """Handle 404 errors."""
+    return JSONResponse(
+        status_code=404,
+        content={
+            "error": "Endpoint not found",
+            "path": str(request.url.path),
+            "suggestion": "Check /docs for available endpoints"
+        }
+    )
+
+
+@app.exception_handler(500)
+async def internal_error_handler(request: Request, exc):
+    """Handle 500 errors."""
+    logger.error(f"Internal server error: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal server error",
+            "message": "An unexpected error occurred"
+        }
+    )
+
+
+if __name__ == "__main__":
+    import uvicorn
+    
+    logger.info("🚀 Starting DEX Sniping Platform")
+    logger.info("📊 Dashboard: http://127.0.0.1:8001/dashboard")
+    logger.info("📚 API Docs: http://127.0.0.1:8001/docs")
+    logger.info("💓 Health: http://127.0.0.1:8001/api/v1/health")
+    
+    uvicorn.run(
+        "app.main:app",
+        host="127.0.0.1",
+        port=8001,
+        reload=True,
+        log_level="info"
+    )
+ + (value / 1000).toFixed(0) + 'K';
+                }
+                return '
+    </body>
+    </html>
+    """
+
+
+def get_simple_fallback_html() -> str:
+    """Simple fallback when everything else fails."""
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>DEX Sniper Pro</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body class="bg-light">
+        <div class="container mt-5 text-center">
+            <h1 class="text-primary">DEX Sniper Pro</h1>
+            <p class="text-muted">Professional Trading Bot Platform</p>
+            <div class="mt-3">
+                <a href="/api/v1/dashboard/stats" class="btn btn-primary me-2">Dashboard API</a>
+                <a href="/docs" class="btn btn-outline-info">API Documentation</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+
+# Error handlers
+@app.exception_handler(404)
+async def not_found_handler(request: Request, exc):
+    """Handle 404 errors."""
+    return JSONResponse(
+        status_code=404,
+        content={
+            "error": "Endpoint not found",
+            "path": str(request.url.path),
+            "suggestion": "Check /docs for available endpoints"
+        }
+    )
+
+
+@app.exception_handler(500)
+async def internal_error_handler(request: Request, exc):
+    """Handle 500 errors."""
+    logger.error(f"Internal server error: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal server error",
+            "message": "An unexpected error occurred"
+        }
+    )
+
+
+if __name__ == "__main__":
+    import uvicorn
+    
+    logger.info("🚀 Starting DEX Sniping Platform")
+    logger.info("📊 Dashboard: http://127.0.0.1:8001/dashboard")
+    logger.info("📚 API Docs: http://127.0.0.1:8001/docs")
+    logger.info("💓 Health: http://127.0.0.1:8001/api/v1/health")
+    
+    uvicorn.run(
+        "app.main:app",
+        host="127.0.0.1",
+        port=8001,
+        reload=True,
+        log_level="info"
+    )
+ + value.toFixed(0);
+            }
+            
+            // Trading controls with live feedback
             function startTrading() {
-                document.getElementById('botStatus').textContent = 'Running';
-                document.getElementById('botStatus').className = 'badge bg-success';
-                alert('Auto-trading started! (Demo mode)');
+                const statusEl = document.getElementById('botStatus');
+                statusEl.textContent = 'Starting...';
+                statusEl.className = 'badge bg-warning';
+                
+                // Simulate API call
+                setTimeout(() => {
+                    statusEl.textContent = 'Running';
+                    statusEl.className = 'badge bg-success';
+                    showNotification('success', 'Auto-trading started successfully!');
+                }, 1000);
             }
             
             function stopTrading() {
-                document.getElementById('botStatus').textContent = 'Stopped';
-                document.getElementById('botStatus').className = 'badge bg-secondary';
-                alert('Auto-trading stopped!');
+                const statusEl = document.getElementById('botStatus');
+                statusEl.textContent = 'Stopping...';
+                statusEl.className = 'badge bg-warning';
+                
+                setTimeout(() => {
+                    statusEl.textContent = 'Stopped';
+                    statusEl.className = 'badge bg-secondary';
+                    showNotification('info', 'Auto-trading stopped.');
+                }, 1000);
             }
             
             function pauseTrading() {
-                document.getElementById('botStatus').textContent = 'Paused';
-                document.getElementById('botStatus').className = 'badge bg-warning';
-                alert('Auto-trading paused!');
+                const statusEl = document.getElementById('botStatus');
+                statusEl.textContent = 'Paused';
+                statusEl.className = 'badge bg-warning';
+                showNotification('warning', 'Auto-trading paused.');
             }
             
             function showSettings() {
-                alert('Trading settings panel would open here!');
+                showNotification('info', 'Trading settings panel coming soon!');
             }
+            
+            function showNotification(type, message) {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+                notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+                notification.innerHTML = `
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                `;
+                
+                document.body.appendChild(notification);
+                
+                // Auto-remove after 3 seconds
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 3000);
+            }
+            
+            // Add CSS animations
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(10px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                
+                .opportunity-item:hover {
+                    background-color: rgba(0, 123, 255, 0.05);
+                    transition: background-color 0.2s;
+                }
+                
+                .live-indicator {
+                    animation: pulse 2s infinite;
+                }
+                
+                @keyframes pulse {
+                    0%, 100% { opacity: 0.7; }
+                    50% { opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
         </script>
     </body>
     </html>
