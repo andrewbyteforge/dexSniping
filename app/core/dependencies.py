@@ -17,6 +17,7 @@ from app.core.blockchain.multi_chain_manager import MultiChainManager
 from app.config import settings
 from app.utils.exceptions import APIRateLimitError, APIUnauthorizedError
 from app.utils.logger import setup_logger
+from app.models.database import get_db
 
 logger = setup_logger(__name__)
 

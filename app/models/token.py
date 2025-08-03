@@ -2,6 +2,7 @@
 File: app/models/token.py
 
 Database models for token storage and discovery tracking.
+FIXED: Removed 'metadata' column names to avoid SQLAlchemy conflict.
 """
 
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, Numeric, ForeignKey, Index
@@ -57,8 +58,8 @@ class Token(Base):
     is_honeypot = Column(Boolean, default=False, nullable=False)
     is_flagged = Column(Boolean, default=False, nullable=False)
     
-    # Metadata
-    metadata = Column(Text, nullable=True)  # JSON string for additional data
+    # Additional data (renamed from metadata to avoid SQLAlchemy conflict)
+    additional_data = Column(Text, nullable=True)  # JSON string for additional data
     notes = Column(Text, nullable=True)
     
     # Timestamps
@@ -193,7 +194,7 @@ class RiskAssessment(Base):
     # Assessment details
     warnings = Column(Text, nullable=True)  # JSON array of warnings
     recommendations = Column(Text, nullable=True)  # JSON array of recommendations
-    metadata = Column(Text, nullable=True)  # JSON object with additional data
+    additional_data = Column(Text, nullable=True)  # JSON object with additional data (renamed from metadata)
     
     # Assessment info
     assessment_version = Column(String(20), default="1.0", nullable=False)

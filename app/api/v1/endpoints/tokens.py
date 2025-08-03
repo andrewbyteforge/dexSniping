@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from typing import List, Optional, Dict, Any
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.dependencies import (
+from app.core.dependencies import (
     get_database_session,
     get_multi_chain_manager,
     rate_limiter,

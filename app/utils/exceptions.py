@@ -43,3 +43,12 @@ class APIException(DexSnipingException):
 class ValidationError(DexSnipingException):
     """Exception raised when data validation fails."""
     pass
+
+class APIRateLimitError(DexSnipingException):
+    """Exception raised when API rate limit is exceeded."""
+    pass
+
+
+class APIUnauthorizedError(DexSnipingException):
+    """Exception raised when API authentication fails."""
+    pass
