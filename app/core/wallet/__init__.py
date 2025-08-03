@@ -1,1 +1,1 @@
-"""Package initialization."""
+"""Wallet module."""
