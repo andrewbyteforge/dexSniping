@@ -1,5 +1,5 @@
 <!-- Statistics Cards Component -->
-<!-- File: frontend/templates/components/stats-cards.html -->
+<!-- File: frontend/templates/base/components/stats-cards.html -->
 <!-- Purpose: Reusable statistics cards for dashboard overview -->
 
 <div class="row mb-4" id="stats-cards-container">
@@ -51,13 +51,15 @@
                     <span>Loading...</span>
                 </div>
             </div>
-            <div class="stat-actions">
-                <button class="btn btn-sm btn-outline-success" 
-                        onclick="StatsCards.viewTrades()"
-                        title="View all trades">
-                    <i class="bi bi-eye" aria-hidden="true"></i>
-                    View All
-                </button>
+            <div class="stat-breakdown" style="display: none;">
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Profitable:</span>
+                    <span class="breakdown-value text-success" id="stat-trades-profitable">--</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">At Risk:</span>
+                    <span class="breakdown-value text-warning" id="stat-trades-risk">--</span>
+                </div>
             </div>
         </div>
     </div>
@@ -72,14 +74,14 @@
                 <div class="stat-value text-info" id="stat-arbitrage-opportunities">
                     <span class="loading-spinner"></span>
                 </div>
-                <div class="stat-label">Arbitrage Opportunities</div>
-                <div class="stat-change" id="stat-arbitrage-change">
-                    <span class="pulse-dot"></span>
-                    <span>Live Scanning</span>
+                <div class="stat-label">Arbitrage Ops</div>
+                <div class="stat-change positive" id="stat-arbitrage-change">
+                    <i class="bi bi-trending-up" aria-hidden="true"></i>
+                    <span>Loading...</span>
                 </div>
             </div>
             <div class="stat-alerts" id="arbitrage-alerts">
-                <!-- Dynamic arbitrage alerts will be inserted here -->
+                <!-- High-value arbitrage alerts will be inserted here -->
             </div>
         </div>
     </div>
@@ -96,11 +98,10 @@
                 </div>
                 <div class="stat-label">Portfolio Value</div>
                 <div class="stat-change" id="stat-portfolio-change">
-                    <i class="bi bi-arrow-up" aria-hidden="true"></i>
                     <span>Loading...</span>
                 </div>
             </div>
-            <div class="stat-breakdown">
+            <div class="stat-breakdown" style="display: none;">
                 <div class="breakdown-item">
                     <span class="breakdown-label">24h P&L:</span>
                     <span class="breakdown-value" id="stat-portfolio-pnl">--</span>
@@ -212,7 +213,7 @@
 <div class="row mb-4">
     <div class="col-12">
         <div class="stats-controls">
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <div class="stats-actions">
                     <button class="btn btn-sm btn-outline-primary" 
                             onclick="StatsCards.toggleAdditionalStats()"
@@ -225,6 +226,12 @@
                             id="refresh-stats">
                         <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
                         Refresh
+                    </button>
+                    <button class="btn btn-sm btn-outline-info" 
+                            onclick="StatsCards.toggleAutoRefresh()"
+                            id="toggle-auto-refresh">
+                        <i class="bi bi-clock" aria-hidden="true"></i>
+                        Auto-Refresh: <span id="auto-refresh-status">OFF</span>
                     </button>
                 </div>
                 <div class="stats-info">
@@ -251,6 +258,7 @@
     transition: all 0.3s ease;
     height: 100%;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .stat-card::before {
@@ -284,12 +292,33 @@
     box-shadow: 0 8px 25px rgba(255, 193, 7, 0.3);
 }
 
+.stat-card[data-stat-type="networks"]:hover {
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.stat-card[data-stat-type="risk"]:hover {
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+}
+
+.stat-card[data-stat-type="performance"]:hover {
+    box-shadow: 0 8px 25px rgba(23, 162, 184, 0.3);
+}
+
+.stat-card[data-stat-type="health"]:hover {
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+}
+
 .stat-icon {
     position: absolute;
     top: 1rem;
     right: 1rem;
     font-size: 2rem;
     opacity: 0.2;
+    transition: opacity 0.3s ease;
+}
+
+.stat-card:hover .stat-icon {
+    opacity: 0.3;
 }
 
 .stat-content {
@@ -324,9 +353,17 @@
     gap: 0.25rem;
 }
 
-.stat-change.positive { color: #28a745; }
-.stat-change.negative { color: #dc3545; }
-.stat-change.neutral { color: #6c757d; }
+.stat-change.positive { 
+    color: #28a745; 
+}
+
+.stat-change.negative { 
+    color: #dc3545; 
+}
+
+.stat-change.neutral { 
+    color: #6c757d; 
+}
 
 .stat-progress {
     margin-top: 1rem;
@@ -335,6 +372,7 @@
 .progress-sm {
     height: 4px;
     margin-bottom: 0.5rem;
+    border-radius: 2px;
 }
 
 .stat-actions {
@@ -345,6 +383,7 @@
     margin-top: 0.5rem;
     max-height: 60px;
     overflow-y: auto;
+    font-size: 0.75rem;
 }
 
 .stat-breakdown {
@@ -381,32 +420,49 @@
     border-radius: 50%;
     background: #28a745;
     title: attr(data-network);
+    transition: all 0.3s ease;
 }
 
 .network-indicator.offline {
     background: #dc3545;
 }
 
+.network-indicator.warning {
+    background: #ffc107;
+}
+
 .risk-distribution {
     margin-top: 0.5rem;
     display: flex;
     gap: 0.25rem;
+    height: 4px;
+    border-radius: 2px;
+    overflow: hidden;
 }
 
 .risk-bar {
     flex: 1;
-    height: 4px;
-    border-radius: 2px;
+    height: 100%;
+    transition: flex 0.3s ease;
 }
 
-.risk-bar.low { background: #28a745; }
-.risk-bar.medium { background: #ffc107; }
-.risk-bar.high { background: #dc3545; }
+.risk-bar.low { 
+    background: #28a745; 
+}
+
+.risk-bar.medium { 
+    background: #ffc107; 
+}
+
+.risk-bar.high { 
+    background: #dc3545; 
+}
 
 .health-indicators {
     display: flex;
     gap: 0.75rem;
     margin-top: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .health-item {
@@ -423,10 +479,12 @@
 }
 
 .stats-controls {
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.9);
     border-radius: 12px;
     padding: 1rem;
     backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 /* Loading state */
@@ -438,6 +496,21 @@
     opacity: 0.7;
 }
 
+.loading-spinner {
+    display: inline-block;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 /* Error state */
 .stat-card.error {
     border-left: 4px solid #dc3545;
@@ -447,7 +520,764 @@
     color: #dc3545;
 }
 
+.stat-card.error .stat-value::after {
+    content: "!";
+    margin-left: 0.5rem;
+    font-size: 1rem;
+}
+
+/* Success state */
+.stat-card.success {
+    border-left: 4px solid #28a745;
+}
+
+/* Warning state */
+.stat-card.warning {
+    border-left: 4px solid #ffc107;
+}
+
+/* Interactive states */
+.stat-card.clickable:hover {
+    cursor: pointer;
+}
+
+.stat-card.expanded .stat-breakdown,
+.stat-card.expanded .stat-alerts {
+    display: block !important;
+}
+
+/* Auto-refresh indicator */
+.auto-refresh-active {
+    position: relative;
+}
+
+.auto-refresh-active::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    background: #28a745;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 0.5;
+        transform: scale(1.2);
+    }
+    100% { 
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     .stat-value {
-        font-size
+        font-size: 2rem;
+        min-height: 2.5rem;
+    }
+    
+    .stat-icon {
+        font-size: 1.5rem;
+        top: 0.75rem;
+        right: 0.75rem;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .stats-controls {
+        padding: 0.75rem;
+    }
+    
+    .stats-actions {
+        margin-bottom: 0.5rem;
+    }
+    
+    .stats-actions .btn {
+        margin-bottom: 0.25rem;
+        font-size: 0.8rem;
+    }
+    
+    .health-indicators {
+        gap: 0.5rem;
+    }
+    
+    .breakdown-item {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .stat-value {
+        font-size: 1.8rem;
+        min-height: 2rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+    
+    .stat-change {
+        font-size: 0.8rem;
+    }
+    
+    .stats-controls .d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .stats-info {
+        margin-top: 0.5rem;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .stat-card {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+    
+    .stat-label {
+        color: #a0aec0;
+    }
+    
+    .breakdown-label {
+        color: #a0aec0;
+    }
+    
+    .stats-controls {
+        background: rgba(45, 55, 72, 0.9);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .stat-breakdown {
+        border-top-color: #4a5568;
+    }
+}
+
+/* Accessibility improvements */
+.stat-card:focus {
+    outline: 2px solid #007bff;
+    outline-offset: 2px;
+}
+
+.stat-card[aria-pressed="true"] {
+    transform: translateY(-2px);
+}
+
+/* Print styles */
+@media print {
+    .stat-card {
+        break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+    
+    .stats-controls {
+        display: none;
+    }
+    
+    .stat-card:hover {
+        transform: none;
+    }
+}
+</style>
+
+<!-- Embedded JavaScript for Stats Cards Functionality -->
+<script>
+/**
+ * StatsCards Module
+ * File: Embedded in frontend/templates/base/components/stats-cards.html
+ * Purpose: Interactive statistics cards with real-time updates
+ */
+window.StatsCards = (function() {
+    'use strict';
+    
+    // Configuration
+    const CONFIG = {
+        API_BASE_URL: '/api/v1',
+        REFRESH_INTERVAL: 30000, // 30 seconds
+        ERROR_RETRY_DELAY: 5000, // 5 seconds
+        ANIMATION_DURATION: 300,
+        MAX_RETRIES: 3
+    };
+    
+    // State management
+    let state = {
+        autoRefresh: false,
+        refreshInterval: null,
+        lastUpdated: null,
+        retryCount: 0,
+        isExpanded: false
+    };
+    
+    // DOM elements cache
+    const elements = {};
+    
+    /**
+     * Initialize the stats cards module
+     */
+    function init() {
+        try {
+            cacheElements();
+            attachEventListeners();
+            loadInitialData();
+            updateLastUpdatedTime();
+            
+            console.log('StatsCards module initialized successfully');
+        } catch (error) {
+            console.error('Failed to initialize StatsCards:', error);
+            showError('Initialization failed');
+        }
+    }
+    
+    /**
+     * Cache DOM elements for performance
+     */
+    function cacheElements() {
+        elements.container = document.getElementById('stats-cards-container');
+        elements.additionalStats = document.getElementById('additional-stats');
+        elements.toggleButton = document.getElementById('toggle-additional-stats');
+        elements.refreshButton = document.getElementById('refresh-stats');
+        elements.autoRefreshButton = document.getElementById('toggle-auto-refresh');
+        elements.autoRefreshStatus = document.getElementById('auto-refresh-status');
+        elements.lastUpdated = document.getElementById('stats-last-updated');
+        
+        // Cache stat value elements
+        elements.stats = {
+            tokensDiscovered: document.getElementById('stat-tokens-discovered'),
+            activeTrades: document.getElementById('stat-active-trades'),
+            arbitrageOpportunities: document.getElementById('stat-arbitrage-opportunities'),
+            portfolioValue: document.getElementById('stat-portfolio-value'),
+            activeNetworks: document.getElementById('stat-active-networks'),
+            avgRiskScore: document.getElementById('stat-avg-risk-score'),
+            responseTime: document.getElementById('stat-response-time'),
+            systemHealth: document.getElementById('stat-system-health')
+        };
+        
+        // Cache change elements
+        elements.changes = {
+            tokens: document.getElementById('stat-tokens-change'),
+            trades: document.getElementById('stat-trades-change'),
+            arbitrage: document.getElementById('stat-arbitrage-change'),
+            portfolio: document.getElementById('stat-portfolio-change'),
+            risk: document.getElementById('stat-risk-change'),
+            performance: document.getElementById('stat-performance-change')
+        };
+    }
+    
+    /**
+     * Attach event listeners
+     */
+    function attachEventListeners() {
+        // Toggle additional stats
+        if (elements.toggleButton) {
+            elements.toggleButton.addEventListener('click', toggleAdditionalStats);
+        }
+        
+        // Refresh stats
+        if (elements.refreshButton) {
+            elements.refreshButton.addEventListener('click', refreshAll);
+        }
+        
+        // Auto-refresh toggle
+        if (elements.autoRefreshButton) {
+            elements.autoRefreshButton.addEventListener('click', toggleAutoRefresh);
+        }
+        
+        // Card click handlers for expansion
+        document.querySelectorAll('.stat-card[data-stat-type]').forEach(card => {
+            card.addEventListener('click', handleCardClick);
+            card.setAttribute('tabindex', '0');
+            card.setAttribute('role', 'button');
+            
+            // Keyboard accessibility
+            card.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleCardClick.call(card, e);
+                }
+            });
+        });
+        
+        // Window visibility change for auto-refresh
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+    
+    /**
+     * Handle card click for expansion
+     */
+    function handleCardClick(event) {
+        const card = event.currentTarget;
+        const breakdown = card.querySelector('.stat-breakdown');
+        const alerts = card.querySelector('.stat-alerts');
+        
+        if (breakdown || alerts) {
+            card.classList.toggle('expanded');
+            const isExpanded = card.classList.contains('expanded');
+            card.setAttribute('aria-pressed', isExpanded);
+            
+            // Animate expansion
+            if (breakdown) {
+                breakdown.style.display = isExpanded ? 'block' : 'none';
+            }
+            if (alerts) {
+                alerts.style.display = isExpanded ? 'block' : 'none';
+            }
+        }
+    }
+    
+    /**
+     * Load initial data from API
+     */
+    async function loadInitialData() {
+        showLoading();
+        
+        try {
+            const data = await fetchDashboardStats();
+            updateStatsCards(data);
+            state.retryCount = 0;
+        } catch (error) {
+            console.error('Failed to load initial data:', error);
+            handleAPIError(error);
+        } finally {
+            hideLoading();
+        }
+    }
+    
+    /**
+     * Fetch dashboard statistics from API
+     */
+    async function fetchDashboardStats() {
+        try {
+            const response = await fetch(`${CONFIG.API_BASE_URL}/dashboard/stats`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('API request failed:', error);
+            throw error;
+        }
+    }
+    
+    /**
+     * Update stats cards with new data
+     */
+    function updateStatsCards(data) {
+        try {
+            // Update basic stats
+            updateStatValue('tokensDiscovered', data.tokens_discovered || 0);
+            updateStatValue('activeTrades', data.active_trades || 0);
+            updateStatValue('arbitrageOpportunities', data.arbitrage_opportunities || 0);
+            updateStatValue('portfolioValue', formatCurrency(data.portfolio_value || 0));
+            updateStatValue('systemHealth', `${data.system_health || 100}%`);
+            
+            // Update changes
+            updateStatChange('tokens', data.tokens_change || 0);
+            updateStatChange('trades', data.trades_change || 0);
+            updateStatChange('arbitrage', data.arbitrage_change || 0);
+            updateStatChange('portfolio', data.portfolio_change || 0);
+            
+            // Update performance metrics
+            if (data.avg_response_time) {
+                updateStatValue('responseTime', `${data.avg_response_time}ms`);
+            }
+            
+            if (data.avg_risk_score) {
+                updateStatValue('avgRiskScore', data.avg_risk_score.toFixed(1));
+            }
+            
+            // Update progress bars
+            updateProgressBar('stat-tokens-progress', data.tokens_progress || 0);
+            
+            // Update network indicators
+            updateNetworkIndicators(data.network_status || {});
+            
+            // Update health indicators
+            updateHealthIndicators(data.health_status || {});
+            
+            // Update risk distribution
+            updateRiskDistribution(data.risk_distribution || {});
+            
+            state.lastUpdated = new Date();
+            updateLastUpdatedTime();
+            
+            // Remove error state from cards
+            document.querySelectorAll('.stat-card.error').forEach(card => {
+                card.classList.remove('error');
+            });
+            
+        } catch (error) {
+            console.error('Failed to update stats cards:', error);
+            showError('Failed to update statistics');
+        }
+    }
+    
+    /**
+     * Update individual stat value
+     */
+    function updateStatValue(statKey, value) {
+        const element = elements.stats[statKey];
+        if (element) {
+            const spinner = element.querySelector('.loading-spinner');
+            if (spinner) {
+                spinner.remove();
+            }
+            element.textContent = value;
+        }
+    }
+    
+    /**
+     * Update stat change indicator
+     */
+    function updateStatChange(statKey, changeValue) {
+        const element = elements.changes[statKey];
+        if (!element) return;
+        
+        const span = element.querySelector('span');
+        const icon = element.querySelector('i');
+        
+        // Remove existing classes
+        element.classList.remove('positive', 'negative', 'neutral');
+        
+        if (changeValue > 0) {
+            element.classList.add('positive');
+            if (icon) {
+                icon.className = 'bi bi-arrow-up';
+            }
+            if (span) {
+                span.textContent = `+${Math.abs(changeValue)}`;
+            }
+        } else if (changeValue < 0) {
+            element.classList.add('negative');
+            if (icon) {
+                icon.className = 'bi bi-arrow-down';
+            }
+            if (span) {
+                span.textContent = `-${Math.abs(changeValue)}`;
+            }
+        } else {
+            element.classList.add('neutral');
+            if (icon) {
+                icon.className = 'bi bi-dash';
+            }
+            if (span) {
+                span.textContent = 'No change';
+            }
+        }
+    }
+    
+    /**
+     * Update progress bar
+     */
+    function updateProgressBar(elementId, percentage) {
+        const progressBar = document.getElementById(elementId);
+        if (progressBar) {
+            const clampedPercentage = Math.max(0, Math.min(100, percentage));
+            progressBar.style.width = `${clampedPercentage}%`;
+            progressBar.setAttribute('aria-valuenow', clampedPercentage);
+        }
+    }
+    
+    /**
+     * Update network status indicators
+     */
+    function updateNetworkIndicators(networkStatus) {
+        const container = document.getElementById('network-status-indicators');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        Object.entries(networkStatus).forEach(([network, status]) => {
+            const indicator = document.createElement('div');
+            indicator.className = `network-indicator ${status === 'offline' ? 'offline' : ''}`;
+            indicator.setAttribute('data-network', network);
+            indicator.title = `${network}: ${status}`;
+            container.appendChild(indicator);
+        });
+    }
+    
+    /**
+     * Update health indicators
+     */
+    function updateHealthIndicators(healthStatus) {
+        const indicators = {
+            'API': healthStatus.api || 'healthy',
+            'WebSocket': healthStatus.websocket || 'healthy',
+            'Database': healthStatus.database || 'healthy'
+        };
+        
+        Object.entries(indicators).forEach(([service, status]) => {
+            const dot = document.querySelector(`.health-item:contains('${service}') .health-dot`);
+            if (dot) {
+                dot.className = `health-dot bg-${status === 'healthy' ? 'success' : 'danger'}`;
+            }
+        });
+    }
+    
+    /**
+     * Update risk distribution visualization
+     */
+    function updateRiskDistribution(riskData) {
+        const container = document.getElementById('risk-distribution');
+        if (!container) return;
+        
+        const { low = 60, medium = 30, high = 10 } = riskData;
+        
+        container.innerHTML = `
+            <div class="risk-bar low" style="flex: ${low}"></div>
+            <div class="risk-bar medium" style="flex: ${medium}"></div>
+            <div class="risk-bar high" style="flex: ${high}"></div>
+        `;
+    }
+    
+    /**
+     * Show loading state
+     */
+    function showLoading() {
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.classList.add('loading');
+        });
+    }
+    
+    /**
+     * Hide loading state
+     */
+    function hideLoading() {
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.classList.remove('loading');
+        });
+    }
+    
+    /**
+     * Show error state
+     */
+    function showError(message) {
+        console.error('StatsCards error:', message);
+        
+        document.querySelectorAll('.stat-card').forEach(card => {
+            card.classList.add('error');
+        });
+        
+        // Show error in stat values
+        Object.values(elements.stats).forEach(element => {
+            if (element && element.querySelector('.loading-spinner')) {
+                element.innerHTML = '<span class="text-danger">Error</span>';
+            }
+        });
+    }
+    
+    /**
+     * Handle API errors with retry logic
+     */
+    function handleAPIError(error) {
+        state.retryCount++;
+        
+        if (state.retryCount <= CONFIG.MAX_RETRIES) {
+            console.log(`Retrying API request (${state.retryCount}/${CONFIG.MAX_RETRIES})...`);
+            setTimeout(() => {
+                loadInitialData();
+            }, CONFIG.ERROR_RETRY_DELAY * state.retryCount);
+        } else {
+            showError('Unable to load data after multiple attempts');
+        }
+    }
+    
+    /**
+     * Toggle additional statistics visibility
+     */
+    function toggleAdditionalStats() {
+        if (!elements.additionalStats || !elements.toggleButton) return;
+        
+        const isVisible = elements.additionalStats.style.display !== 'none';
+        const icon = elements.toggleButton.querySelector('i');
+        
+        if (isVisible) {
+            elements.additionalStats.style.display = 'none';
+            elements.toggleButton.innerHTML = '<i class="bi bi-plus-circle" aria-hidden="true"></i> Show More Stats';
+            state.isExpanded = false;
+        } else {
+            elements.additionalStats.style.display = 'block';
+            elements.toggleButton.innerHTML = '<i class="bi bi-dash-circle" aria-hidden="true"></i> Show Less Stats';
+            state.isExpanded = true;
+        }
+    }
+    
+    /**
+     * Refresh all statistics
+     */
+    function refreshAll() {
+        if (elements.refreshButton) {
+            elements.refreshButton.disabled = true;
+            const originalText = elements.refreshButton.innerHTML;
+            elements.refreshButton.innerHTML = '<i class="bi bi-arrow-clockwise spin" aria-hidden="true"></i> Refreshing...';
+            
+            loadInitialData().finally(() => {
+                elements.refreshButton.disabled = false;
+                elements.refreshButton.innerHTML = originalText;
+            });
+        }
+    }
+    
+    /**
+     * Toggle auto-refresh functionality
+     */
+    function toggleAutoRefresh() {
+        state.autoRefresh = !state.autoRefresh;
+        
+        if (state.autoRefresh) {
+            startAutoRefresh();
+            if (elements.autoRefreshStatus) {
+                elements.autoRefreshStatus.textContent = 'ON';
+            }
+            if (elements.autoRefreshButton) {
+                elements.autoRefreshButton.classList.add('auto-refresh-active');
+            }
+        } else {
+            stopAutoRefresh();
+            if (elements.autoRefreshStatus) {
+                elements.autoRefreshStatus.textContent = 'OFF';
+            }
+            if (elements.autoRefreshButton) {
+                elements.autoRefreshButton.classList.remove('auto-refresh-active');
+            }
+        }
+    }
+    
+    /**
+     * Start auto-refresh interval
+     */
+    function startAutoRefresh() {
+        if (state.refreshInterval) {
+            clearInterval(state.refreshInterval);
+        }
+        
+        state.refreshInterval = setInterval(() => {
+            if (!document.hidden) {
+                loadInitialData();
+            }
+        }, CONFIG.REFRESH_INTERVAL);
+    }
+    
+    /**
+     * Stop auto-refresh interval
+     */
+    function stopAutoRefresh() {
+        if (state.refreshInterval) {
+            clearInterval(state.refreshInterval);
+            state.refreshInterval = null;
+        }
+    }
+    
+    /**
+     * Handle browser visibility change
+     */
+    function handleVisibilityChange() {
+        if (state.autoRefresh) {
+            if (document.hidden) {
+                console.log('Page hidden, pausing auto-refresh');
+            } else {
+                console.log('Page visible, resuming auto-refresh');
+                loadInitialData();
+            }
+        }
+    }
+    
+    /**
+     * Update last updated timestamp
+     */
+    function updateLastUpdatedTime() {
+        if (elements.lastUpdated && state.lastUpdated) {
+            elements.lastUpdated.textContent = state.lastUpdated.toLocaleTimeString();
+        }
+    }
+    
+    /**
+     * Format currency values
+     */
+    function formatCurrency(value) {
+        if (typeof value !== 'number') return value;
+        
+        if (value >= 1000000) {
+            return `$${(value / 1000000).toFixed(1)}M`;
+        } else if (value >= 1000) {
+            return `$${(value / 1000).toFixed(1)}K`;
+        } else {
+            return `$${value.toFixed(2)}`;
+        }
+    }
+    
+    /**
+     * Format numbers with appropriate suffixes
+     */
+    function formatNumber(value) {
+        if (typeof value !== 'number') return value;
+        
+        if (value >= 1000000) {
+            return `${(value / 1000000).toFixed(1)}M`;
+        } else if (value >= 1000) {
+            return `${(value / 1000).toFixed(1)}K`;
+        } else {
+            return value.toString();
+        }
+    }
+    
+    /**
+     * Cleanup function
+     */
+    function destroy() {
+        stopAutoRefresh();
+        
+        // Remove event listeners
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        
+        // Clear state
+        state = {
+            autoRefresh: false,
+            refreshInterval: null,
+            lastUpdated: null,
+            retryCount: 0,
+            isExpanded: false
+        };
+        
+        console.log('StatsCards module destroyed');
+    }
+    
+    // Public API
+    return {
+        init,
+        toggleAdditionalStats,
+        refreshAll,
+        toggleAutoRefresh,
+        destroy,
+        getState: () => ({ ...state })
+    };
+})();
+
+// Auto-initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', StatsCards.init);
+} else {
+    StatsCards.init();
+}
+</script>

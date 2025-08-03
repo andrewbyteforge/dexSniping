@@ -1,0 +1,2184 @@
+<!-- Token Discovery Table Component -->
+<!-- File: frontend/templates/base/components/token-discovery-table.html -->
+<!-- Purpose: Enhanced token discovery table with real-time monitoring and filtering -->
+
+<!-- Control Panel -->
+<div class="discovery-controls mb-4">
+    <div class="row">
+        <div class="col-lg-8 col-md-7">
+            <div class="controls-group">
+                <!-- Search and Filters -->
+                <div class="search-container">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="bi bi-search" aria-hidden="true"></i>
+                        </span>
+                        <input type="text" 
+                               class="form-control" 
+                               id="token-search" 
+                               placeholder="Search by name, symbol, or address..." 
+                               aria-label="Search tokens"
+                               autocomplete="off">
+                        <button class="btn btn-outline-secondary" 
+                                type="button" 
+                                id="clear-search"
+                                aria-label="Clear search">
+                            <i class="bi bi-x" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Filter Buttons -->
+                <div class="filter-buttons">
+                    <div class="btn-group" role="group" aria-label="Risk level filters">
+                        <input type="checkbox" class="btn-check" id="filter-low-risk" checked>
+                        <label class="btn btn-outline-success btn-sm" for="filter-low-risk">
+                            <i class="bi bi-shield-check" aria-hidden="true"></i> Low Risk
+                        </label>
+                        
+                        <input type="checkbox" class="btn-check" id="filter-medium-risk" checked>
+                        <label class="btn btn-outline-warning btn-sm" for="filter-medium-risk">
+                            <i class="bi bi-shield-exclamation" aria-hidden="true"></i> Medium Risk
+                        </label>
+                        
+                        <input type="checkbox" class="btn-check" id="filter-high-risk">
+                        <label class="btn btn-outline-danger btn-sm" for="filter-high-risk">
+                            <i class="bi bi-shield-x" aria-hidden="true"></i> High Risk
+                        </label>
+                    </div>
+                    
+                    <div class="btn-group ms-2" role="group" aria-label="Network filters">
+                        <button type="button" class="btn btn-outline-primary btn-sm dropdown-toggle" 
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-globe" aria-hidden="true"></i> Networks
+                        </button>
+                        <ul class="dropdown-menu" id="network-filter-dropdown">
+                            <li>
+                                <div class="dropdown-item">
+                                    <input class="form-check-input me-2" type="checkbox" id="network-ethereum" checked>
+                                    <label class="form-check-label" for="network-ethereum">Ethereum</label>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="dropdown-item">
+                                    <input class="form-check-input me-2" type="checkbox" id="network-bsc" checked>
+                                    <label class="form-check-label" for="network-bsc">BSC</label>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="dropdown-item">
+                                    <input class="form-check-input me-2" type="checkbox" id="network-polygon" checked>
+                                    <label class="form-check-label" for="network-polygon">Polygon</label>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="dropdown-item">
+                                    <input class="form-check-input me-2" type="checkbox" id="network-arbitrum">
+                                    <label class="form-check-label" for="network-arbitrum">Arbitrum</label>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-5">
+            <div class="action-buttons">
+                <button class="btn btn-primary btn-sm" 
+                        id="start-discovery"
+                        type="button">
+                    <i class="bi bi-play-circle" aria-hidden="true"></i>
+                    Start Discovery
+                </button>
+                
+                <button class="btn btn-outline-secondary btn-sm" 
+                        id="pause-discovery"
+                        type="button"
+                        disabled>
+                    <i class="bi bi-pause-circle" aria-hidden="true"></i>
+                    Pause
+                </button>
+                
+                <button class="btn btn-outline-info btn-sm" 
+                        id="refresh-discovery"
+                        type="button">
+                    <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+                    Refresh
+                </button>
+                
+                <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" 
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-gear" aria-hidden="true"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" id="export-csv">
+                            <i class="bi bi-download" aria-hidden="true"></i> Export CSV
+                        </a></li>
+                        <li><a class="dropdown-item" href="#" id="import-watchlist">
+                            <i class="bi bi-upload" aria-hidden="true"></i> Import Watchlist
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" id="discovery-settings">
+                            <i class="bi bi-sliders" aria-hidden="true"></i> Settings
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Status Bar -->
+    <div class="status-bar mt-3">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="discovery-status">
+                    <span class="status-indicator" id="discovery-status-indicator">
+                        <i class="bi bi-circle-fill text-secondary" aria-hidden="true"></i>
+                        <span id="discovery-status-text">Ready</span>
+                    </span>
+                    <span class="status-stats ms-3">
+                        <span class="badge bg-primary" id="total-tokens">0 tokens</span>
+                        <span class="badge bg-success" id="new-tokens">0 new</span>
+                        <span class="badge bg-warning" id="filtered-tokens">0 filtered</span>
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="discovery-metrics text-end">
+                    <small class="text-muted">
+                        <i class="bi bi-clock" aria-hidden="true"></i>
+                        Last scan: <span id="last-scan-time">Never</span> |
+                        <i class="bi bi-speedometer2" aria-hidden="true"></i>
+                        Speed: <span id="scan-speed">0 tokens/min</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Table Container -->
+<div class="table-container">
+    <div class="table-responsive">
+        <table class="table table-hover" id="token-discovery-table">
+            <thead class="table-dark sticky-top">
+                <tr>
+                    <th scope="col" class="sortable" data-sort="watchlist" style="width: 50px;">
+                        <button class="btn btn-sm btn-link text-white p-0" 
+                                aria-label="Toggle watchlist for all visible tokens">
+                            <i class="bi bi-heart" aria-hidden="true"></i>
+                        </button>
+                    </th>
+                    <th scope="col" class="sortable" data-sort="name" style="width: 200px;">
+                        Token <i class="bi bi-arrow-down-up sort-icon" aria-hidden="true"></i>
+                    </th>
+                    <th scope="col" class="sortable" data-sort="symbol" style="width: 80px;">
+                        Symbol <i class="bi bi-arrow-down-up sort-icon" aria-hidden="true"></i>
+                    </th>
+                    <th scope="col" class="sortable" data-sort="network" style="width: 100px;">
+                        Network <i class="bi bi-arrow-down-up sort-icon" aria-hidden="true"></i>
+                    </th>
+                    <th scope="col" class="sortable" data-sort="price" style="width: 120px;">
+                        Price <i class="bi bi-arrow-down-up sort-icon" aria-hidden="true"></i>
+                    </th>
+                    <th scope="col" class="sortable" data-sort="market_cap" style="width: 120px;">
+                        Market Cap <i class="bi bi-arrow-down-up sort-icon" aria-hidden="true"></i>
+                    </th>
+                    <th scope="col" class="sortable" data-sort="liquidity" style="width: 120px;">
+                        Liquidity <i class="bi bi-arrow-down-up sort-icon" aria-hidden="true"></i>
+                    </th>
+                    <th scope="col" class="sortable" data-sort="volume_24h" style="width: 120px;">
+                        24h Volume <i class="bi bi-arrow-down-up sort-icon" aria-hidden="true"></i>
+                    </th>
+                    <th scope="col" class="sortable" data-sort="age" style="width: 100px;">
+                        Age <i class="bi bi-arrow-down-up sort-icon" aria-hidden="true"></i>
+                    </th>
+                    <th scope="col" class="sortable" data-sort="risk_score" style="width: 100px;">
+                        Risk <i class="bi bi-arrow-down-up sort-icon" aria-hidden="true"></i>
+                    </th>
+                    <th scope="col" style="width: 150px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="token-table-body">
+                <!-- Loading row -->
+                <tr class="loading-row">
+                    <td colspan="11" class="text-center py-5">
+                        <div class="loading-container">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading tokens...</span>
+                            </div>
+                            <p class="mt-3 text-muted">Scanning for new tokens...</p>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination -->
+<div class="pagination-container">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <div class="pagination-info">
+                <small class="text-muted">
+                    Showing <span id="showing-start">0</span> to <span id="showing-end">0</span> 
+                    of <span id="total-count">0</span> tokens
+                </small>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <nav aria-label="Token discovery pagination">
+                <ul class="pagination justify-content-end mb-0" id="pagination-controls">
+                    <li class="page-item disabled">
+                        <button class="page-link" id="prev-page" aria-label="Previous page">
+                            <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                        </button>
+                    </li>
+                    <li class="page-item active">
+                        <button class="page-link" data-page="1">1</button>
+                    </li>
+                    <li class="page-item disabled">
+                        <button class="page-link" id="next-page" aria-label="Next page">
+                            <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<!-- Token Details Modal -->
+<div class="modal fade" id="tokenDetailsModal" tabindex="-1" aria-labelledby="tokenDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tokenDetailsModalLabel">
+                    <span id="modal-token-name">Token Details</span>
+                    <span class="badge bg-secondary ms-2" id="modal-token-symbol">SYM</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Basic Information</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Address:</strong> <code id="modal-token-address">--</code></li>
+                            <li><strong>Network:</strong> <span id="modal-token-network">--</span></li>
+                            <li><strong>Decimals:</strong> <span id="modal-token-decimals">--</span></li>
+                            <li><strong>Total Supply:</strong> <span id="modal-token-supply">--</span></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Market Data</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Price:</strong> <span id="modal-token-price">--</span></li>
+                            <li><strong>Market Cap:</strong> <span id="modal-token-market-cap">--</span></li>
+                            <li><strong>Liquidity:</strong> <span id="modal-token-liquidity">--</span></li>
+                            <li><strong>24h Volume:</strong> <span id="modal-token-volume">--</span></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6>Risk Analysis</h6>
+                        <div class="risk-analysis-container">
+                            <div class="progress mb-2">
+                                <div class="progress-bar" id="modal-risk-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <div class="risk-factors" id="modal-risk-factors">
+                                <!-- Risk factors will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6>Trading Information</h6>
+                        <div class="trading-info">
+                            <p><strong>DEX Pairs:</strong> <span id="modal-dex-pairs">--</span></p>
+                            <p><strong>Holders:</strong> <span id="modal-holders">--</span></p>
+                            <p><strong>Launch Time:</strong> <span id="modal-launch-time">--</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-warning" id="add-to-watchlist-modal">
+                    <i class="bi bi-heart" aria-hidden="true"></i> Add to Watchlist
+                </button>
+                <button type="button" class="btn btn-success" id="quick-trade-modal">
+                    <i class="bi bi-lightning" aria-hidden="true"></i> Quick Trade
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Embedded CSS -->
+<style>
+/* Token Discovery Table Styles */
+.discovery-controls {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(10px);
+}
+
+.controls-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: center;
+}
+
+.search-container {
+    flex: 1;
+    min-width: 300px;
+}
+
+.search-container .input-group {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.status-bar {
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.discovery-status {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.status-stats .badge {
+    margin-right: 0.25rem;
+}
+
+.table-container {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    border-top: none;
+    padding: 1rem 0.75rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    vertical-align: middle;
+}
+
+.table td {
+    padding: 0.75rem;
+    vertical-align: middle;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+    position: relative;
+}
+
+.sortable:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.sort-icon {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    transition: opacity 0.2s ease;
+}
+
+.sortable:hover .sort-icon,
+.sortable.sorted .sort-icon {
+    opacity: 1;
+}
+
+.sortable.sorted.asc .sort-icon::before {
+    content: "\f148"; /* bi-arrow-up */
+}
+
+.sortable.sorted.desc .sort-icon::before {
+    content: "\f149"; /* bi-arrow-down */
+}
+
+/* Token row styles */
+.token-row {
+    transition: all 0.2s ease;
+}
+
+.token-row:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+    transform: translateY(-1px);
+}
+
+.token-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.token-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.token-details h6 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.token-details small {
+    color: #6c757d;
+    font-size: 0.75rem;
+}
+
+.network-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.network-ethereum { background: #f3f4f6; color: #374151; }
+.network-bsc { background: #fef3c7; color: #92400e; }
+.network-polygon { background: #f3e8ff; color: #7c3aed; }
+.network-arbitrum { background: #dbeafe; color: #1d4ed8; }
+
+.price-info {
+    text-align: right;
+}
+
+.price-value {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.price-change {
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.25rem;
+}
+
+.price-change.positive { color: #10b981; }
+.price-change.negative { color: #ef4444; }
+.price-change.neutral { color: #6b7280; }
+
+.metric-value {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.metric-secondary {
+    color: #6c757d;
+    font-size: 0.75rem;
+}
+
+.age-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.age-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.age-new { background: #10b981; }
+.age-recent { background: #f59e0b; }
+.age-old { background: #6b7280; }
+
+.risk-score {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.risk-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    min-width: 60px;
+    text-align: center;
+}
+
+.risk-low {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.risk-medium {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.risk-high {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.risk-progress {
+    width: 40px;
+    height: 4px;
+    background: #e5e7eb;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.risk-progress-bar {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.action-buttons-cell {
+    white-space: nowrap;
+}
+
+.action-buttons-cell .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+}
+
+.watchlist-btn {
+    border: none;
+    background: transparent;
+    color: #6c757d;
+    transition: color 0.2s ease;
+}
+
+.watchlist-btn:hover {
+    color: #dc3545;
+}
+
+.watchlist-btn.active {
+    color: #dc3545;
+}
+
+.loading-row td {
+    border: none;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.no-data-row td {
+    border: none;
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.no-data-container {
+    color: #6c757d;
+}
+
+.pagination-container {
+    background: white;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.pagination .page-link {
+    border: 1px solid #dee2e6;
+    color: #6c757d;
+    padding: 0.5rem 0.75rem;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.pagination .page-link:hover {
+    background-color: #f8f9fa;
+    border-color: #dee2e6;
+}
+
+/* Modal styles */
+.modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 1rem 1.5rem;
+}
+
+.risk-analysis-container .progress {
+    height: 8px;
+    border-radius: 4px;
+}
+
+.risk-factors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.risk-factor {
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    background: #f8f9fa;
+    color: #495057;
+}
+
+.risk-factor.warning {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.risk-factor.danger {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* Responsive design */
+@media (max-width: 992px) {
+    .controls-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-container {
+        min-width: auto;
+    }
+    
+    .action-buttons {
+        justify-content: flex-start;
+    }
+    
+    .table-responsive {
+        font-size: 0.875rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 0.5rem 0.25rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .discovery-controls {
+        padding: 1rem;
+    }
+    
+    .filter-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .action-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .status-bar .row {
+        text-align: center;
+    }
+    
+    .discovery-metrics {
+        text-align: center !important;
+        margin-top: 0.5rem;
+    }
+    
+    .table th:nth-child(n+6),
+    .table td:nth-child(n+6) {
+        display: none;
+    }
+    
+    .token-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+    
+    .token-logo {
+        width: 24px;
+        height: 24px;
+        font-size: 0.6rem;
+    }
+    
+    .pagination-container {
+        padding: 0.75rem;
+    }
+    
+    .pagination-info {
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+    
+    .pagination {
+        justify-content: center !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .table th:nth-child(n+5),
+    .table td:nth-child(n+5) {
+        display: none;
+    }
+    
+    .btn-group .btn {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    .modal-body .row {
+        flex-direction: column;
+    }
+}
+
+/* Animation classes */
+.token-row.new-token {
+    animation: highlightNewToken 2s ease-out;
+}
+
+@keyframes highlightNewToken {
+    0% {
+        background-color: rgba(16, 185, 129, 0.2);
+        transform: scale(1.02);
+    }
+    100% {
+        background-color: transparent;
+        transform: scale(1);
+    }
+}
+
+.discovery-pulse {
+    animation: discoveryPulse 2s infinite;
+}
+
+@keyframes discoveryPulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .discovery-controls {
+        background: rgba(45, 55, 72, 0.95);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: #e2e8f0;
+    }
+    
+    .table-container {
+        background: #2d3748;
+    }
+    
+    .table {
+        color: #e2e8f0;
+    }
+    
+    .table td {
+        border-top-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .token-row:hover {
+        background-color: rgba(66, 153, 225, 0.1);
+    }
+    
+    .pagination-container {
+        background: #2d3748;
+        border-top-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .modal-content {
+        background: #2d3748;
+        color: #e2e8f0;
+    }
+    
+    .modal-header,
+    .modal-footer {
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* Print styles */
+@media print {
+    .discovery-controls,
+    .pagination-container,
+    .action-buttons-cell {
+        display: none;
+    }
+    
+    .table-container {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+    
+    .table th,
+    .table td {
+        border: 1px solid #ddd;
+    }
+}
+</style>
+
+<!-- Embedded JavaScript -->
+<script>
+/**
+ * TokenDiscoveryTable Module
+ * File: Embedded in frontend/templates/base/components/token-discovery-table.html
+ * Purpose: Advanced token discovery with real-time monitoring and filtering
+ */
+window.TokenDiscoveryTable = (function() {
+    'use strict';
+    
+    // Configuration
+    const CONFIG = {
+        API_BASE_URL: '/api/v1',
+        REFRESH_INTERVAL: 10000, // 10 seconds
+        BATCH_SIZE: 50,
+        MAX_RETRIES: 3,
+        DEBOUNCE_DELAY: 300,
+        DISCOVERY_INTERVAL: 5000, // 5 seconds when active
+        DEFAULT_SORT: 'age',
+        DEFAULT_ORDER: 'desc'
+    };
+    
+    // State management
+    let state = {
+        tokens: [],
+        filteredTokens: [],
+        currentPage: 1,
+        itemsPerPage: 20,
+        totalPages: 1,
+        isDiscovering: false,
+        isLoading: false,
+        sortField: CONFIG.DEFAULT_SORT,
+        sortOrder: CONFIG.DEFAULT_ORDER,
+        searchQuery: '',
+        filters: {
+            riskLevels: ['low', 'medium'],
+            networks: ['ethereum', 'bsc', 'polygon'],
+            minLiquidity: 0,
+            maxAge: null
+        },
+        discoveryInterval: null,
+        lastScanTime: null,
+        scanSpeed: 0,
+        watchlist: new Set()
+    };
+    
+    // DOM elements cache
+    const elements = {};
+    
+    /**
+     * Initialize the token discovery table
+     */
+    function init() {
+        try {
+            cacheElements();
+            attachEventListeners();
+            loadWatchlist();
+            loadInitialData();
+            
+            console.log('TokenDiscoveryTable module initialized successfully');
+        } catch (error) {
+            console.error('Failed to initialize TokenDiscoveryTable:', error);
+            showError('Initialization failed');
+        }
+    }
+    
+    /**
+     * Cache DOM elements for performance
+     */
+    function cacheElements() {
+        // Control elements
+        elements.searchInput = document.getElementById('token-search');
+        elements.clearSearch = document.getElementById('clear-search');
+        elements.startButton = document.getElementById('start-discovery');
+        elements.pauseButton = document.getElementById('pause-discovery');
+        elements.refreshButton = document.getElementById('refresh-discovery');
+        
+        // Filter elements
+        elements.filterLowRisk = document.getElementById('filter-low-risk');
+        elements.filterMediumRisk = document.getElementById('filter-medium-risk');
+        elements.filterHighRisk = document.getElementById('filter-high-risk');
+        elements.networkFilters = document.getElementById('network-filter-dropdown');
+        
+        // Status elements
+        elements.statusIndicator = document.getElementById('discovery-status-indicator');
+        elements.statusText = document.getElementById('discovery-status-text');
+        elements.totalTokens = document.getElementById('total-tokens');
+        elements.newTokens = document.getElementById('new-tokens');
+        elements.filteredTokens = document.getElementById('filtered-tokens');
+        elements.lastScanTime = document.getElementById('last-scan-time');
+        elements.scanSpeed = document.getElementById('scan-speed');
+        
+        // Table elements
+        elements.table = document.getElementById('token-discovery-table');
+        elements.tableBody = document.getElementById('token-table-body');
+        elements.tableHeaders = document.querySelectorAll('.sortable');
+        
+        // Pagination elements
+        elements.showingStart = document.getElementById('showing-start');
+        elements.showingEnd = document.getElementById('showing-end');
+        elements.totalCount = document.getElementById('total-count');
+        elements.paginationControls = document.getElementById('pagination-controls');
+        elements.prevPage = document.getElementById('prev-page');
+        elements.nextPage = document.getElementById('next-page');
+        
+        // Modal elements
+        elements.modal = document.getElementById('tokenDetailsModal');
+        elements.modalTitle = document.getElementById('tokenDetailsModalLabel');
+        elements.modalContent = {
+            name: document.getElementById('modal-token-name'),
+            symbol: document.getElementById('modal-token-symbol'),
+            address: document.getElementById('modal-token-address'),
+            network: document.getElementById('modal-token-network'),
+            decimals: document.getElementById('modal-token-decimals'),
+            supply: document.getElementById('modal-token-supply'),
+            price: document.getElementById('modal-token-price'),
+            marketCap: document.getElementById('modal-token-market-cap'),
+            liquidity: document.getElementById('modal-token-liquidity'),
+            volume: document.getElementById('modal-token-volume'),
+            riskBar: document.getElementById('modal-risk-bar'),
+            riskFactors: document.getElementById('modal-risk-factors'),
+            dexPairs: document.getElementById('modal-dex-pairs'),
+            holders: document.getElementById('modal-holders'),
+            launchTime: document.getElementById('modal-launch-time')
+        };
+    }
+    
+    /**
+     * Attach event listeners
+     */
+    function attachEventListeners() {
+        // Search functionality
+        if (elements.searchInput) {
+            elements.searchInput.addEventListener('input', debounce(handleSearch, CONFIG.DEBOUNCE_DELAY));
+        }
+        
+        if (elements.clearSearch) {
+            elements.clearSearch.addEventListener('click', clearSearch);
+        }
+        
+        // Discovery controls
+        if (elements.startButton) {
+            elements.startButton.addEventListener('click', startDiscovery);
+        }
+        
+        if (elements.pauseButton) {
+            elements.pauseButton.addEventListener('click', pauseDiscovery);
+        }
+        
+        if (elements.refreshButton) {
+            elements.refreshButton.addEventListener('click', refreshData);
+        }
+        
+        // Filter controls
+        [elements.filterLowRisk, elements.filterMediumRisk, elements.filterHighRisk].forEach(filter => {
+            if (filter) {
+                filter.addEventListener('change', handleFilterChange);
+            }
+        });
+        
+        // Network filters
+        if (elements.networkFilters) {
+            elements.networkFilters.addEventListener('change', handleNetworkFilterChange);
+        }
+        
+        // Sorting
+        elements.tableHeaders.forEach(header => {
+            header.addEventListener('click', handleSort);
+        });
+        
+        // Pagination
+        if (elements.prevPage) {
+            elements.prevPage.addEventListener('click', () => changePage(state.currentPage - 1));
+        }
+        
+        if (elements.nextPage) {
+            elements.nextPage.addEventListener('click', () => changePage(state.currentPage + 1));
+        }
+        
+        // Export/Import
+        const exportBtn = document.getElementById('export-csv');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', exportToCSV);
+        }
+        
+        // Modal actions
+        const addToWatchlistBtn = document.getElementById('add-to-watchlist-modal');
+        if (addToWatchlistBtn) {
+            addToWatchlistBtn.addEventListener('click', handleModalWatchlist);
+        }
+        
+        // Window events
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+    
+    /**
+     * Load initial data
+     */
+    async function loadInitialData() {
+        showLoading();
+        
+        try {
+            const data = await fetchTokens();
+            state.tokens = data.tokens || [];
+            updateTokenDisplay();
+            updateStatus();
+        } catch (error) {
+            console.error('Failed to load initial data:', error);
+            showError('Failed to load tokens');
+        } finally {
+            hideLoading();
+        }
+    }
+    
+    /**
+     * Fetch tokens from API
+     */
+    async function fetchTokens(params = {}) {
+        try {
+            const queryParams = new URLSearchParams({
+                limit: CONFIG.BATCH_SIZE,
+                offset: (state.currentPage - 1) * state.itemsPerPage,
+                sort: state.sortField,
+                order: state.sortOrder,
+                ...params
+            });
+            
+            const response = await fetch(`${CONFIG.API_BASE_URL}/tokens/discover?${queryParams}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.error('API request failed:', error);
+            throw error;
+        }
+    }
+    
+    /**
+     * Update token display
+     */
+    function updateTokenDisplay() {
+        applyFilters();
+        applySorting();
+        updatePagination();
+        renderTokens();
+        updateStatusCounts();
+    }
+    
+    /**
+     * Apply filters to tokens
+     */
+    function applyFilters() {
+        state.filteredTokens = state.tokens.filter(token => {
+            // Search filter
+            if (state.searchQuery) {
+                const query = state.searchQuery.toLowerCase();
+                const searchableText = `${token.name} ${token.symbol} ${token.address}`.toLowerCase();
+                if (!searchableText.includes(query)) {
+                    return false;
+                }
+            }
+            
+            // Risk level filter
+            if (!state.filters.riskLevels.includes(token.risk_level)) {
+                return false;
+            }
+            
+            // Network filter
+            if (!state.filters.networks.includes(token.network)) {
+                return false;
+            }
+            
+            // Liquidity filter
+            if (token.liquidity < state.filters.minLiquidity) {
+                return false;
+            }
+            
+            // Age filter
+            if (state.filters.maxAge && token.age_hours > state.filters.maxAge) {
+                return false;
+            }
+            
+            return true;
+        });
+    }
+    
+    /**
+     * Apply sorting to filtered tokens
+     */
+    function applySorting() {
+        state.filteredTokens.sort((a, b) => {
+            let aValue = a[state.sortField];
+            let bValue = b[state.sortField];
+            
+            // Handle special cases
+            if (state.sortField === 'price' || state.sortField === 'market_cap' || 
+                state.sortField === 'liquidity' || state.sortField === 'volume_24h') {
+                aValue = parseFloat(aValue) || 0;
+                bValue = parseFloat(bValue) || 0;
+            }
+            
+            if (state.sortField === 'age') {
+                aValue = a.age_hours || 0;
+                bValue = b.age_hours || 0;
+            }
+            
+            if (state.sortField === 'risk_score') {
+                aValue = a.risk_score || 0;
+                bValue = b.risk_score || 0;
+            }
+            
+            // Compare values
+            let comparison = 0;
+            if (aValue > bValue) {
+                comparison = 1;
+            } else if (aValue < bValue) {
+                comparison = -1;
+            }
+            
+            return state.sortOrder === 'desc' ? -comparison : comparison;
+        });
+    }
+    
+    /**
+     * Update pagination
+     */
+    function updatePagination() {
+        state.totalPages = Math.ceil(state.filteredTokens.length / state.itemsPerPage);
+        
+        // Ensure current page is valid
+        if (state.currentPage > state.totalPages) {
+            state.currentPage = Math.max(1, state.totalPages);
+        }
+        
+        // Update pagination info
+        const start = (state.currentPage - 1) * state.itemsPerPage + 1;
+        const end = Math.min(state.currentPage * state.itemsPerPage, state.filteredTokens.length);
+        
+        if (elements.showingStart) elements.showingStart.textContent = start;
+        if (elements.showingEnd) elements.showingEnd.textContent = end;
+        if (elements.totalCount) elements.totalCount.textContent = state.filteredTokens.length;
+        
+        // Update pagination controls
+        renderPaginationControls();
+    }
+    
+    /**
+     * Render pagination controls
+     */
+    function renderPaginationControls() {
+        if (!elements.paginationControls) return;
+        
+        const maxPages = 5; // Maximum page buttons to show
+        const startPage = Math.max(1, state.currentPage - Math.floor(maxPages / 2));
+        const endPage = Math.min(state.totalPages, startPage + maxPages - 1);
+        
+        let html = '';
+        
+        // Previous button
+        html += `
+            <li class="page-item ${state.currentPage === 1 ? 'disabled' : ''}">
+                <button class="page-link" id="prev-page" aria-label="Previous page">
+                    <i class="bi bi-chevron-left" aria-hidden="true"></i>
+                </button>
+            </li>
+        `;
+        
+        // Page numbers
+        for (let i = startPage; i <= endPage; i++) {
+            html += `
+                <li class="page-item ${i === state.currentPage ? 'active' : ''}">
+                    <button class="page-link" data-page="${i}">${i}</button>
+                </li>
+            `;
+        }
+        
+        // Next button
+        html += `
+            <li class="page-item ${state.currentPage === state.totalPages ? 'disabled' : ''}">
+                <button class="page-link" id="next-page" aria-label="Next page">
+                    <i class="bi bi-chevron-right" aria-hidden="true"></i>
+                </button>
+            </li>
+        `;
+        
+        elements.paginationControls.innerHTML = html;
+        
+        // Attach event listeners to new pagination buttons
+        elements.paginationControls.querySelectorAll('[data-page]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                changePage(parseInt(e.target.dataset.page));
+            });
+        });
+        
+        // Re-cache pagination buttons
+        elements.prevPage = document.getElementById('prev-page');
+        elements.nextPage = document.getElementById('next-page');
+        
+        if (elements.prevPage) {
+            elements.prevPage.addEventListener('click', () => changePage(state.currentPage - 1));
+        }
+        
+        if (elements.nextPage) {
+            elements.nextPage.addEventListener('click', () => changePage(state.currentPage + 1));
+        }
+    }
+    
+    /**
+     * Render tokens in table
+     */
+    function renderTokens() {
+        if (!elements.tableBody) return;
+        
+        if (state.filteredTokens.length === 0) {
+            elements.tableBody.innerHTML = `
+                <tr class="no-data-row">
+                    <td colspan="11">
+                        <div class="no-data-container">
+                            <i class="bi bi-search display-4 text-muted"></i>
+                            <p class="mt-3 text-muted">No tokens found matching your filters.</p>
+                            <button class="btn btn-outline-primary btn-sm" onclick="TokenDiscoveryTable.clearAllFilters()">
+                                Clear Filters
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        const startIndex = (state.currentPage - 1) * state.itemsPerPage;
+        const endIndex = startIndex + state.itemsPerPage;
+        const tokensToShow = state.filteredTokens.slice(startIndex, endIndex);
+        
+        const html = tokensToShow.map(token => renderTokenRow(token)).join('');
+        elements.tableBody.innerHTML = html;
+        
+        // Attach event listeners to new rows
+        attachTokenRowListeners();
+    }
+    
+    /**
+     * Render individual token row
+     */
+    function renderTokenRow(token) {
+        const isInWatchlist = state.watchlist.has(token.address);
+        const riskClass = getRiskClass(token.risk_score);
+        const ageClass = getAgeClass(token.age_hours);
+        const priceChangeClass = getPriceChangeClass(token.price_change_24h);
+        
+        return `
+            <tr class="token-row" data-token-address="${token.address}">
+                <td>
+                    <button class="watchlist-btn ${isInWatchlist ? 'active' : ''}" 
+                            data-token-address="${token.address}"
+                            aria-label="Toggle watchlist">
+                        <i class="bi ${isInWatchlist ? 'bi-heart-fill' : 'bi-heart'}" aria-hidden="true"></i>
+                    </button>
+                </td>
+                <td>
+                    <div class="token-info">
+                        <div class="token-logo" title="${token.name}">
+                            ${token.symbol.substring(0, 2).toUpperCase()}
+                        </div>
+                        <div class="token-details">
+                            <h6>${escapeHtml(token.name)}</h6>
+                            <small>${escapeHtml(token.address.substring(0, 10))}...</small>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="fw-bold">${escapeHtml(token.symbol)}</span>
+                </td>
+                <td>
+                    <span class="network-badge network-${token.network}">
+                        <i class="bi bi-circle-fill" aria-hidden="true"></i>
+                        ${token.network.toUpperCase()}
+                    </span>
+                </td>
+                <td>
+                    <div class="price-info">
+                        <div class="price-value">$${formatNumber(token.price)}</div>
+                        <div class="price-change ${priceChangeClass}">
+                            <i class="bi ${priceChangeClass === 'positive' ? 'bi-arrow-up' : priceChangeClass === 'negative' ? 'bi-arrow-down' : 'bi-dash'}" aria-hidden="true"></i>
+                            ${formatPercentage(token.price_change_24h)}
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="metric-value">$${formatLargeNumber(token.market_cap)}</div>
+                    <div class="metric-secondary">Market Cap</div>
+                </td>
+                <td>
+                    <div class="metric-value">$${formatLargeNumber(token.liquidity)}</div>
+                    <div class="metric-secondary">Liquidity</div>
+                </td>
+                <td>
+                    <div class="metric-value">$${formatLargeNumber(token.volume_24h)}</div>
+                    <div class="metric-secondary">24h Volume</div>
+                </td>
+                <td>
+                    <div class="age-indicator">
+                        <span class="age-dot ${ageClass}"></span>
+                        ${formatAge(token.age_hours)}
+                    </div>
+                </td>
+                <td>
+                    <div class="risk-score">
+                        <span class="risk-badge risk-${riskClass}">
+                            ${token.risk_score.toFixed(1)}
+                        </span>
+                        <div class="risk-progress">
+                            <div class="risk-progress-bar bg-${riskClass === 'low' ? 'success' : riskClass === 'medium' ? 'warning' : 'danger'}" 
+                                 style="width: ${token.risk_score * 10}%"></div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="action-buttons-cell">
+                        <button class="btn btn-outline-info btn-sm" 
+                                onclick="TokenDiscoveryTable.showTokenDetails('${token.address}')"
+                                aria-label="View token details">
+                            <i class="bi bi-info-circle" aria-hidden="true"></i>
+                        </button>
+                        <button class="btn btn-outline-success btn-sm" 
+                                onclick="TokenDiscoveryTable.quickTrade('${token.address}')"
+                                aria-label="Quick trade">
+                            <i class="bi bi-lightning" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+    
+    /**
+     * Attach event listeners to token rows
+     */
+    function attachTokenRowListeners() {
+        // Watchlist buttons
+        document.querySelectorAll('.watchlist-btn').forEach(btn => {
+            btn.addEventListener('click', handleWatchlistToggle);
+        });
+        
+        // Row click for details
+        document.querySelectorAll('.token-row').forEach(row => {
+            row.addEventListener('click', (e) => {
+                if (!e.target.closest('.watchlist-btn') && !e.target.closest('.action-buttons-cell')) {
+                    const address = row.dataset.tokenAddress;
+                    showTokenDetails(address);
+                }
+            });
+        });
+    }
+    
+    /**
+     * Handle search input
+     */
+    function handleSearch(event) {
+        state.searchQuery = event.target.value.trim();
+        state.currentPage = 1;
+        updateTokenDisplay();
+    }
+    
+    /**
+     * Clear search
+     */
+    function clearSearch() {
+        if (elements.searchInput) {
+            elements.searchInput.value = '';
+        }
+        state.searchQuery = '';
+        state.currentPage = 1;
+        updateTokenDisplay();
+    }
+    
+    /**
+     * Handle filter changes
+     */
+    function handleFilterChange() {
+        // Update risk level filters
+        state.filters.riskLevels = [];
+        if (elements.filterLowRisk?.checked) state.filters.riskLevels.push('low');
+        if (elements.filterMediumRisk?.checked) state.filters.riskLevels.push('medium');
+        if (elements.filterHighRisk?.checked) state.filters.riskLevels.push('high');
+        
+        state.currentPage = 1;
+        updateTokenDisplay();
+    }
+    
+    /**
+     * Handle network filter changes
+     */
+    function handleNetworkFilterChange(event) {
+        if (event.target.type === 'checkbox') {
+            const network = event.target.id.replace('network-', '');
+            
+            if (event.target.checked) {
+                if (!state.filters.networks.includes(network)) {
+                    state.filters.networks.push(network);
+                }
+            } else {
+                state.filters.networks = state.filters.networks.filter(n => n !== network);
+            }
+            
+            state.currentPage = 1;
+            updateTokenDisplay();
+        }
+    }
+    
+    /**
+     * Handle sorting
+     */
+    function handleSort(event) {
+        const header = event.currentTarget;
+        const sortField = header.dataset.sort;
+        
+        if (state.sortField === sortField) {
+            state.sortOrder = state.sortOrder === 'asc' ? 'desc' : 'asc';
+        } else {
+            state.sortField = sortField;
+            state.sortOrder = 'desc';
+        }
+        
+        // Update header classes
+        elements.tableHeaders.forEach(h => {
+            h.classList.remove('sorted', 'asc', 'desc');
+        });
+        
+        header.classList.add('sorted', state.sortOrder);
+        
+        updateTokenDisplay();
+    }
+    
+    /**
+     * Change page
+     */
+    function changePage(page) {
+        if (page >= 1 && page <= state.totalPages) {
+            state.currentPage = page;
+            updateTokenDisplay();
+        }
+    }
+    
+    /**
+     * Start discovery
+     */
+    function startDiscovery() {
+        if (state.isDiscovering) return;
+        
+        state.isDiscovering = true;
+        updateDiscoveryStatus('discovering', 'Discovering...');
+        
+        // Update buttons
+        if (elements.startButton) {
+            elements.startButton.disabled = true;
+        }
+        if (elements.pauseButton) {
+            elements.pauseButton.disabled = false;
+        }
+        
+        // Start discovery interval
+        state.discoveryInterval = setInterval(async () => {
+            try {
+                await performDiscoveryScan();
+            } catch (error) {
+                console.error('Discovery scan failed:', error);
+            }
+        }, CONFIG.DISCOVERY_INTERVAL);
+        
+        // Perform initial scan
+        performDiscoveryScan();
+    }
+    
+    /**
+     * Pause discovery
+     */
+    function pauseDiscovery() {
+        if (!state.isDiscovering) return;
+        
+        state.isDiscovering = false;
+        updateDiscoveryStatus('paused', 'Paused');
+        
+        // Update buttons
+        if (elements.startButton) {
+            elements.startButton.disabled = false;
+        }
+        if (elements.pauseButton) {
+            elements.pauseButton.disabled = true;
+        }
+        
+        // Clear discovery interval
+        if (state.discoveryInterval) {
+            clearInterval(state.discoveryInterval);
+            state.discoveryInterval = null;
+        }
+    }
+    
+    /**
+     * Perform discovery scan
+     */
+    async function performDiscoveryScan() {
+        try {
+            const startTime = Date.now();
+            const data = await fetchTokens({ fresh: true });
+            const endTime = Date.now();
+            
+            const newTokens = data.tokens || [];
+            const existingAddresses = new Set(state.tokens.map(t => t.address));
+            const actuallyNewTokens = newTokens.filter(t => !existingAddresses.has(t.address));
+            
+            // Add new tokens to the beginning of the list
+            state.tokens = [...actuallyNewTokens, ...state.tokens];
+            
+            // Update scan metrics
+            state.lastScanTime = new Date();
+            state.scanSpeed = Math.round((newTokens.length / (endTime - startTime)) * 60000); // tokens per minute
+            
+            // Highlight new tokens
+            if (actuallyNewTokens.length > 0) {
+                setTimeout(() => {
+                    document.querySelectorAll('.token-row').slice(0, actuallyNewTokens.length).forEach(row => {
+                        row.classList.add('new-token');
+                    });
+                }, 100);
+            }
+            
+            updateTokenDisplay();
+            updateStatus();
+            
+        } catch (error) {
+            console.error('Discovery scan failed:', error);
+        }
+    }
+    
+    /**
+     * Refresh data
+     */
+    async function refreshData() {
+        if (elements.refreshButton) {
+            elements.refreshButton.disabled = true;
+            const originalText = elements.refreshButton.innerHTML;
+            elements.refreshButton.innerHTML = '<i class="bi bi-arrow-clockwise spin" aria-hidden="true"></i> Refreshing...';
+            
+            try {
+                await loadInitialData();
+            } finally {
+                elements.refreshButton.disabled = false;
+                elements.refreshButton.innerHTML = originalText;
+            }
+        }
+    }
+    
+    /**
+     * Show token details in modal
+     */
+    function showTokenDetails(address) {
+        const token = state.tokens.find(t => t.address === address);
+        if (!token) return;
+        
+        // Populate modal with token data
+        if (elements.modalContent.name) elements.modalContent.name.textContent = token.name;
+        if (elements.modalContent.symbol) elements.modalContent.symbol.textContent = token.symbol;
+        if (elements.modalContent.address) elements.modalContent.address.textContent = token.address;
+        if (elements.modalContent.network) elements.modalContent.network.textContent = token.network.toUpperCase();
+        if (elements.modalContent.decimals) elements.modalContent.decimals.textContent = token.decimals || '--';
+        if (elements.modalContent.supply) elements.modalContent.supply.textContent = formatLargeNumber(token.total_supply);
+        if (elements.modalContent.price) elements.modalContent.price.textContent = `$${formatNumber(token.price)}`;
+        if (elements.modalContent.marketCap) elements.modalContent.marketCap.textContent = `$${formatLargeNumber(token.market_cap)}`;
+        if (elements.modalContent.liquidity) elements.modalContent.liquidity.textContent = `$${formatLargeNumber(token.liquidity)}`;
+        if (elements.modalContent.volume) elements.modalContent.volume.textContent = `$${formatLargeNumber(token.volume_24h)}`;
+        if (elements.modalContent.dexPairs) elements.modalContent.dexPairs.textContent = token.dex_pairs || '--';
+        if (elements.modalContent.holders) elements.modalContent.holders.textContent = formatNumber(token.holders);
+        if (elements.modalContent.launchTime) elements.modalContent.launchTime.textContent = formatDate(token.launch_time);
+        
+        // Update risk analysis
+        if (elements.modalContent.riskBar) {
+            const riskPercentage = token.risk_score * 10;
+            const riskClass = getRiskClass(token.risk_score);
+            elements.modalContent.riskBar.style.width = `${riskPercentage}%`;
+            elements.modalContent.riskBar.className = `progress-bar bg-${riskClass === 'low' ? 'success' : riskClass === 'medium' ? 'warning' : 'danger'}`;
+        }
+        
+        // Update risk factors
+        if (elements.modalContent.riskFactors && token.risk_factors) {
+            const factorsHtml = token.risk_factors.map(factor => {
+                const severity = factor.severity || 'info';
+                return `<span class="risk-factor ${severity}">${escapeHtml(factor.name)}</span>`;
+            }).join('');
+            elements.modalContent.riskFactors.innerHTML = factorsHtml;
+        }
+        
+        // Show modal
+        if (elements.modal) {
+            const modal = new bootstrap.Modal(elements.modal);
+            modal.show();
+            
+            // Store current token for modal actions
+            elements.modal.dataset.currentToken = address;
+        }
+    }
+    
+    /**
+     * Handle watchlist toggle
+     */
+    function handleWatchlistToggle(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        const address = event.currentTarget.dataset.tokenAddress;
+        const icon = event.currentTarget.querySelector('i');
+        
+        if (state.watchlist.has(address)) {
+            state.watchlist.delete(address);
+            event.currentTarget.classList.remove('active');
+            icon.className = 'bi bi-heart';
+        } else {
+            state.watchlist.add(address);
+            event.currentTarget.classList.add('active');
+            icon.className = 'bi bi-heart-fill';
+        }
+        
+        saveWatchlist();
+    }
+    
+    /**
+     * Handle modal watchlist action
+     */
+    function handleModalWatchlist() {
+        const address = elements.modal?.dataset.currentToken;
+        if (!address) return;
+        
+        const btn = document.getElementById('add-to-watchlist-modal');
+        if (state.watchlist.has(address)) {
+            state.watchlist.delete(address);
+            btn.innerHTML = '<i class="bi bi-heart" aria-hidden="true"></i> Add to Watchlist';
+            btn.className = 'btn btn-warning';
+        } else {
+            state.watchlist.add(address);
+            btn.innerHTML = '<i class="bi bi-heart-fill" aria-hidden="true"></i> Remove from Watchlist';
+            btn.className = 'btn btn-outline-warning';
+        }
+        
+        saveWatchlist();
+        updateTokenDisplay(); // Refresh display to update heart icons
+    }
+    
+    /**
+     * Quick trade action
+     */
+    function quickTrade(address) {
+        const token = state.tokens.find(t => t.address === address);
+        if (!token) return;
+        
+        // TODO: Integrate with trading module
+        console.log('Quick trade for token:', token);
+        
+        // For now, show a simple alert
+        alert(`Quick trade for ${token.name} (${token.symbol}) will be implemented in the trading module.`);
+    }
+    
+    /**
+     * Export data to CSV
+     */
+    function exportToCSV() {
+        const headers = [
+            'Name', 'Symbol', 'Address', 'Network', 'Price', 'Market Cap', 
+            'Liquidity', '24h Volume', 'Age (hours)', 'Risk Score', 'Risk Level'
+        ];
+        
+        const csvData = [
+            headers.join(','),
+            ...state.filteredTokens.map(token => [
+                `"${token.name}"`,
+                `"${token.symbol}"`,
+                token.address,
+                token.network,
+                token.price,
+                token.market_cap,
+                token.liquidity,
+                token.volume_24h,
+                token.age_hours,
+                token.risk_score,
+                getRiskClass(token.risk_score)
+            ].join(','))
+        ].join('\n');
+        
+        const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', `token_discovery_${new Date().toISOString().split('T')[0]}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    
+    /**
+     * Clear all filters
+     */
+    function clearAllFilters() {
+        // Reset search
+        if (elements.searchInput) {
+            elements.searchInput.value = '';
+        }
+        state.searchQuery = '';
+        
+        // Reset risk filters
+        if (elements.filterLowRisk) elements.filterLowRisk.checked = true;
+        if (elements.filterMediumRisk) elements.filterMediumRisk.checked = true;
+        if (elements.filterHighRisk) elements.filterHighRisk.checked = false;
+        
+        // Reset network filters
+        const networkCheckboxes = elements.networkFilters?.querySelectorAll('input[type="checkbox"]');
+        networkCheckboxes?.forEach(checkbox => {
+            checkbox.checked = ['network-ethereum', 'network-bsc', 'network-polygon'].includes(checkbox.id);
+        });
+        
+        // Reset state
+        state.filters = {
+            riskLevels: ['low', 'medium'],
+            networks: ['ethereum', 'bsc', 'polygon'],
+            minLiquidity: 0,
+            maxAge: null
+        };
+        
+        state.currentPage = 1;
+        updateTokenDisplay();
+    }
+    
+    /**
+     * Update discovery status
+     */
+    function updateDiscoveryStatus(status, text) {
+        if (elements.statusIndicator) {
+            const icon = elements.statusIndicator.querySelector('i');
+            if (icon) {
+                icon.className = `bi bi-circle-fill text-${status === 'discovering' ? 'success' : status === 'paused' ? 'warning' : 'secondary'}`;
+                
+                if (status === 'discovering') {
+                    icon.classList.add('discovery-pulse');
+                } else {
+                    icon.classList.remove('discovery-pulse');
+                }
+            }
+        }
+        
+        if (elements.statusText) {
+            elements.statusText.textContent = text;
+        }
+    }
+    
+    /**
+     * Update status information
+     */
+    function updateStatus() {
+        // Update last scan time
+        if (elements.lastScanTime && state.lastScanTime) {
+            elements.lastScanTime.textContent = state.lastScanTime.toLocaleTimeString();
+        }
+        
+        // Update scan speed
+        if (elements.scanSpeed) {
+            elements.scanSpeed.textContent = `${state.scanSpeed} tokens/min`;
+        }
+    }
+    
+    /**
+     * Update status counts
+     */
+    function updateStatusCounts() {
+        if (elements.totalTokens) {
+            elements.totalTokens.textContent = `${state.tokens.length} tokens`;
+        }
+        
+        if (elements.newTokens) {
+            const newCount = state.tokens.filter(t => t.age_hours < 1).length;
+            elements.newTokens.textContent = `${newCount} new`;
+        }
+        
+        if (elements.filteredTokens) {
+            const hiddenCount = state.tokens.length - state.filteredTokens.length;
+            elements.filteredTokens.textContent = `${hiddenCount} filtered`;
+        }
+    }
+    
+    /**
+     * Show loading state
+     */
+    function showLoading() {
+        state.isLoading = true;
+        
+        if (elements.tableBody) {
+            elements.tableBody.innerHTML = `
+                <tr class="loading-row">
+                    <td colspan="11" class="text-center py-5">
+                        <div class="loading-container">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading tokens...</span>
+                            </div>
+                            <p class="mt-3 text-muted">Scanning for new tokens...</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+    }
+    
+    /**
+     * Hide loading state
+     */
+    function hideLoading() {
+        state.isLoading = false;
+    }
+    
+    /**
+     * Show error state
+     */
+    function showError(message) {
+        console.error('TokenDiscoveryTable error:', message);
+        
+        if (elements.tableBody) {
+            elements.tableBody.innerHTML = `
+                <tr class="error-row">
+                    <td colspan="11" class="text-center py-5">
+                        <div class="error-container">
+                            <i class="bi bi-exclamation-triangle display-4 text-danger"></i>
+                            <p class="mt-3 text-danger">${escapeHtml(message)}</p>
+                            <button class="btn btn-outline-primary btn-sm" onclick="TokenDiscoveryTable.refreshData()">
+                                <i class="bi bi-arrow-clockwise" aria-hidden="true"></i> Retry
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+    }
+    
+    /**
+     * Load watchlist from localStorage
+     */
+    function loadWatchlist() {
+        try {
+            const saved = localStorage.getItem('tokenDiscoveryWatchlist');
+            if (saved) {
+                state.watchlist = new Set(JSON.parse(saved));
+            }
+        } catch (error) {
+            console.error('Failed to load watchlist:', error);
+        }
+    }
+    
+    /**
+     * Save watchlist to localStorage
+     */
+    function saveWatchlist() {
+        try {
+            localStorage.setItem('tokenDiscoveryWatchlist', JSON.stringify([...state.watchlist]));
+        } catch (error) {
+            console.error('Failed to save watchlist:', error);
+        }
+    }
+    
+    /**
+     * Handle window visibility change
+     */
+    function handleVisibilityChange() {
+        if (state.isDiscovering) {
+            if (document.hidden) {
+                console.log('Page hidden, pausing discovery');
+                // Don't actually pause, just log
+            } else {
+                console.log('Page visible, resuming discovery');
+                // Perform immediate scan when page becomes visible
+                performDiscoveryScan();
+            }
+        }
+    }
+    
+    /**
+     * Handle before unload
+     */
+    function handleBeforeUnload() {
+        if (state.discoveryInterval) {
+            clearInterval(state.discoveryInterval);
+        }
+        saveWatchlist();
+    }
+    
+    // Utility functions
+    
+    /**
+     * Debounce function calls
+     */
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+    
+    /**
+     * Escape HTML to prevent XSS
+     */
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+    
+    /**
+     * Get risk class based on score
+     */
+    function getRiskClass(riskScore) {
+        if (riskScore <= 3) return 'low';
+        if (riskScore <= 7) return 'medium';
+        return 'high';
+    }
+    
+    /**
+     * Get age class based on hours
+     */
+    function getAgeClass(ageHours) {
+        if (ageHours < 1) return 'new';
+        if (ageHours < 24) return 'recent';
+        return 'old';
+    }
+    
+    /**
+     * Get price change class
+     */
+    function getPriceChangeClass(change) {
+        if (change > 0) return 'positive';
+        if (change < 0) return 'negative';
+        return 'neutral';
+    }
+    
+    /**
+     * Format numbers with appropriate precision
+     */
+    function formatNumber(value) {
+        if (typeof value !== 'number') return '0';
+        
+        if (value < 0.000001) {
+            return value.toExponential(2);
+        } else if (value < 0.01) {
+            return value.toFixed(6);
+        } else if (value < 1) {
+            return value.toFixed(4);
+        } else {
+            return value.toFixed(2);
+        }
+    }
+    
+    /**
+     * Format large numbers with K/M/B suffixes
+     */
+    function formatLargeNumber(value) {
+        if (typeof value !== 'number') return '0';
+        
+        if (value >= 1000000000) {
+            return (value / 1000000000).toFixed(1) + 'B';
+        } else if (value >= 1000000) {
+            return (value / 1000000).toFixed(1) + 'M';
+        } else if (value >= 1000) {
+            return (value / 1000).toFixed(1) + 'K';
+        } else {
+            return value.toFixed(0);
+        }
+    }
+    
+    /**
+     * Format percentage values
+     */
+    function formatPercentage(value) {
+        if (typeof value !== 'number') return '0%';
+        return (value >= 0 ? '+' : '') + value.toFixed(2) + '%';
+    }
+    
+    /**
+     * Format age in human readable format
+     */
+    function formatAge(ageHours) {
+        if (ageHours < 1) {
+            return `${Math.round(ageHours * 60)}m`;
+        } else if (ageHours < 24) {
+            return `${Math.round(ageHours)}h`;
+        } else {
+            return `${Math.round(ageHours / 24)}d`;
+        }
+    }
+    
+    /**
+     * Format date for display
+     */
+    function formatDate(timestamp) {
+        if (!timestamp) return '--';
+        const date = new Date(timestamp);
+        return date.toLocaleString();
+    }
+    
+    /**
+     * Cleanup function
+     */
+    function destroy() {
+        // Clear intervals
+        if (state.discoveryInterval) {
+            clearInterval(state.discoveryInterval);
+        }
+        
+        // Save watchlist
+        saveWatchlist();
+        
+        // Remove event listeners
+        window.removeEventListener('beforeunload', handleBeforeUnload);
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+        
+        // Clear state
+        state = {
+            tokens: [],
+            filteredTokens: [],
+            currentPage: 1,
+            itemsPerPage: 20,
+            totalPages: 1,
+            isDiscovering: false,
+            isLoading: false,
+            sortField: CONFIG.DEFAULT_SORT,
+            sortOrder: CONFIG.DEFAULT_ORDER,
+            searchQuery: '',
+            filters: {
+                riskLevels: ['low', 'medium'],
+                networks: ['ethereum', 'bsc', 'polygon'],
+                minLiquidity: 0,
+                maxAge: null
+            },
+            discoveryInterval: null,
+            lastScanTime: null,
+            scanSpeed: 0,
+            watchlist: new Set()
+        };
+        
+        console.log('TokenDiscoveryTable module destroyed');
+    }
+    
+    // Public API
+    return {
+        init,
+        startDiscovery,
+        pauseDiscovery,
+        refreshData,
+        showTokenDetails,
+        quickTrade,
+        clearAllFilters,
+        exportToCSV,
+        destroy,
+        getState: () => ({ ...state, watchlist: [...state.watchlist] })
+    };
+})();
+
+// Auto-initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', TokenDiscoveryTable.init);
+} else {
+    TokenDiscoveryTable.init();
+}
+</script>
