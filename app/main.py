@@ -1,102 +1,52 @@
-"""
-Main FastAPI Application
-File: app/main.py
-
-Main application entry point for the DEX Sniper Pro trading bot.
-"""
-
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from pathlib import Path
 
-from app.api.v1.endpoints import live_trading
-from app.utils.logger import setup_logger
+app = FastAPI(title="DEX Sniper Pro API")
 
-logger = setup_logger(__name__)
-
-# Global trading engine instance
-trading_engine_instance = None
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Handle application startup and shutdown."""
-    global trading_engine_instance
-    
-    # Startup
-    logger.info("🚀 Starting DEX Sniper Pro Trading Bot...")
-    try:
-        from app.core.trading.trading_engine import TradingEngine, NetworkType
-        trading_engine_instance = TradingEngine(NetworkType.ETHEREUM)
-        await trading_engine_instance.initialize()
-        logger.info("✅ Trading engine initialized successfully")
-        yield
-    except Exception as e:
-        logger.error(f"❌ Failed to initialize trading engine: {e}")
-        yield
-    finally:
-        # Shutdown
-        logger.info("🛑 Shutting down trading bot...")
-        if trading_engine_instance:
-            try:
-                await trading_engine_instance.stop_trading()
-                logger.info("✅ Trading engine stopped successfully")
-            except Exception as e:
-                logger.error(f"❌ Error during shutdown: {e}")
-
-
-# Create FastAPI app
-app = FastAPI(
-    title="DEX Sniper Pro API",
-    description="Automated crypto trading bot with profit generation capabilities",
-    version="1.0.0",
-    lifespan=lifespan
-)
-
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(live_trading.router, prefix="/api/v1")
+templates = Jinja2Templates(directory="frontend/templates")
 
+if Path("frontend/static").exists():
+    app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
+
+# Include both API routers
+from app.api.v1.endpoints.dashboard import dashboard_router, tokens_router
+app.include_router(dashboard_router, prefix="/api/v1")
+app.include_router(tokens_router, prefix="/api/v1")
 
 @app.get("/")
 async def root():
-    """Root endpoint."""
     return {
         "message": "🤖 DEX Sniper Pro Trading Bot API",
         "version": "1.0.0",
         "status": "running",
-        "docs": "/docs",
-        "trading_endpoints": "/api/v1/live-trading"
+        "dashboard": "/dashboard",
+        "docs": "/docs"
     }
 
+@app.get("/dashboard")
+async def serve_dashboard(request: Request):
+    return templates.TemplateResponse("pages/dashboard.html", {"request": request})
 
-@app.get("/health")
-async def health_check():
-    """Health check endpoint."""
-    global trading_engine_instance
-    
-    return {
-        "status": "healthy",
-        "trading_engine": trading_engine_instance is not None,
-        "message": "Trading bot is operational"
-    }
+# Sidebar navigation - all redirect to dashboard for now
+@app.get("/token-discovery")
+async def token_discovery(request: Request):
+    return templates.TemplateResponse("pages/dashboard.html", {"request": request})
 
+@app.get("/live-trading")
+async def live_trading(request: Request):
+    return templates.TemplateResponse("pages/dashboard.html", {"request": request})
 
-def get_trading_engine():
-    """Get the global trading engine instance."""
-    global trading_engine_instance
-    if trading_engine_instance is None:
-        raise HTTPException(status_code=503, detail="Trading engine not initialized")
-    return trading_engine_instance
-
-
-# Make trading engine available to endpoints
-live_trading.set_trading_engine_getter(get_trading_engine)
+@app.get("/portfolio")
+async def portfolio(request: Request):
+    return templates.TemplateResponse("pages/dashboard.html", {"request": request})
