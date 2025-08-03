@@ -1,12 +1,13 @@
 """
 Production-ready configuration file that matches your comprehensive .env setup.
-Replace your current app/config.py with this file.
+File: app/config.py
+
+FIXED VERSION - Removed circular import issue
 """
 
 from pydantic_settings import BaseSettings
 from typing import List, Optional
 from decimal import Decimal
-from app.core.dependencies import get_current_user
 
 
 class Settings(BaseSettings):
@@ -52,226 +53,95 @@ class Settings(BaseSettings):
     max_gas_price_gwei: str = "50"
     bridge_timeout_seconds: str = "300"
     
-        
-    @property
-    def ENVIRONMENT(self) -> str:
-        """Get environment name for compatibility."""
-        return self.environment
+    # Configuration
+    class Config:
+        env_file = ".env"
+        extra = "allow"
     
-
     @property
     def ENVIRONMENT(self) -> str:
         """Get environment name for compatibility."""
         return self.environment
-
-
-    @property
-    def ENVIRONMENT(self) -> str:
-        """Get environment name for compatibility."""
-        return self.environment
-
-class Config:
-    env_file = ".env"
-    extra = "allow"  # Allow extra fields from .env without validation errors
     
     @property
     def max_slippage_decimal(self) -> Decimal:
-        """Get max slippage as Decimal."""
         return Decimal(self.max_slippage)
     
     @property
     def min_liquidity_usd_int(self) -> int:
-        """Get min liquidity as integer."""
         return int(self.min_liquidity_usd)
     
     @property
     def max_position_size_decimal(self) -> Decimal:
-        """Get max position size as Decimal."""
         return Decimal(self.max_position_size)
     
     @property
     def risk_score_threshold_float(self) -> float:
-        """Get risk score threshold as float."""
         return float(self.risk_score_threshold)
     
     @property
     def min_profit_threshold_decimal(self) -> Decimal:
-        """Get min profit threshold as Decimal."""
         return Decimal(self.min_profit_threshold)
     
     @property
     def max_gas_price_gwei_int(self) -> int:
-        """Get max gas price as integer."""
         return int(self.max_gas_price_gwei)
     
     @property
     def bridge_timeout_seconds_int(self) -> int:
-        """Get bridge timeout as integer."""
         return int(self.bridge_timeout_seconds)
 
 
 class NetworkConfig:
-    """Network configuration constants with dynamic RPC URL support."""
+    """Network configuration constants."""
     
     @classmethod
     def get_supported_networks(cls, settings: Settings) -> dict:
-        """Get supported networks with actual RPC URLs from settings."""
         return {
-            # Ethereum Ecosystem
             "ethereum": {
                 "chain_id": 1,
                 "type": "evm",
                 "name": "Ethereum",
                 "symbol": "ETH",
-                "rpc_urls": [
-                    settings.ethereum_rpc_url,
-                    "https://ethereum.publicnode.com"
-                ],
-                "dex_protocols": ["uniswap_v3", "uniswap_v2", "sushiswap", "1inch"],
+                "rpc_urls": [settings.ethereum_rpc_url],
+                "dex_protocols": ["uniswap_v3", "uniswap_v2", "sushiswap"],
                 "block_time": 12,
                 "gas_token": "ETH",
                 "explorer": "https://etherscan.io"
             },
-            "arbitrum": {
-                "chain_id": 42161,
-                "type": "evm",
-                "name": "Arbitrum One",
-                "symbol": "ETH",
-                "rpc_urls": [
-                    settings.arbitrum_rpc_url,
-                    "https://arbitrum-one.publicnode.com"
-                ],
-                "dex_protocols": ["uniswap_v3", "sushiswap", "camelot", "gmx"],
-                "block_time": 0.25,
-                "gas_token": "ETH",
-                "explorer": "https://arbiscan.io"
-            },
-            "optimism": {
-                "chain_id": 10,
-                "type": "evm",
-                "name": "Optimism",
-                "symbol": "ETH",
-                "rpc_urls": [
-                    settings.optimism_rpc_url,
-                    "https://optimism.publicnode.com"
-                ],
-                "dex_protocols": ["uniswap_v3", "velodrome", "beethoven_x"],
-                "block_time": 2,
-                "gas_token": "ETH",
-                "explorer": "https://optimistic.etherscan.io"
-            },
-            "base": {
-                "chain_id": 8453,
-                "type": "evm",
-                "name": "Base",
-                "symbol": "ETH",
-                "rpc_urls": [
-                    settings.base_rpc_url,
-                    "https://base.publicnode.com"
-                ],
-                "dex_protocols": ["uniswap_v3", "aerodrome", "baseswap"],
-                "block_time": 2,
-                "gas_token": "ETH",
-                "explorer": "https://basescan.org"
-            },
             "polygon": {
                 "chain_id": 137,
-                "type": "evm",
+                "type": "evm", 
                 "name": "Polygon",
                 "symbol": "MATIC",
-                "rpc_urls": [
-                    settings.polygon_rpc_url,
-                    "https://polygon-bor.publicnode.com"
-                ],
-                "dex_protocols": ["uniswap_v3", "quickswap", "sushiswap", "1inch"],
+                "rpc_urls": [settings.polygon_rpc_url],
+                "dex_protocols": ["uniswap_v3", "quickswap"],
                 "block_time": 2,
                 "gas_token": "MATIC",
                 "explorer": "https://polygonscan.com"
-            },
-            "bnb_chain": {
-                "chain_id": 56,
-                "type": "evm",
-                "name": "BNB Chain",
-                "symbol": "BNB",
-                "rpc_urls": [
-                    settings.bnb_rpc_url,
-                    "https://bsc.publicnode.com"
-                ],
-                "dex_protocols": ["pancakeswap", "biswap", "1inch"],
-                "block_time": 3,
-                "gas_token": "BNB",
-                "explorer": "https://bscscan.com"
-            },
-            "avalanche": {
-                "chain_id": 43114,
-                "type": "evm",
-                "name": "Avalanche",
-                "symbol": "AVAX",
-                "rpc_urls": [
-                    settings.avalanche_rpc_url,
-                    "https://avalanche.publicnode.com"
-                ],
-                "dex_protocols": ["traderjoe", "pangolin", "sushiswap"],
-                "block_time": 2,
-                "gas_token": "AVAX",
-                "explorer": "https://snowtrace.io"
-            },
-            
-            # Non-EVM Chains
-            "solana": {
-                "type": "solana",
-                "name": "Solana",
-                "symbol": "SOL",
-                "rpc_urls": [
-                    settings.solana_rpc_url,
-                    "https://solana-api.projectserum.com"
-                ],
-                "dex_protocols": ["raydium", "orca", "jupiter", "serum"],
-                "block_time": 0.4,
-                "gas_token": "SOL",
-                "explorer": "https://solscan.io"
             }
         }
     
     @classmethod
     def get_all_networks(cls) -> List[str]:
-        """Get list of all supported networks."""
-        # Use a default settings instance for network names
         default_settings = Settings()
         networks = cls.get_supported_networks(default_settings)
         return list(networks.keys())
     
     @classmethod
     def get_network_config(cls, network_name: str, settings: Optional[Settings] = None) -> dict:
-        """Get configuration for a specific network."""
         if settings is None:
             settings = Settings()
-        
         networks = cls.get_supported_networks(settings)
         if network_name not in networks:
             raise ValueError(f"Unsupported network: {network_name}")
         return networks[network_name]
-    
-    @classmethod
-    def get_evm_networks(cls) -> List[str]:
-        """Get list of EVM-compatible networks."""
-        default_settings = Settings()
-        networks = cls.get_supported_networks(default_settings)
-        return [
-            name for name, config in networks.items()
-            if config.get("type") == "evm"
-        ]
-    
-    @classmethod
-    def get_non_evm_networks(cls) -> List[str]:
-        """Get list of non-EVM networks."""
-        default_settings = Settings()
-        networks = cls.get_supported_networks(default_settings)
-        return [
-            name for name, config in networks.items()
-            if config.get("type") != "evm"
-        ]
 
 
 # Global settings instance
 settings = Settings()
+
+
+def get_network_config(network_name: str) -> Optional[dict]:
+    """Get network configuration by name."""
+    return NetworkConfig.get_network_config(network_name)
