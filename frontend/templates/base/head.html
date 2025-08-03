@@ -1,0 +1,93 @@
+<!-- Meta Tags -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="DEX Sniper Pro - Professional trading dashboard for DEX sniping, real-time token discovery, and arbitrage opportunities">
+<meta name="keywords" content="DEX, sniping, trading, cryptocurrency, blockchain, arbitrage, token discovery">
+<meta name="author" content="DEX Sniper Pro">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/static/images/favicon.svg">
+<link rel="icon" type="image/png" href="/static/images/favicon.png">
+
+<!-- External CSS Libraries -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet" 
+      integrity="sha512-b2QcS5SsA8tZodcDtGRELiGv5SaKSk1vDHDaQRda0htPYWZ6046lr3kJ5bAAQdpV2mmA/4v0wQF9MyU6/pDIAg==" 
+      crossorigin="anonymous">
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet"
+      integrity="sha512-oAvyhq/vGiIkIyJhQ3Y0HnLhY4P3WoVqFvwGBQvEcqC2UPwQzPDG2w8CbJ8wMUG1vfZe8xvF2+Rf3bQ7gLbDw==" 
+      crossorigin="anonymous">
+
+<!-- Chart.js for Data Visualization -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js" 
+        integrity="sha512-xzz6Q6U0+9X4H6Q7mZzJ6k4Nz8S7YzMfx9fL6dj5K0x3z6D2Qvj4z3DWKYhSGQZzG4U1ZmzjZQ7Xhvy/WQT9w==" 
+        crossorigin="anonymous"></script>
+
+<!-- Custom CSS -->
+<link href="/static/css/main.css" rel="stylesheet">
+<link href="/static/css/components.css" rel="stylesheet">
+<link href="/static/css/dashboard.css" rel="stylesheet">
+<link href="/static/css/responsive.css" rel="stylesheet">
+
+<!-- Performance Optimization -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+
+<!-- Progressive Web App -->
+<link rel="manifest" href="/static/manifest.json">
+<meta name="theme-color" content="#667eea">
+
+<!-- CSS Custom Properties -->
+<style>
+:root {
+    --primary-color: #667eea;
+    --secondary-color: #764ba2;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --light-color: #f8f9fa;
+    --dark-color: #343a40;
+    
+    --sidebar-width: 280px;
+    --header-height: 70px;
+    --border-radius: 12px;
+    --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+    
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-size-base: 1rem;
+    --font-size-sm: 0.875rem;
+    --font-size-lg: 1.125rem;
+    
+    --z-index-sidebar: 1000;
+    --z-index-header: 999;
+    --z-index-modal: 1050;
+    --z-index-tooltip: 1070;
+}
+
+/* Performance: Reduce paint on animations */
+.pulse-dot,
+.loading-spinner,
+.fade-in {
+    will-change: transform, opacity;
+}
+
+/* Accessibility: Focus styles */
+*:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+/* Performance: Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Loading state */
+.loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+</style>

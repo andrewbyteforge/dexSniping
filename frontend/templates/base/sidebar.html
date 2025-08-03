@@ -1,0 +1,174 @@
+<!-- Sidebar Navigation -->
+<nav class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+    <!-- Sidebar Header -->
+    <div class="sidebar-header">
+        <a href="/" class="sidebar-brand" aria-label="DEX Sniper Pro Home">
+            <i class="bi bi-graph-up-arrow" aria-hidden="true"></i>
+            <span>DEX Sniper Pro</span>
+        </a>
+        <div class="sidebar-version">
+            <small class="text-muted">Phase 3B</small>
+        </div>
+    </div>
+    
+    <!-- Navigation Menu -->
+    <div class="sidebar-nav">
+        <ul class="nav flex-column" role="menu">
+            <!-- Dashboard -->
+            <li class="nav-item" role="none">
+                <a class="nav-link active" 
+                   href="#dashboard" 
+                   data-section="dashboard" 
+                   role="menuitem"
+                   aria-current="page">
+                    <i class="bi bi-speedometer2" aria-hidden="true"></i>
+                    <span>Dashboard</span>
+                    <span class="nav-indicator"></span>
+                </a>
+            </li>
+            
+            <!-- Token Discovery -->
+            <li class="nav-item" role="none">
+                <a class="nav-link" 
+                   href="#token-discovery" 
+                   data-section="token-discovery" 
+                   role="menuitem">
+                    <i class="bi bi-search" aria-hidden="true"></i>
+                    <span>Token Discovery</span>
+                    <span class="badge bg-success ms-auto">Live</span>
+                </a>
+            </li>
+            
+            <!-- Live Trading -->
+            <li class="nav-item" role="none">
+                <a class="nav-link" 
+                   href="#live-trading" 
+                   data-section="live-trading" 
+                   role="menuitem">
+                    <i class="bi bi-graph-up" aria-hidden="true"></i>
+                    <span>Live Trading</span>
+                    <span class="badge bg-warning ms-auto">Phase 3B</span>
+                </a>
+            </li>
+            
+            <!-- Portfolio -->
+            <li class="nav-item" role="none">
+                <a class="nav-link" 
+                   href="#portfolio" 
+                   data-section="portfolio" 
+                   role="menuitem">
+                    <i class="bi bi-wallet2" aria-hidden="true"></i>
+                    <span>Portfolio</span>
+                </a>
+            </li>
+            
+            <!-- Arbitrage -->
+            <li class="nav-item" role="none">
+                <a class="nav-link" 
+                   href="#arbitrage" 
+                   data-section="arbitrage" 
+                   role="menuitem">
+                    <i class="bi bi-arrow-left-right" aria-hidden="true"></i>
+                    <span>Arbitrage</span>
+                    <span class="pulse-dot ms-auto"></span>
+                </a>
+            </li>
+            
+            <!-- Analytics -->
+            <li class="nav-item" role="none">
+                <a class="nav-link" 
+                   href="#analytics" 
+                   data-section="analytics" 
+                   role="menuitem">
+                    <i class="bi bi-bar-chart" aria-hidden="true"></i>
+                    <span>Analytics</span>
+                </a>
+            </li>
+            
+            <!-- Divider -->
+            <li class="nav-divider" role="separator"></li>
+            
+            <!-- Settings -->
+            <li class="nav-item" role="none">
+                <a class="nav-link" 
+                   href="#settings" 
+                   data-section="settings" 
+                   role="menuitem">
+                    <i class="bi bi-gear" aria-hidden="true"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+            
+            <!-- API Documentation -->
+            <li class="nav-item" role="none">
+                <a class="nav-link" 
+                   href="/docs" 
+                   target="_blank" 
+                   role="menuitem"
+                   aria-describedby="api-docs-description">
+                    <i class="bi bi-book" aria-hidden="true"></i>
+                    <span>API Docs</span>
+                    <i class="bi bi-box-arrow-up-right ms-auto" aria-hidden="true"></i>
+                </a>
+                <span id="api-docs-description" class="sr-only">Opens in new tab</span>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+        <!-- System Status -->
+        <div class="system-status">
+            <div class="status-item">
+                <span class="status-dot status-success"></span>
+                <small>System Operational</small>
+            </div>
+            <div class="status-item">
+                <span class="status-dot status-success"></span>
+                <small>APIs Online</small>
+            </div>
+            <div class="status-item">
+                <span class="status-dot status-warning"></span>
+                <small>WebSocket Connecting</small>
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="quick-stats">
+            <div class="stat-mini">
+                <span class="stat-value" id="sidebar-tokens">--</span>
+                <span class="stat-label">Tokens</span>
+            </div>
+            <div class="stat-mini">
+                <span class="stat-value" id="sidebar-trades">--</span>
+                <span class="stat-label">Trades</span>
+            </div>
+            <div class="stat-mini">
+                <span class="stat-value" id="sidebar-arb">--</span>
+                <span class="stat-label">Arb</span>
+            </div>
+        </div>
+        
+        <!-- Phase 3B Progress -->
+        <div class="phase-progress">
+            <div class="progress-header">
+                <small class="fw-bold">Phase 3B Progress</small>
+                <small class="text-success">25%</small>
+            </div>
+            <div class="progress progress-sm">
+                <div class="progress-bar bg-success" 
+                     role="progressbar" 
+                     style="width: 25%" 
+                     aria-valuenow="25" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100"
+                     aria-label="Phase 3B completion progress">
+                </div>
+            </div>
+            <small class="text-muted">Step 1: Enhanced Token Discovery ✅</small>
+        </div>
+    </div>
+</nav>
+
+<!-- Sidebar Overlay for Mobile -->
+<div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>

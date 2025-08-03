@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% include 'base/head.html' %}
+    <title>{% block title %}DEX Sniper Pro{% endblock %} - Professional Trading Dashboard</title>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    {% include 'base/sidebar.html' %}
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <!-- Top Navigation Bar -->
+        <div class="top-nav">
+            <button class="btn btn-link d-md-none me-3" id="sidebarToggle">
+                <i class="bi bi-list fs-4"></i>
+            </button>
+            
+            <div class="me-auto">
+                <h5 class="mb-0">{% block page_title %}Professional Trading Dashboard{% endblock %}</h5>
+                <small class="text-muted">{% block page_subtitle %}Real-time DEX monitoring and trading{% endblock %}</small>
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <div class="live-indicator active">
+                    <span class="pulse-dot"></span>
+                    <span id="connection-status">Live</span>
+                </div>
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle"></i>
+                        Account
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Profile</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Settings</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div class="content-area">
+            {% block content %}
+            <!-- Page-specific content will be inserted here -->
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- Footer Scripts -->
+    {% include 'base/footer.html' %}
+    
+    <!-- Page-specific JavaScript -->
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

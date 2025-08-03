@@ -1,0 +1,209 @@
+<!-- Bootstrap JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js" 
+        integrity="sha512-X/YkDZyjTf4wyc2Vy16YGCPHwAY8rZJY+POgokZjQB2mhIRFJCckEGc6YyX9eNsPfn0PzThEuNs+uaomE5CO6A==" 
+        crossorigin="anonymous"></script>
+
+<!-- Core Application Scripts -->
+<script src="/static/js/utils/constants.js"></script>
+<script src="/static/js/utils/formatters.js"></script>
+<script src="/static/js/utils/validators.js"></script>
+
+<!-- API and WebSocket Management -->
+<script src="/static/js/api-client.js"></script>
+<script src="/static/js/websocket-manager.js"></script>
+
+<!-- Component Controllers -->
+<script src="/static/js/components/dashboard-controller.js"></script>
+<script src="/static/js/components/token-discovery-controller.js"></script>
+<script src="/static/js/components/trading-controller.js"></script>
+<script src="/static/js/components/chart-controller.js"></script>
+
+<!-- Main Application Controller -->
+<script src="/static/js/app.js"></script>
+
+<!-- Application Initialization -->
+<script>
+    // Global application configuration
+    window.DEX_SNIPER_CONFIG = {
+        API_BASE_URL: '/api/v1',
+        WEBSOCKET_URL: `ws://${window.location.host}/api/v1/dashboard/ws`,
+        VERSION: '3.1.0',
+        PHASE: '3B',
+        DEBUG: {{ 'true' if config.DEBUG else 'false' }},
+        FEATURES: {
+            TOKEN_DISCOVERY: true,
+            LIVE_TRADING: false,  // Phase 3B
+            ARBITRAGE: false,     // Phase 3B
+            AI_RISK: false,       // Phase 3B
+            MOBILE_APP: false     // Phase 3C
+        },
+        NETWORKS: [
+            'Ethereum',
+            'Polygon', 
+            'BSC',
+            'Arbitrum',
+            'Optimism',
+            'Avalanche',
+            'Fantom',
+            'Solana'
+        ],
+        REFRESH_INTERVALS: {
+            STATS: 10000,         // 10 seconds
+            TOKENS: 30000,        // 30 seconds
+            PORTFOLIO: 60000,     // 1 minute
+            ALERTS: 5000          // 5 seconds
+        }
+    };
+
+    // Performance monitoring
+    window.PERFORMANCE_MONITOR = {
+        startTime: performance.now(),
+        apiCalls: 0,
+        webSocketReconnects: 0,
+        errors: []
+    };
+
+    // Error tracking
+    window.addEventListener('error', function(event) {
+        window.PERFORMANCE_MONITOR.errors.push({
+            message: event.message,
+            filename: event.filename,
+            lineno: event.lineno,
+            timestamp: new Date().toISOString()
+        });
+        
+        // Log to console in debug mode
+        if (window.DEX_SNIPER_CONFIG.DEBUG) {
+            console.error('Application Error:', {
+                message: event.message,
+                source: event.filename,
+                line: event.lineno,
+                stack: event.error?.stack
+            });
+        }
+    });
+
+    // Unhandled promise rejection tracking
+    window.addEventListener('unhandledrejection', function(event) {
+        window.PERFORMANCE_MONITOR.errors.push({
+            message: 'Unhandled Promise Rejection: ' + event.reason,
+            timestamp: new Date().toISOString()
+        });
+        
+        if (window.DEX_SNIPER_CONFIG.DEBUG) {
+            console.error('Unhandled Promise Rejection:', event.reason);
+        }
+    });
+
+    // Application initialization
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            // Initialize main application
+            if (typeof DexSniperApp !== 'undefined') {
+                DexSniperApp.init();
+                console.log('✅ DEX Sniper Pro initialized successfully');
+            } else {
+                throw new Error('DexSniperApp not found');
+            }
+        } catch (error) {
+            console.error('❌ Failed to initialize DEX Sniper Pro:', error);
+            
+            // Show user-friendly error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+            errorDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 400px;';
+            errorDiv.innerHTML = `
+                <strong>Initialization Error</strong><br>
+                The application failed to start properly. Please refresh the page.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(errorDiv);
+        }
+    });
+
+    // Performance measurement
+    window.addEventListener('load', function() {
+        const loadTime = performance.now() - window.PERFORMANCE_MONITOR.startTime;
+        console.log(`📊 Page load time: ${loadTime.toFixed(2)}ms`);
+        
+        // Report to analytics if configured
+        if (window.DEX_SNIPER_CONFIG.DEBUG) {
+            console.log('Performance metrics:', {
+                loadTime: loadTime,
+                domContentLoaded: performance.timing.domContentLoadedEventEnd - performance.timing.navigationStart,
+                firstContentfulPaint: performance.getEntriesByName('first-contentful-paint')[0]?.startTime
+            });
+        }
+    });
+
+    // Service Worker registration for PWA (if available)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/static/sw.js')
+                .then(function(registration) {
+                    console.log('✅ Service Worker registered:', registration.scope);
+                })
+                .catch(function(error) {
+                    console.log('❌ Service Worker registration failed:', error);
+                });
+        });
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(event) {
+        // Ctrl/Cmd + K for search
+        if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+            event.preventDefault();
+            // TODO: Open search modal
+            console.log('Search shortcut activated');
+        }
+        
+        // Ctrl/Cmd + D for dashboard
+        if ((event.ctrlKey || event.metaKey) && event.key === 'd') {
+            event.preventDefault();
+            if (typeof DexSniperApp !== 'undefined' && DexSniperApp.navigation) {
+                DexSniperApp.navigation.showSection('dashboard');
+            }
+        }
+        
+        // Escape to close modals/overlays
+        if (event.key === 'Escape') {
+            // Close mobile sidebar
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (sidebar && sidebar.classList.contains('show')) {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+            }
+        }
+    });
+</script>
+
+<!-- Development Tools (only in debug mode) -->
+{% if config.DEBUG %}
+<script>
+    // Debug utilities
+    window.DEBUG_TOOLS = {
+        showPerformanceMetrics: function() {
+            console.table(window.PERFORMANCE_MONITOR);
+        },
+        
+        testWebSocket: function() {
+            if (window.WebSocketManager) {
+                window.WebSocketManager.testConnection();
+            }
+        },
+        
+        simulateError: function() {
+            throw new Error('Simulated error for testing');
+        },
+        
+        logApiCalls: function() {
+            console.log('API calls made:', window.PERFORMANCE_MONITOR.apiCalls);
+        }
+    };
+    
+    console.log('🔧 Debug mode enabled. Use DEBUG_TOOLS for testing.');
+    console.log('Available commands:', Object.keys(window.DEBUG_TOOLS));
+</script>
+{% endif %}
