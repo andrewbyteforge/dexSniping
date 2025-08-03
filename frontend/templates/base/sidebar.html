@@ -1,13 +1,13 @@
 <!-- 
 DEX Sniper Pro - Sidebar Navigation Component
 File: frontend/templates/base/sidebar.html
-Professional navigation component with Flake8 compliance
+Professional navigation component with proper layout
 -->
 
 <nav class="sidebar" id="sidebar">
     <!-- Brand Section -->
     <div class="sidebar-brand">
-        <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center justify-content-center">
             <div class="brand-icon me-2">
                 <i class="bi bi-lightning-charge-fill text-warning fs-3"></i>
             </div>
@@ -37,7 +37,7 @@ Professional navigation component with Flake8 compliance
                 <a class="nav-link" href="/token-discovery">
                     <i class="bi bi-search"></i>
                     <span class="nav-text">Token Discovery</span>
-                    <span class="badge bg-success ms-auto" id="new-tokens-count">0</span>
+                    <span class="badge bg-success ms-auto" id="new-tokens-count">10</span>
                 </a>
             </li>
 
@@ -46,7 +46,7 @@ Professional navigation component with Flake8 compliance
                 <a class="nav-link" href="/trading">
                     <i class="bi bi-graph-up-arrow"></i>
                     <span class="nav-text">Live Trading</span>
-                    <span class="badge bg-warning ms-auto">Soon</span>
+                    <span class="badge bg-warning ms-auto">AI</span>
                 </a>
             </li>
 
@@ -55,16 +55,16 @@ Professional navigation component with Flake8 compliance
                 <a class="nav-link" href="/portfolio">
                     <i class="bi bi-briefcase"></i>
                     <span class="nav-text">Portfolio</span>
-                    <span class="portfolio-value ms-auto text-success">$0.00</span>
+                    <span class="badge bg-info ms-auto">$125K</span>
                 </a>
             </li>
 
-            <!-- Arbitrage -->
+            <!-- Risk Management -->
             <li class="nav-item">
-                <a class="nav-link" href="/arbitrage">
-                    <i class="bi bi-arrow-left-right"></i>
-                    <span class="nav-text">Arbitrage</span>
-                    <span class="opportunity-count ms-auto">0</span>
+                <a class="nav-link" href="/risk-management">
+                    <i class="bi bi-shield-check"></i>
+                    <span class="nav-text">Risk Management</span>
+                    <span class="badge bg-secondary ms-auto">99%</span>
                 </a>
             </li>
 
@@ -73,27 +73,7 @@ Professional navigation component with Flake8 compliance
                 <a class="nav-link" href="/analytics">
                     <i class="bi bi-bar-chart"></i>
                     <span class="nav-text">Analytics</span>
-                </a>
-            </li>
-
-            <!-- Navigation Divider -->
-            <li class="nav-divider">
-                <hr class="my-3 opacity-25">
-            </li>
-
-            <!-- Risk Management -->
-            <li class="nav-item">
-                <a class="nav-link" href="/risk-management">
-                    <i class="bi bi-shield-check"></i>
-                    <span class="nav-text">Risk Management</span>
-                </a>
-            </li>
-
-            <!-- Transaction History -->
-            <li class="nav-item">
-                <a class="nav-link" href="/transactions">
-                    <i class="bi bi-clock-history"></i>
-                    <span class="nav-text">Transactions</span>
+                    <span class="badge bg-primary ms-auto">AI</span>
                 </a>
             </li>
 
@@ -105,364 +85,67 @@ Professional navigation component with Flake8 compliance
                 </a>
             </li>
 
-            <!-- Navigation Divider -->
-            <li class="nav-divider">
-                <hr class="my-3 opacity-25">
-            </li>
+            <!-- Divider -->
+            <li><hr class="nav-divider" style="border-color: rgba(255, 255, 255, 0.1); margin: 0.5rem 1.5rem;"></li>
 
             <!-- API Documentation -->
             <li class="nav-item">
                 <a class="nav-link" href="/docs" target="_blank">
-                    <i class="bi bi-file-text"></i>
+                    <i class="bi bi-book"></i>
                     <span class="nav-text">API Docs</span>
                     <i class="bi bi-box-arrow-up-right ms-auto"></i>
                 </a>
             </li>
 
-            <!-- System Health -->
+            <!-- Health Status -->
             <li class="nav-item">
                 <a class="nav-link" href="/api/v1/health" target="_blank">
                     <i class="bi bi-heart-pulse"></i>
-                    <span class="nav-text">System Health</span>
-                    <span class="health-status ms-auto text-success">
-                        <i class="bi bi-check-circle-fill"></i>
-                    </span>
+                    <span class="nav-text">Health Status</span>
+                    <span class="badge bg-success ms-auto">OK</span>
                 </a>
             </li>
         </ul>
     </div>
 
     <!-- Sidebar Footer -->
-    <div class="sidebar-footer mt-auto p-3">
-        <!-- Connection Status -->
-        <div class="connection-widget bg-dark bg-opacity-25 rounded p-3 mb-3">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-                <small class="text-light opacity-75">Connection</small>
-                <span class="connection-status text-success">
-                    <i class="bi bi-wifi"></i>
-                </span>
-            </div>
-            <div class="connection-details">
-                <div class="d-flex justify-content-between">
-                    <small class="text-light opacity-75">WebSocket:</small>
-                    <small class="text-success" id="ws-status">Connected</small>
+    <div class="sidebar-footer p-3 mt-auto">
+        <!-- Connection Status Widget -->
+        <div class="connection-widget p-2 rounded mb-2" style="background: rgba(255, 255, 255, 0.1);">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <small class="text-light opacity-75">Status</small>
+                    <div class="fw-bold">
+                        <i class="bi bi-dot text-success"></i>
+                        <span id="sidebar-status">Operational</span>
+                    </div>
                 </div>
-                <div class="d-flex justify-content-between">
-                    <small class="text-light opacity-75">Latency:</small>
-                    <small class="text-warning" id="ws-latency">--ms</small>
+                <div class="text-end">
+                    <small class="text-light opacity-75">Uptime</small>
+                    <div class="fw-bold">99.8%</div>
                 </div>
             </div>
         </div>
 
         <!-- Quick Stats -->
-        <div class="quick-stats bg-dark bg-opacity-25 rounded p-3 mb-3">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-                <small class="text-light opacity-75">Today's Stats</small>
-                <i class="bi bi-graph-up text-success"></i>
-            </div>
-            <div class="stats-grid-small">
-                <div class="d-flex justify-content-between">
-                    <small class="text-light opacity-75">Scanned:</small>
-                    <small class="text-info" id="tokens-scanned">0</small>
+        <div class="quick-stats p-2 rounded" style="background: rgba(255, 255, 255, 0.1);">
+            <div class="row g-1 text-center">
+                <div class="col-4">
+                    <small class="text-light opacity-75">Tokens</small>
+                    <div class="fw-bold">47</div>
                 </div>
-                <div class="d-flex justify-content-between">
-                    <small class="text-light opacity-75">Alerts:</small>
-                    <small class="text-warning" id="alerts-today">0</small>
+                <div class="col-4">
+                    <small class="text-light opacity-75">Active</small>
+                    <div class="fw-bold">23</div>
                 </div>
-                <div class="d-flex justify-content-between">
-                    <small class="text-light opacity-75">Uptime:</small>
-                    <small class="text-success" id="system-uptime">99.9%</small>
+                <div class="col-4">
+                    <small class="text-light opacity-75">P&L</small>
+                    <div class="fw-bold text-warning">+2.6%</div>
                 </div>
             </div>
         </div>
-
-        <!-- Collapse Button -->
-        <button class="btn btn-outline-light btn-sm w-100" id="sidebar-collapse" 
-                title="Collapse Sidebar">
-            <i class="bi bi-chevron-left"></i>
-            <span class="nav-text ms-2">Collapse</span>
-        </button>
     </div>
 </nav>
 
-<!-- Sidebar Overlay for Mobile -->
-<div class="sidebar-overlay d-md-none" id="sidebar-overlay"></div>
-
-<!-- Sidebar Styles -->
-<style>
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: var(--sidebar-width, 280px);
-    height: 100vh;
-    background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    z-index: var(--z-sidebar, 1000);
-    transform: translateX(0);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-}
-
-.sidebar-collapsed .sidebar {
-    width: var(--sidebar-collapsed-width, 70px);
-}
-
-.sidebar-collapsed .nav-text,
-.sidebar-collapsed .brand-text,
-.sidebar-collapsed .sidebar-footer {
-    opacity: 0;
-    visibility: hidden;
-}
-
-.sidebar-brand {
-    padding: 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    flex-shrink: 0;
-}
-
-.brand-icon {
-    flex-shrink: 0;
-}
-
-.sidebar-nav {
-    flex: 1;
-    padding: 1rem 0;
-    overflow-y: auto;
-}
-
-.nav-item {
-    margin: 0.25rem 0;
-}
-
-.nav-link {
-    display: flex;
-    align-items: center;
-    padding: 0.75rem 1.5rem;
-    color: rgba(255, 255, 255, 0.8);
-    text-decoration: none;
-    transition: all 0.15s ease;
-    border-radius: 0;
-    position: relative;
-}
-
-.nav-link:hover,
-.nav-link.active {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    transform: translateX(4px);
-}
-
-.nav-link.active::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: #fbbf24;
-    border-radius: 0 4px 4px 0;
-}
-
-.nav-link i {
-    width: 20px;
-    margin-right: 0.75rem;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-.nav-text {
-    flex: 1;
-    transition: all 0.3s ease;
-}
-
-.nav-divider {
-    margin: 0.5rem 1.5rem;
-}
-
-.badge {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-}
-
-.sidebar-footer {
-    flex-shrink: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-}
-
-.connection-widget,
-.quick-stats {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: var(--z-sidebar, 1000) - 1;
-    display: none;
-}
-
-.sidebar-overlay.show {
-    display: block;
-}
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-100%);
-    }
-    
-    .sidebar.show {
-        transform: translateX(0);
-    }
-}
-
-/* Performance Optimizations */
-.sidebar,
-.nav-link,
-.sidebar-overlay {
-    will-change: transform;
-}
-
-/* Accessibility */
-.nav-link:focus-visible {
-    outline: 2px solid #fbbf24;
-    outline-offset: 2px;
-}
-
-/* Dark Mode Support */
-[data-bs-theme="dark"] .sidebar {
-    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-}
-</style>
-
-<!-- Sidebar JavaScript -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    initializeSidebar();
-});
-
-function initializeSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebarToggle');
-    const sidebarCollapse = document.getElementById('sidebar-collapse');
-    const sidebarOverlay = document.getElementById('sidebar-overlay');
-    
-    // Mobile sidebar toggle
-    if (sidebarToggle) {
-        sidebarToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('show');
-            sidebarOverlay.classList.toggle('show');
-        });
-    }
-    
-    // Sidebar collapse/expand
-    if (sidebarCollapse) {
-        sidebarCollapse.addEventListener('click', function() {
-            document.body.classList.toggle('sidebar-collapsed');
-            
-            const icon = this.querySelector('i');
-            const text = this.querySelector('.nav-text');
-            
-            if (document.body.classList.contains('sidebar-collapsed')) {
-                icon.className = 'bi bi-chevron-right';
-                if (text) text.textContent = 'Expand';
-            } else {
-                icon.className = 'bi bi-chevron-left';
-                if (text) text.textContent = 'Collapse';
-            }
-        });
-    }
-    
-    // Close sidebar on overlay click
-    if (sidebarOverlay) {
-        sidebarOverlay.addEventListener('click', function() {
-            sidebar.classList.remove('show');
-            sidebarOverlay.classList.remove('show');
-        });
-    }
-    
-    // Set active navigation item based on current page
-    setActiveNavItem();
-    
-    // Update sidebar stats
-    updateSidebarStats();
-    
-    // Setup periodic updates
-    setInterval(updateSidebarStats, 30000); // Every 30 seconds
-}
-
-function setActiveNavItem() {
-    const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('.sidebar .nav-link');
-    
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        
-        const href = link.getAttribute('href');
-        if (href && (currentPath === href || currentPath.startsWith(href + '/'))) {
-            link.classList.add('active');
-        }
-    });
-}
-
-function updateSidebarStats() {
-    // Update connection status
-    updateConnectionStatus();
-    
-    // Update quick stats
-    updateQuickStats();
-}
-
-function updateConnectionStatus() {
-    try {
-        // Check WebSocket status
-        const wsStatus = document.getElementById('ws-status');
-        const wsLatency = document.getElementById('ws-latency');
-        
-        if (window.DexSniperApp && window.DexSniperApp.websocket) {
-            const ws = window.DexSniperApp.websocket;
-            
-            if (wsStatus) {
-                wsStatus.textContent = ws.readyState === WebSocket.OPEN ? 'Connected' : 'Disconnected';
-                wsStatus.className = ws.readyState === WebSocket.OPEN ? 'text-success' : 'text-danger';
-            }
-            
-            if (wsLatency && ws.latency) {
-                wsLatency.textContent = `${ws.latency}ms`;
-                wsLatency.className = ws.latency < 100 ? 'text-success' : 
-                                      ws.latency < 300 ? 'text-warning' : 'text-danger';
-            }
-        }
-    } catch (error) {
-        console.warn('Error updating connection status:', error);
-    }
-}
-
-function updateQuickStats() {
-    try {
-        // Update tokens scanned
-        const tokensScanned = document.getElementById('tokens-scanned');
-        const alertsToday = document.getElementById('alerts-today');
-        const systemUptime = document.getElementById('system-uptime');
-        
-        // Get stats from app state or API
-        if (window.DexSniperApp && window.DexSniperApp.stats) {
-            const stats = window.DexSniperApp.stats;
-            
-            if (tokensScanned) tokensScanned.textContent = stats.tokensScanned || 0;
-            if (alertsToday) alertsToday.textContent = stats.alertsToday || 0;
-            if (systemUptime) systemUptime.textContent = stats.uptime || '99.9%';
-        }
-    } catch (error) {
-        console.warn('Error updating quick stats:', error);
-    }
-}
-</script>
+<!-- Mobile Sidebar Overlay -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
