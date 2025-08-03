@@ -1,506 +1,339 @@
-<!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
-<head>
-    {% include 'base/head.html' %}
-    <title>Dashboard - DEX Sniper Pro</title>
-    
-    <!-- Chart.js for data visualization -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js" 
-            integrity="sha512-7U4rRB8aGAHGVad3u2jiC7GA5/1YhQcQjxKeaVms/bT66i3LVBMRcBI9KwABNWnxOSwulkuSXxZLGuyfvo7V0A==" 
-            crossorigin="anonymous"></script>
-    
-    <!-- Page-specific styles -->
-    <style>
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        @media (min-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: 2fr 1fr;
-            }
-            
-            .dashboard-grid.three-columns {
-                grid-template-columns: 1fr 1fr 1fr;
-            }
-        }
-        
-        .chart-container {
-            position: relative;
-            height: 300px;
-            background: var(--bs-body-bg);
-            border-radius: 0.5rem;
-            border: 1px solid var(--bs-border-color);
-            padding: 1rem;
-        }
-        
-        .chart-loading {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: var(--bs-text-muted);
-        }
-        
-        .widget-header {
-            display: flex;
-            justify-content: between;
-            align-items: center;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--bs-border-color);
-        }
-        
-        .widget-title {
-            margin: 0;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
-        
-        .widget-controls {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .status-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            font-size: 0.875rem;
-        }
-        
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: currentColor;
-        }
-        
-        .dashboard-summary {
-            background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-info) 100%);
-            color: white;
-            border-radius: 1rem;
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-        
-        .summary-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-        
-        .summary-stat {
-            text-align: center;
-        }
-        
-        .summary-stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
-        
-        .summary-stat-label {
-            font-size: 0.875rem;
-            opacity: 0.9;
-        }
-        
-        .quick-actions {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-bottom: 2rem;
-        }
-        
-        .action-button {
-            flex: 1;
-            min-width: 150px;
-            padding: 1rem;
-            border: none;
-            border-radius: 0.5rem;
-            background: var(--bs-body-bg);
-            border: 1px solid var(--bs-border-color);
-            color: var(--bs-body-color);
-            text-decoration: none;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-        
-        .action-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            color: var(--bs-primary);
-            border-color: var(--bs-primary);
-        }
-        
-        .performance-metrics {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        
-        .metric-card {
-            background: var(--bs-body-bg);
-            border: 1px solid var(--bs-border-color);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            text-align: center;
-        }
-        
-        .metric-value {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-        
-        .metric-label {
-            font-size: 0.75rem;
-            color: var(--bs-text-muted);
-        }
-        
-        @media (max-width: 767px) {
-            .dashboard-summary {
-                padding: 1.5rem;
-            }
-            
-            .summary-stats {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
-            }
-            
-            .summary-stat-value {
-                font-size: 1.5rem;
-            }
-            
-            .quick-actions {
-                flex-direction: column;
-            }
-            
-            .action-button {
-                min-width: unset;
-            }
-        }
-    </style>
-</head>
+{% extends "base/layout.html" %}
 
-<body>
-    {% include 'base/layout.html' %}
-    
-    <!-- Main Dashboard Content -->
-    <div class="main-content">
-        <!-- Dashboard Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Professional Trading Dashboard{% endblock %}
+{% block page_subtitle %}Real-time DEX monitoring and analytics{% endblock %}
+
+{% block extra_css %}
+<!-- Chart.js for data visualization -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js" 
+        crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1">Dashboard</h1>
+        <p class="text-muted mb-0">
+            Real-time DEX monitoring and trading analytics
+            <span class="status-indicator ms-2">
+                <span class="status-dot text-success"></span>
+                <span class="connection-status text-success">Online</span>
+            </span>
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-outline-primary btn-sm" id="refresh-dashboard" title="Refresh All Data">
+            <i class="fas fa-sync-alt"></i>
+            <span class="d-none d-sm-inline ms-1">Refresh</span>
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" id="toggle-auto-refresh" title="Toggle Auto-refresh">
+            <i class="fas fa-play"></i>
+            <span class="d-none d-sm-inline ms-1">Auto</span>
+        </button>
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" 
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-cog"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="#" id="export-data">Export Data</a></li>
+                <li><a class="dropdown-item" href="#" id="dashboard-settings">Settings</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/docs" target="_blank">API Docs</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard Summary -->
+<div class="card mb-4" style="background: linear-gradient(135deg, var(--bs-primary) 0%, var(--bs-info) 100%); color: white;">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start flex-wrap">
             <div>
-                <h1 class="h3 mb-1">Dashboard</h1>
-                <p class="text-muted mb-0">
-                    Real-time DEX monitoring and trading analytics
-                    <span class="status-indicator ms-2">
-                        <span class="status-dot text-success"></span>
-                        <span class="connection-status text-success">Online</span>
-                    </span>
+                <h2 class="h4 mb-2">Portfolio Overview</h2>
+                <p class="mb-0 opacity-75">
+                    Last updated: <span class="last-update-time">--:--</span>
                 </p>
             </div>
-            <div class="d-flex gap-2">
-                <button class="btn btn-outline-primary btn-sm" id="refresh-dashboard" title="Refresh All Data">
+            <div class="text-end">
+                <div class="h5 mb-1">Total Value</div>
+                <div class="h3 mb-0" id="total-portfolio-value">$0.00</div>
+            </div>
+        </div>
+        
+        <div class="row mt-3">
+            <div class="col-md-3 text-center">
+                <div class="h4" id="summary-tokens">0</div>
+                <small>Tokens Discovered</small>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="h4" id="summary-trades">0</div>
+                <small>Active Trades</small>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="h4" id="summary-profit">$0.00</div>
+                <small>24h P&L</small>
+            </div>
+            <div class="col-md-3 text-center">
+                <div class="h4" id="summary-risk">0</div>
+                <small>Avg Risk Score</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-md-2">
+        <a href="/token-discovery" class="btn btn-outline-primary w-100">
+            <i class="fas fa-search"></i><br>
+            <small>Discover Tokens</small>
+        </a>
+    </div>
+    <div class="col-md-2">
+        <a href="/live-trading" class="btn btn-outline-success w-100">
+            <i class="fas fa-chart-line"></i><br>
+            <small>Live Trading</small>
+        </a>
+    </div>
+    <div class="col-md-2">
+        <a href="/portfolio" class="btn btn-outline-info w-100">
+            <i class="fas fa-wallet"></i><br>
+            <small>Portfolio</small>
+        </a>
+    </div>
+    <div class="col-md-2">
+        <a href="/arbitrage" class="btn btn-outline-warning w-100">
+            <i class="fas fa-exchange-alt"></i><br>
+            <small>Arbitrage</small>
+        </a>
+    </div>
+    <div class="col-md-2">
+        <a href="/analytics" class="btn btn-outline-secondary w-100">
+            <i class="fas fa-chart-bar"></i><br>
+            <small>Analytics</small>
+        </a>
+    </div>
+    <div class="col-md-2">
+        <a href="/api/v1/health" class="btn btn-outline-success w-100" target="_blank">
+            <i class="fas fa-heart-pulse"></i><br>
+            <small>System Health</small>
+        </a>
+    </div>
+</div>
+
+<!-- Stats Cards Section -->
+<div class="card mb-4">
+    <div class="card-header">
+        <div class="widget-header">
+            <h5 class="widget-title">
+                <i class="fas fa-tachometer-alt me-2"></i>
+                System Statistics
+            </h5>
+            <div class="widget-controls">
+                <button class="btn btn-sm btn-outline-primary" id="refresh-stats" title="Refresh Stats">
                     <i class="fas fa-sync-alt"></i>
-                    <span class="d-none d-sm-inline ms-1">Refresh</span>
                 </button>
-                <button class="btn btn-outline-secondary btn-sm" id="toggle-auto-refresh" title="Toggle Auto-refresh">
-                    <i class="fas fa-play"></i>
-                    <span class="d-none d-sm-inline ms-1">Auto</span>
-                </button>
-                <div class="dropdown">
-                    <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" 
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-cog"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#" id="export-data">Export Data</a></li>
-                        <li><a class="dropdown-item" href="#" id="dashboard-settings">Settings</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="/docs" target="_blank">API Docs</a></li>
-                    </ul>
-                </div>
             </div>
         </div>
+    </div>
+    <div class="card-body">
+        {% include 'components/stats-cards.html' %}
+    </div>
+</div>
 
-        <!-- Dashboard Summary -->
-        <div class="dashboard-summary">
-            <div class="d-flex justify-content-between align-items-start flex-wrap">
-                <div>
-                    <h2 class="h4 mb-2">Portfolio Overview</h2>
-                    <p class="mb-0 opacity-75">
-                        Last updated: <span class="last-update-time">--:--</span>
-                    </p>
-                </div>
-                <div class="text-end">
-                    <div class="h5 mb-1">Total Value</div>
-                    <div class="h3 mb-0" id="total-portfolio-value">$0.00</div>
-                </div>
-            </div>
-            
-            <div class="summary-stats">
-                <div class="summary-stat">
-                    <div class="summary-stat-value" id="summary-tokens">0</div>
-                    <div class="summary-stat-label">Tokens Discovered</div>
-                </div>
-                <div class="summary-stat">
-                    <div class="summary-stat-value" id="summary-trades">0</div>
-                    <div class="summary-stat-label">Active Trades</div>
-                </div>
-                <div class="summary-stat">
-                    <div class="summary-stat-value" id="summary-profit">$0.00</div>
-                    <div class="summary-stat-label">24h P&L</div>
-                </div>
-                <div class="summary-stat">
-                    <div class="summary-stat-value" id="summary-risk">0</div>
-                    <div class="summary-stat-label">Avg Risk Score</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <a href="/token-discovery" class="action-button">
-                <i class="fas fa-search"></i>
-                <span>Discover Tokens</span>
-            </a>
-            <a href="/live-trading" class="action-button">
-                <i class="fas fa-chart-line"></i>
-                <span>Live Trading</span>
-            </a>
-            <a href="/portfolio" class="action-button">
-                <i class="fas fa-wallet"></i>
-                <span>Portfolio</span>
-            </a>
-            <a href="/arbitrage" class="action-button">
-                <i class="fas fa-exchange-alt"></i>
-                <span>Arbitrage</span>
-            </a>
-            <a href="/analytics" class="action-button">
-                <i class="fas fa-chart-bar"></i>
-                <span>Analytics</span>
-            </a>
-        </div>
-
-        <!-- Stats Cards Section -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <div class="widget-header">
-                    <h5 class="widget-title">
-                        <i class="fas fa-tachometer-alt me-2"></i>
-                        System Statistics
-                    </h5>
-                    <div class="widget-controls">
-                        <button class="btn btn-sm btn-outline-primary" id="refresh-stats" title="Refresh Stats">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                {% include 'components/stats-cards.html' %}
-            </div>
-        </div>
-
-        <!-- Charts and Data Grid -->
-        <div class="dashboard-grid">
-            <!-- Price Chart -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="widget-header">
-                        <h5 class="widget-title">
-                            <i class="fas fa-chart-line me-2"></i>
-                            Price Trends
-                        </h5>
-                        <div class="widget-controls">
-                            <div class="btn-group btn-group-sm" role="group">
-                                <input type="radio" class="btn-check" name="chart-timeframe" id="timeframe-1h" checked>
-                                <label class="btn btn-outline-primary" for="timeframe-1h">1H</label>
-                                
-                                <input type="radio" class="btn-check" name="chart-timeframe" id="timeframe-24h">
-                                <label class="btn btn-outline-primary" for="timeframe-24h">24H</label>
-                                
-                                <input type="radio" class="btn-check" name="chart-timeframe" id="timeframe-7d">
-                                <label class="btn btn-outline-primary" for="timeframe-7d">7D</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="chart-container">
-                        <canvas id="price-chart" data-chart-type="price"></canvas>
-                        <div class="chart-loading" id="price-chart-loading">
-                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                            Loading price data...
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Portfolio Performance -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="widget-header">
-                        <h5 class="widget-title">
-                            <i class="fas fa-wallet me-2"></i>
-                            Portfolio Performance
-                        </h5>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="chart-container">
-                        <canvas id="portfolio-chart" data-chart-type="portfolio"></canvas>
-                        <div class="chart-loading" id="portfolio-chart-loading">
-                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                            Loading portfolio data...
-                        </div>
+<!-- Charts and Data Grid -->
+<div class="dashboard-grid">
+    <!-- Price Chart -->
+    <div class="card">
+        <div class="card-header">
+            <div class="widget-header">
+                <h5 class="widget-title">
+                    <i class="fas fa-chart-line me-2"></i>
+                    Price Trends
+                </h5>
+                <div class="widget-controls">
+                    <div class="btn-group btn-group-sm" role="group">
+                        <input type="radio" class="btn-check" name="chart-timeframe" id="timeframe-1h" checked>
+                        <label class="btn btn-outline-primary" for="timeframe-1h">1H</label>
+                        
+                        <input type="radio" class="btn-check" name="chart-timeframe" id="timeframe-24h">
+                        <label class="btn btn-outline-primary" for="timeframe-24h">24H</label>
+                        
+                        <input type="radio" class="btn-check" name="chart-timeframe" id="timeframe-7d">
+                        <label class="btn btn-outline-primary" for="timeframe-7d">7D</label>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Token Discovery and Alerts Grid -->
-        <div class="dashboard-grid">
-            <!-- Token Discovery Table -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="widget-header">
-                        <h5 class="widget-title">
-                            <i class="fas fa-coins me-2"></i>
-                            Recent Token Discoveries
-                        </h5>
-                        <div class="widget-controls">
-                            <a href="/token-discovery" class="btn btn-sm btn-primary">
-                                View All
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    {% include 'components/token-discovery-table.html' %}
-                </div>
-            </div>
-
-            <!-- Live Alerts -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="widget-header">
-                        <h5 class="widget-title">
-                            <i class="fas fa-bell me-2"></i>
-                            Live Alerts
-                        </h5>
-                        <div class="widget-controls">
-                            <button class="btn btn-sm btn-outline-secondary" id="clear-alerts" title="Clear All Alerts">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body">
-                    {% include 'components/live-alerts.html' %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Performance Metrics -->
-        <div class="card">
-            <div class="card-header">
-                <div class="widget-header">
-                    <h5 class="widget-title">
-                        <i class="fas fa-gauge-high me-2"></i>
-                        Performance Metrics
-                    </h5>
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="performance-metrics">
-                    <div class="metric-card">
-                        <div class="metric-value text-info" id="metric-api-response">--ms</div>
-                        <div class="metric-label">API Response</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value text-success" id="metric-uptime">--%</div>
-                        <div class="metric-label">Uptime</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value text-warning" id="metric-memory">--MB</div>
-                        <div class="metric-label">Memory Usage</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value text-primary" id="metric-websocket">--ms</div>
-                        <div class="metric-label">WebSocket Latency</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value text-secondary" id="metric-cache-hit">--%</div>
-                        <div class="metric-label">Cache Hit Rate</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-value text-info" id="metric-requests">--</div>
-                        <div class="metric-label">Requests/min</div>
-                    </div>
+        <div class="card-body">
+            <div class="chart-container">
+                <canvas id="price-chart" data-chart-type="price"></canvas>
+                <div class="chart-loading" id="price-chart-loading">
+                    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                    Loading price data...
                 </div>
             </div>
         </div>
     </div>
 
-    {% include 'base/footer.html' %}
+    <!-- Portfolio Performance -->
+    <div class="card">
+        <div class="card-header">
+            <div class="widget-header">
+                <h5 class="widget-title">
+                    <i class="fas fa-wallet me-2"></i>
+                    Portfolio Performance
+                </h5>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="chart-container">
+                <canvas id="portfolio-chart" data-chart-type="portfolio"></canvas>
+                <div class="chart-loading" id="portfolio-chart-loading">
+                    <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                    Loading portfolio data...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <!-- Dashboard-specific JavaScript -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('📊 Dashboard page loaded');
+<!-- Token Discovery and Alerts Grid -->
+<div class="dashboard-grid">
+    <!-- Token Discovery Table -->
+    <div class="card">
+        <div class="card-header">
+            <div class="widget-header">
+                <h5 class="widget-title">
+                    <i class="fas fa-coins me-2"></i>
+                    Recent Token Discoveries
+                </h5>
+                <div class="widget-controls">
+                    <a href="/token-discovery" class="btn btn-sm btn-primary">
+                        View All
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            {% include 'components/token-discovery-table.html' %}
+        </div>
+    </div>
 
-            // Initialize dashboard-specific functionality
-            initializeDashboard();
-            
-            // Setup dashboard event listeners
-            setupDashboardEvents();
-            
-            // Load initial chart data
-            loadInitialCharts();
-        });
+    <!-- Live Alerts -->
+    <div class="card">
+        <div class="card-header">
+            <div class="widget-header">
+                <h5 class="widget-title">
+                    <i class="fas fa-bell me-2"></i>
+                    Live Alerts
+                </h5>
+                <div class="widget-controls">
+                    <button class="btn btn-sm btn-outline-secondary" id="clear-alerts" title="Clear All Alerts">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            {% include 'components/live-alerts.html' %}
+        </div>
+    </div>
+</div>
 
-        /**
-         * Initialize dashboard functionality
-         */
-        function initializeDashboard() {
-            try {
-                // Initialize charts if Chart Controller is available
-                if (window.DexSniperApp && window.DexSniperApp.components.charts) {
-                    initializeCharts();
-                }
-                
-                // Setup refresh handlers
-                setupRefreshHandlers();
-                
-                // Initialize performance monitoring
-                initializePerformanceMonitoring();
-                
-                console.log('✅ Dashboard initialized');
-                
-            } catch (error) {
-                console.error('❌ Dashboard initialization failed:', error);
-            }
+<!-- Performance Metrics -->
+<div class="card">
+    <div class="card-header">
+        <div class="widget-header">
+            <h5 class="widget-title">
+                <i class="fas fa-gauge-high me-2"></i>
+                Performance Metrics
+            </h5>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-2 text-center">
+                <div class="h5 text-info" id="metric-api-response">--ms</div>
+                <small>API Response</small>
+            </div>
+            <div class="col-md-2 text-center">
+                <div class="h5 text-success" id="metric-uptime">--%</div>
+                <small>Uptime</small>
+            </div>
+            <div class="col-md-2 text-center">
+                <div class="h5 text-warning" id="metric-memory">--MB</div>
+                <small>Memory Usage</small>
+            </div>
+            <div class="col-md-2 text-center">
+                <div class="h5 text-primary" id="metric-websocket">--ms</div>
+                <small>WebSocket Latency</small>
+            </div>
+            <div class="col-md-2 text-center">
+                <div class="h5 text-secondary" id="metric-cache-hit">--%</div>
+                <small>Cache Hit Rate</small>
+            </div>
+            <div class="col-md-2 text-center">
+                <div class="h5 text-info" id="metric-requests">--</div>
+                <small>Requests/min</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📊 Dashboard page loaded');
+
+    // Initialize dashboard-specific functionality
+    initializeDashboard();
+    
+    // Setup dashboard event listeners
+    setupDashboardEvents();
+    
+    // Load initial chart data
+    loadInitialCharts();
+});
+
+/**
+ * Initialize dashboard functionality
+ */
+function initializeDashboard() {
+    try {
+        // Initialize charts if Chart Controller is available
+        if (window.DexSniperApp && window.DexSniperApp.components && window.DexSniperApp.components.charts) {
+            initializeCharts();
         }
+        
+        // Setup refresh handlers
+        setupRefreshHandlers();
+        
+        // Initialize performance monitoring
+        initializePerformanceMonitoring();
+        
+        console.log('✅ Dashboard initialized');
+        
+    } catch (error) {
+        console.error('❌ Dashboard initialization failed:', error);
+    }
+}
 
-        /**
-         * Initialize charts
-         */
-        function initializeCharts() {
-            try {
-                const chartController = window.DexSniperApp.components.charts;
-                
-                // Initialize price chart
-                const priceData = chartController.generateSampleData('price', 20);
+/**
+ * Initialize charts
+ */
+function initializeCharts() {
+    try {
+        const chartController = window.DexSniperApp.components.charts;
+        
+        // Initialize price chart with sample data
+        setTimeout(() => {
+            const priceData = generateSampleData('price', 20);
+            if (chartController && typeof chartController.createChart === 'function') {
                 chartController.createChart('price-chart', 'price', {
                     labels: priceData.labels,
                     datasets: [{
@@ -513,212 +346,162 @@
                         tension: 0.4
                     }]
                 });
-                
-                // Initialize portfolio chart
-                const portfolioData = chartController.generateSampleData('portfolio', 15);
-                chartController.createChart('portfolio-chart', 'portfolio', {
-                    labels: portfolioData.labels,
-                    datasets: [{
-                        label: 'Portfolio Value',
-                        data: portfolioData.data,
-                        borderColor: '#198754',
-                        backgroundColor: 'rgba(25, 135, 84, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                });
-
-                // Hide loading indicators
-                document.getElementById('price-chart-loading').style.display = 'none';
-                document.getElementById('portfolio-chart-loading').style.display = 'none';
-                
-                console.log('✅ Charts initialized');
-                
-            } catch (error) {
-                console.error('❌ Failed to initialize charts:', error);
             }
-        }
-
-        /**
-         * Setup dashboard event listeners
-         */
-        function setupDashboardEvents() {
-            // Refresh button
-            document.getElementById('refresh-dashboard')?.addEventListener('click', function() {
-                if (window.DexSniperApp && window.DexSniperApp.components.dashboard) {
-                    window.DexSniperApp.components.dashboard.forceRefresh();
-                }
-            });
-
-            // Auto-refresh toggle
-            document.getElementById('toggle-auto-refresh')?.addEventListener('click', function() {
-                if (window.DexSniperApp && window.DexSniperApp.components.dashboard) {
-                    window.DexSniperApp.components.dashboard.toggleAutoRefresh();
-                    
-                    const icon = this.querySelector('i');
-                    if (icon.classList.contains('fa-play')) {
-                        icon.className = 'fas fa-pause';
-                    } else {
-                        icon.className = 'fas fa-play';
-                    }
-                }
-            });
-
-            // Chart timeframe buttons
-            document.querySelectorAll('input[name="chart-timeframe"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    updateChartTimeframe(this.id.replace('timeframe-', ''));
-                });
-            });
-
-            // Clear alerts
-            document.getElementById('clear-alerts')?.addEventListener('click', function() {
-                if (window.LiveAlerts && typeof window.LiveAlerts.clearAll === 'function') {
-                    window.LiveAlerts.clearAll();
-                }
-            });
-        }
-
-        /**
-         * Setup refresh handlers
-         */
-        function setupRefreshHandlers() {
-            // Stats refresh
-            document.getElementById('refresh-stats')?.addEventListener('click', function() {
-                if (window.StatsCards && typeof window.StatsCards.refreshAll === 'function') {
-                    window.StatsCards.refreshAll();
-                }
-            });
-        }
-
-        /**
-         * Initialize performance monitoring
-         */
-        function initializePerformanceMonitoring() {
-            // Update performance metrics every 10 seconds
-            setInterval(updatePerformanceMetrics, 10000);
             
-            // Initial update
-            updatePerformanceMetrics();
-        }
+            // Hide loading indicators
+            const priceLoading = document.getElementById('price-chart-loading');
+            if (priceLoading) priceLoading.style.display = 'none';
+        }, 1000);
+        
+        console.log('✅ Charts initialized');
+        
+    } catch (error) {
+        console.error('❌ Failed to initialize charts:', error);
+    }
+}
 
-        /**
-         * Update performance metrics
-         */
-        function updatePerformanceMetrics() {
-            try {
-                // API Response Time
-                const apiResponse = window.PERFORMANCE_MONITOR?.apiCalls > 0 ? 
-                    Math.round(Math.random() * 100 + 50) : '--';
-                document.getElementById('metric-api-response').textContent = apiResponse + 'ms';
-
-                // Uptime
-                const uptime = Math.round(((Date.now() - window.PERFORMANCE_MONITOR?.startTime) / 3600000) * 100) / 100;
-                document.getElementById('metric-uptime').textContent = uptime > 0 ? uptime + 'h' : '--h';
-
-                // Memory Usage (approximation)
-                const memory = Math.round(Math.random() * 50 + 20);
-                document.getElementById('metric-memory').textContent = memory + 'MB';
-
-                // WebSocket Latency
-                const wsLatency = window.DexSniperApp?.websocket?.isConnected ? 
-                    Math.round(Math.random() * 20 + 10) : '--';
-                document.getElementById('metric-websocket').textContent = wsLatency + 'ms';
-
-                // Cache Hit Rate
-                const cacheHit = Math.round(Math.random() * 20 + 80);
-                document.getElementById('metric-cache-hit').textContent = cacheHit + '%';
-
-                // Requests per minute
-                const requests = Math.round(Math.random() * 100 + 50);
-                document.getElementById('metric-requests').textContent = requests;
-
-            } catch (error) {
-                console.error('❌ Failed to update performance metrics:', error);
-            }
-        }
-
-        /**
-         * Update chart timeframe
-         */
-        function updateChartTimeframe(timeframe) {
-            console.log('📊 Updating chart timeframe:', timeframe);
-            
-            // This would typically fetch new data based on timeframe
-            // For now, just regenerate sample data
-            if (window.DexSniperApp && window.DexSniperApp.components.charts) {
-                const chartController = window.DexSniperApp.components.charts;
-                const points = timeframe === '1h' ? 20 : timeframe === '24h' ? 48 : 168;
-                
-                const newData = chartController.generateSampleData('price', points);
-                chartController.updateChart('price-chart', {
-                    labels: newData.labels,
-                    datasets: [{
-                        label: 'ETH/USD',
-                        data: newData.data,
-                        borderColor: '#0dcaf0',
-                        backgroundColor: 'rgba(13, 202, 240, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4
-                    }]
-                });
-            }
-        }
-
-        /**
-         * Load initial chart data
-         */
-        function loadInitialCharts() {
-            // This would typically load real data from the API
-            // Charts are initialized in initializeCharts() for now
-        }
-
-        /**
-         * Update summary stats
-         */
-        function updateSummaryStats(stats) {
-            try {
-                if (stats.tokens_discovered !== undefined) {
-                    document.getElementById('summary-tokens').textContent = stats.tokens_discovered;
-                }
-                if (stats.active_trades !== undefined) {
-                    document.getElementById('summary-trades').textContent = stats.active_trades;
-                }
-                if (stats.profit_24h !== undefined) {
-                    const formatter = window.DexSniperApp?.formatters;
-                    const formatted = formatter ? 
-                        formatter.formatCurrency(stats.profit_24h) : 
-                        '$' + stats.profit_24h.toFixed(2);
-                    document.getElementById('summary-profit').textContent = formatted;
-                }
-                if (stats.avg_risk_score !== undefined) {
-                    document.getElementById('summary-risk').textContent = Math.round(stats.avg_risk_score);
-                }
-                if (stats.portfolio_value !== undefined) {
-                    const formatter = window.DexSniperApp?.formatters;
-                    const formatted = formatter ? 
-                        formatter.formatCurrency(stats.portfolio_value) : 
-                        '$' + stats.portfolio_value.toFixed(2);
-                    document.getElementById('total-portfolio-value').textContent = formatted;
-                }
-            } catch (error) {
-                console.error('❌ Failed to update summary stats:', error);
-            }
-        }
-
-        // Listen for dashboard data updates
-        document.addEventListener('dashboard:refreshed', function() {
-            console.log('📊 Dashboard data refreshed');
+/**
+ * Setup dashboard event listeners
+ */
+function setupDashboardEvents() {
+    // Refresh button
+    const refreshBtn = document.getElementById('refresh-dashboard');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+            console.log('🔄 Manual dashboard refresh');
+            location.reload();
         });
+    }
 
-        // Listen for stats updates
-        document.addEventListener('stats:updated', function(event) {
-            if (event.detail && event.detail.stats) {
-                updateSummaryStats(event.detail.stats);
+    // Auto-refresh toggle
+    const autoRefreshBtn = document.getElementById('toggle-auto-refresh');
+    if (autoRefreshBtn) {
+        autoRefreshBtn.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            if (icon.classList.contains('fa-play')) {
+                icon.className = 'fas fa-pause';
+                console.log('▶️ Auto-refresh enabled');
+            } else {
+                icon.className = 'fas fa-play';
+                console.log('⏸️ Auto-refresh disabled');
             }
         });
-    </script>
-</body>
-</html>
+    }
+
+    // Chart timeframe buttons
+    document.querySelectorAll('input[name="chart-timeframe"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            updateChartTimeframe(this.id.replace('timeframe-', ''));
+        });
+    });
+
+    // Clear alerts
+    const clearAlertsBtn = document.getElementById('clear-alerts');
+    if (clearAlertsBtn) {
+        clearAlertsBtn.addEventListener('click', function() {
+            console.log('🗑️ Clear alerts clicked');
+        });
+    }
+}
+
+/**
+ * Setup refresh handlers
+ */
+function setupRefreshHandlers() {
+    // Stats refresh
+    const refreshStatsBtn = document.getElementById('refresh-stats');
+    if (refreshStatsBtn) {
+        refreshStatsBtn.addEventListener('click', function() {
+            console.log('📊 Manual stats refresh');
+        });
+    }
+}
+
+/**
+ * Initialize performance monitoring
+ */
+function initializePerformanceMonitoring() {
+    // Update performance metrics every 10 seconds
+    setInterval(updatePerformanceMetrics, 10000);
+    
+    // Initial update
+    updatePerformanceMetrics();
+}
+
+/**
+ * Update performance metrics
+ */
+function updatePerformanceMetrics() {
+    try {
+        // Mock performance data
+        const metrics = {
+            apiResponse: Math.round(Math.random() * 50 + 25),
+            uptime: Math.round(((Date.now() - (window.PERFORMANCE_MONITOR?.startTime || Date.now())) / 3600000) * 100) / 100,
+            memory: Math.round(Math.random() * 30 + 20),
+            websocket: Math.round(Math.random() * 20 + 10),
+            cacheHit: Math.round(Math.random() * 20 + 80),
+            requests: Math.round(Math.random() * 100 + 50)
+        };
+
+        const elements = {
+            'metric-api-response': metrics.apiResponse + 'ms',
+            'metric-uptime': metrics.uptime + 'h',
+            'metric-memory': metrics.memory + 'MB',
+            'metric-websocket': metrics.websocket + 'ms',
+            'metric-cache-hit': metrics.cacheHit + '%',
+            'metric-requests': metrics.requests
+        };
+
+        Object.entries(elements).forEach(([id, value]) => {
+            const element = document.getElementById(id);
+            if (element) element.textContent = value;
+        });
+
+    } catch (error) {
+        console.error('❌ Failed to update performance metrics:', error);
+    }
+}
+
+/**
+ * Update chart timeframe
+ */
+function updateChartTimeframe(timeframe) {
+    console.log('📊 Updating chart timeframe:', timeframe);
+    // This would normally update chart data based on timeframe
+}
+
+/**
+ * Generate sample data for charts
+ */
+function generateSampleData(type, points) {
+    const labels = [];
+    const data = [];
+    
+    for (let i = 0; i < points; i++) {
+        const date = new Date();
+        date.setMinutes(date.getMinutes() - (points - i) * 5);
+        labels.push(date.toLocaleTimeString());
+        
+        switch (type) {
+            case 'price':
+                data.push((Math.random() * 100 + 1500).toFixed(2));
+                break;
+            case 'volume':
+                data.push(Math.floor(Math.random() * 1000000));
+                break;
+            default:
+                data.push(Math.random() * 100);
+        }
+    }
+    
+    return { labels, data };
+}
+
+/**
+ * Load initial chart data
+ */
+function loadInitialCharts() {
+    // Charts will be initialized when components are ready
+}
+</script>
+{% endblock %}
