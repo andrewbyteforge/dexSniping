@@ -6,7 +6,6 @@ Replace your current app/config.py with this file.
 from pydantic_settings import BaseSettings
 from typing import List, Optional
 from decimal import Decimal
-from app.core.dependencies import get_current_user
 
 
 class Settings(BaseSettings):
@@ -58,12 +57,6 @@ class Settings(BaseSettings):
         """Get environment name for compatibility."""
         return self.environment
     
-
-    @property
-    def ENVIRONMENT(self) -> str:
-        """Get environment name for compatibility."""
-        return self.environment
-
 
     @property
     def ENVIRONMENT(self) -> str:

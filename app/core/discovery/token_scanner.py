@@ -82,13 +82,17 @@ class TokenScanner:
     - Real-time statistics
     """
     
-    def __init__(self, multi_chain_manager: MultiChainManager):
+    def __init__(self, multi_chain_manager: Optional[MultiChainManager] = None):
         """
         Initialize token scanner.
         
         Args:
             multi_chain_manager: Multi-chain manager instance
         """
+        if multi_chain_manager is None:
+            from app.core.blockchain.multi_chain_manager import MultiChainManager
+            multi_chain_manager = MultiChainManager()
+
         self.multi_chain_manager = multi_chain_manager
         self.circuit_breaker_manager = CircuitBreakerManager()
         self.config = ScanConfig(

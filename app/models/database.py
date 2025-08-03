@@ -229,3 +229,6 @@ class AuditMixin:
     def set_updated_by(self, user_id: int) -> None:
         """Set the user who last updated this record."""
         self.updated_by = user_id
+
+# Export aliases for compatibility
+async_session_factory = async_sessionmaker

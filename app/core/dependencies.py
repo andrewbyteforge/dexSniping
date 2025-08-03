@@ -19,6 +19,7 @@ from app.utils.exceptions import APIRateLimitError, APIUnauthorizedError
 from app.utils.logger import setup_logger
 from app.models.database import get_db
 
+
 logger = setup_logger(__name__)
 
 # Security scheme
@@ -276,3 +277,31 @@ async def api_health():
         "api_version": "1.0.0",
         "timestamp": "2025-01-01T00:00:00Z"
     }
+
+# Placeholder for user authentication
+async def get_current_user():
+    """
+    Placeholder for user authentication.
+    To be implemented in Phase 3B with proper authentication.
+    """
+    return {"user_id": "anonymous", "role": "user"}
+
+
+# Additional dependencies for Phase 3B
+async def get_database_session():
+    """Get database session dependency."""
+    from app.core.performance.connection_pool import connection_pool
+    async with connection_pool.session_scope() as session:
+        yield session
+
+
+async def get_cache_manager():
+    """Get cache manager dependency."""
+    from app.core.performance.cache_manager import cache_manager
+    return cache_manager
+
+
+async def get_circuit_breaker_manager():
+    """Get circuit breaker manager dependency."""
+    from app.core.performance.circuit_breaker import CircuitBreakerManager
+    return CircuitBreakerManager()
