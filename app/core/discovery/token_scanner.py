@@ -561,17 +561,17 @@ class TokenScanner:
                 1 for health in chain_health.values()
                 if health.status.value == 'connected'
             )
-            
+
             # Check circuit breakers
             breaker_health = await self.circuit_breaker_manager.health_check()
-            
+
             # Determine overall health
             is_healthy = (
                 healthy_chains > 0 and
                 breaker_health["status"] == "healthy" and
                 not self._scanning  # Not stuck in scanning
             )
-            
+
             return {
                 "status": "healthy" if is_healthy else "degraded",
                 "connected_chains": healthy_chains,
@@ -582,7 +582,7 @@ class TokenScanner:
                 "total_scans_completed": self.stats.total_scans,
                 "average_scan_duration": self.stats.average_scan_time
             }
-            
+
         except Exception as e:
             logger.error(f"Token scanner health check failed: {e}")
             return {
