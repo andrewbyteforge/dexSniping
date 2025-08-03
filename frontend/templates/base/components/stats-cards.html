@@ -1,0 +1,453 @@
+<!-- Statistics Cards Component -->
+<!-- File: frontend/templates/components/stats-cards.html -->
+<!-- Purpose: Reusable statistics cards for dashboard overview -->
+
+<div class="row mb-4" id="stats-cards-container">
+    <!-- Tokens Discovered Card -->
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card" data-stat-type="tokens">
+            <div class="stat-icon">
+                <i class="bi bi-search text-primary" aria-hidden="true"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value text-primary" id="stat-tokens-discovered">
+                    <span class="loading-spinner"></span>
+                </div>
+                <div class="stat-label">Tokens Discovered</div>
+                <div class="stat-change positive" id="stat-tokens-change">
+                    <i class="bi bi-arrow-up" aria-hidden="true"></i>
+                    <span>Loading...</span>
+                </div>
+            </div>
+            <div class="stat-progress">
+                <div class="progress progress-sm">
+                    <div class="progress-bar bg-primary" 
+                         role="progressbar" 
+                         style="width: 0%" 
+                         id="stat-tokens-progress"
+                         aria-valuenow="0" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                    </div>
+                </div>
+                <small class="text-muted" id="stat-tokens-target">Target: 200/day</small>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Active Trades Card -->
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card" data-stat-type="trades">
+            <div class="stat-icon">
+                <i class="bi bi-graph-up text-success" aria-hidden="true"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value text-success" id="stat-active-trades">
+                    <span class="loading-spinner"></span>
+                </div>
+                <div class="stat-label">Active Trades</div>
+                <div class="stat-change positive" id="stat-trades-change">
+                    <i class="bi bi-arrow-up" aria-hidden="true"></i>
+                    <span>Loading...</span>
+                </div>
+            </div>
+            <div class="stat-actions">
+                <button class="btn btn-sm btn-outline-success" 
+                        onclick="StatsCards.viewTrades()"
+                        title="View all trades">
+                    <i class="bi bi-eye" aria-hidden="true"></i>
+                    View All
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Arbitrage Opportunities Card -->
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card" data-stat-type="arbitrage">
+            <div class="stat-icon">
+                <i class="bi bi-arrow-left-right text-info" aria-hidden="true"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value text-info" id="stat-arbitrage-opportunities">
+                    <span class="loading-spinner"></span>
+                </div>
+                <div class="stat-label">Arbitrage Opportunities</div>
+                <div class="stat-change" id="stat-arbitrage-change">
+                    <span class="pulse-dot"></span>
+                    <span>Live Scanning</span>
+                </div>
+            </div>
+            <div class="stat-alerts" id="arbitrage-alerts">
+                <!-- Dynamic arbitrage alerts will be inserted here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Portfolio Value Card -->
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card" data-stat-type="portfolio">
+            <div class="stat-icon">
+                <i class="bi bi-wallet2 text-warning" aria-hidden="true"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value text-warning" id="stat-portfolio-value">
+                    <span class="loading-spinner"></span>
+                </div>
+                <div class="stat-label">Portfolio Value</div>
+                <div class="stat-change" id="stat-portfolio-change">
+                    <i class="bi bi-arrow-up" aria-hidden="true"></i>
+                    <span>Loading...</span>
+                </div>
+            </div>
+            <div class="stat-breakdown">
+                <div class="breakdown-item">
+                    <span class="breakdown-label">24h P&L:</span>
+                    <span class="breakdown-value" id="stat-portfolio-pnl">--</span>
+                </div>
+                <div class="breakdown-item">
+                    <span class="breakdown-label">Total ROI:</span>
+                    <span class="breakdown-value" id="stat-portfolio-roi">--</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Statistics Row (Expandable) -->
+<div class="row mb-4" id="additional-stats" style="display: none;">
+    <!-- Network Status Card -->
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card" data-stat-type="networks">
+            <div class="stat-icon">
+                <i class="bi bi-globe text-primary" aria-hidden="true"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value text-primary" id="stat-active-networks">8</div>
+                <div class="stat-label">Active Networks</div>
+                <div class="stat-change positive">
+                    <i class="bi bi-check-circle" aria-hidden="true"></i>
+                    <span>All Operational</span>
+                </div>
+            </div>
+            <div class="network-indicators" id="network-status-indicators">
+                <!-- Network status indicators will be inserted here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Risk Score Card -->
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card" data-stat-type="risk">
+            <div class="stat-icon">
+                <i class="bi bi-shield-check text-success" aria-hidden="true"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value text-success" id="stat-avg-risk-score">
+                    <span class="loading-spinner"></span>
+                </div>
+                <div class="stat-label">Avg Risk Score</div>
+                <div class="stat-change" id="stat-risk-change">
+                    <span>Loading...</span>
+                </div>
+            </div>
+            <div class="risk-distribution" id="risk-distribution">
+                <!-- Risk distribution chart will be inserted here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Performance Card -->
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card" data-stat-type="performance">
+            <div class="stat-icon">
+                <i class="bi bi-speedometer2 text-info" aria-hidden="true"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value text-info" id="stat-response-time">
+                    <span class="loading-spinner"></span>
+                </div>
+                <div class="stat-label">Avg Response Time</div>
+                <div class="stat-change positive" id="stat-performance-change">
+                    <i class="bi bi-lightning" aria-hidden="true"></i>
+                    <span>Optimized</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- System Health Card -->
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="stat-card" data-stat-type="health">
+            <div class="stat-icon">
+                <i class="bi bi-heart-pulse text-danger" aria-hidden="true"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-value text-success" id="stat-system-health">100%</div>
+                <div class="stat-label">System Health</div>
+                <div class="stat-change positive">
+                    <i class="bi bi-check-circle" aria-hidden="true"></i>
+                    <span>Operational</span>
+                </div>
+            </div>
+            <div class="health-indicators">
+                <div class="health-item">
+                    <span class="health-dot bg-success"></span>
+                    <span>API</span>
+                </div>
+                <div class="health-item">
+                    <span class="health-dot bg-success"></span>
+                    <span>WebSocket</span>
+                </div>
+                <div class="health-item">
+                    <span class="health-dot bg-success"></span>
+                    <span>Database</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Control Panel -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="stats-controls">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="stats-actions">
+                    <button class="btn btn-sm btn-outline-primary" 
+                            onclick="StatsCards.toggleAdditionalStats()"
+                            id="toggle-additional-stats">
+                        <i class="bi bi-plus-circle" aria-hidden="true"></i>
+                        Show More Stats
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary" 
+                            onclick="StatsCards.refreshAll()"
+                            id="refresh-stats">
+                        <i class="bi bi-arrow-clockwise" aria-hidden="true"></i>
+                        Refresh
+                    </button>
+                </div>
+                <div class="stats-info">
+                    <small class="text-muted">
+                        <i class="bi bi-clock" aria-hidden="true"></i>
+                        Last updated: <span id="stats-last-updated">--</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Embedded CSS for Stats Cards -->
+<style>
+/* Stats Cards Specific Styles */
+.stat-card {
+    position: relative;
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: none;
+    transition: all 0.3s ease;
+    height: 100%;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.stat-card[data-stat-type="tokens"]:hover {
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.stat-card[data-stat-type="trades"]:hover {
+    box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+}
+
+.stat-card[data-stat-type="arbitrage"]:hover {
+    box-shadow: 0 8px 25px rgba(23, 162, 184, 0.3);
+}
+
+.stat-card[data-stat-type="portfolio"]:hover {
+    box-shadow: 0 8px 25px rgba(255, 193, 7, 0.3);
+}
+
+.stat-icon {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 2rem;
+    opacity: 0.2;
+}
+
+.stat-content {
+    position: relative;
+    z-index: 2;
+}
+
+.stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    line-height: 1;
+    min-height: 3rem;
+    display: flex;
+    align-items: center;
+}
+
+.stat-label {
+    color: #6c757d;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.75rem;
+}
+
+.stat-change {
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.stat-change.positive { color: #28a745; }
+.stat-change.negative { color: #dc3545; }
+.stat-change.neutral { color: #6c757d; }
+
+.stat-progress {
+    margin-top: 1rem;
+}
+
+.progress-sm {
+    height: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.stat-actions {
+    margin-top: 1rem;
+}
+
+.stat-alerts {
+    margin-top: 0.5rem;
+    max-height: 60px;
+    overflow-y: auto;
+}
+
+.stat-breakdown {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e9ecef;
+}
+
+.breakdown-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+    font-size: 0.8rem;
+}
+
+.breakdown-label {
+    color: #6c757d;
+}
+
+.breakdown-value {
+    font-weight: 600;
+}
+
+.network-indicators {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+}
+
+.network-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #28a745;
+    title: attr(data-network);
+}
+
+.network-indicator.offline {
+    background: #dc3545;
+}
+
+.risk-distribution {
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 0.25rem;
+}
+
+.risk-bar {
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+}
+
+.risk-bar.low { background: #28a745; }
+.risk-bar.medium { background: #ffc107; }
+.risk-bar.high { background: #dc3545; }
+
+.health-indicators {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.health-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+}
+
+.health-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.stats-controls {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 12px;
+    padding: 1rem;
+    backdrop-filter: blur(10px);
+}
+
+/* Loading state */
+.stat-card.loading {
+    pointer-events: none;
+}
+
+.stat-card.loading .stat-content {
+    opacity: 0.7;
+}
+
+/* Error state */
+.stat-card.error {
+    border-left: 4px solid #dc3545;
+}
+
+.stat-card.error .stat-value {
+    color: #dc3545;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .stat-value {
+        font-size
