@@ -1,16 +1,91 @@
-class TradingError(Exception): pass 
-class WalletError(TradingError): pass   
-class DEXError(TradingError): pass 
-class NetworkError(TradingError): pass 
-class ConnectionError(NetworkError): pass 
-class InsufficientFundsError(TradingError): pass 
-class InvalidAddressError(WalletError): pass 
-class TransactionError(TradingError): pass 
-class SecurityError(WalletError): pass 
-class RiskLimitExceededError(TradingError): pass 
-class StrategyError(TradingError): pass 
-class PortfolioError(TradingError): pass 
-class OrderExecutionError(TradingError): pass 
-class InvalidOrderError(TradingError): pass 
-class SlippageExceededError(TradingError): pass 
-class InsufficientLiquidityError(DEXError): pass 
+"""
+Core Exceptions
+File: app/core/exceptions.py
+
+Custom exceptions for the trading platform including service layer errors.
+"""
+
+
+class TradingError(Exception):
+    """Base exception for trading operations."""
+    pass
+
+
+class ServiceError(TradingError):
+    """Service layer errors."""
+    pass
+
+
+class WalletError(TradingError):
+    """Wallet-related errors."""
+    pass
+
+
+class DEXError(TradingError):
+    """DEX integration errors."""
+    pass
+
+
+class NetworkError(TradingError):
+    """Network connection and blockchain errors."""
+    pass
+
+
+class ConnectionError(NetworkError):
+    """Connection-specific errors."""
+    pass
+
+
+class InsufficientFundsError(TradingError):
+    """Insufficient funds for operation."""
+    pass
+
+
+class InvalidAddressError(WalletError):
+    """Invalid wallet address format."""
+    pass
+
+
+class TransactionError(TradingError):
+    """Transaction execution errors."""
+    pass
+
+
+class SecurityError(WalletError):
+    """Security-related errors."""
+    pass
+
+
+class RiskLimitExceededError(TradingError):
+    """Risk limit exceeded."""
+    pass
+
+
+class StrategyError(TradingError):
+    """Strategy execution errors."""
+    pass
+
+
+class PortfolioError(TradingError):
+    """Portfolio management errors."""
+    pass
+
+
+class OrderExecutionError(TradingError):
+    """Order execution errors."""
+    pass
+
+
+class InvalidOrderError(TradingError):
+    """Invalid order parameters."""
+    pass
+
+
+class SlippageExceededError(TradingError):
+    """Slippage exceeded acceptable limits."""
+    pass
+
+
+class InsufficientLiquidityError(DEXError):
+    """Insufficient liquidity for trade."""
+    pass
