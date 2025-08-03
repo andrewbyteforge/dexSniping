@@ -677,7 +677,7 @@
 }
 
 /* Print styles */
-@media print {
+@media (print) {
     .stat-card {
         break-inside: avoid;
         box-shadow: none;
@@ -883,67 +883,59 @@ window.StatsCards = (function() {
     /**
      * Update stats cards with new data
      */
-    function updateStatsCards(data) {
+
+    async updateStatsCards(statsData) {
         try {
-            // Update basic stats
-            updateStatValue('tokensDiscovered', data.tokens_discovered || 0);
-            updateStatValue('activeTrades', data.active_trades || 0);
-            updateStatValue('arbitrageOpportunities', data.arbitrage_opportunities || 0);
-            updateStatValue('portfolioValue', formatCurrency(data.portfolio_value || 0));
-            updateStatValue('systemHealth', `${data.system_health || 100}%`);
-            
-            // Update changes
-            updateStatChange('tokens', data.tokens_change || 0);
-            updateStatChange('trades', data.trades_change || 0);
-            updateStatChange('arbitrage', data.arbitrage_change || 0);
-            updateStatChange('portfolio', data.portfolio_change || 0);
-            
-            // Update performance metrics
-            if (data.avg_response_time) {
-                updateStatValue('responseTime', `${data.avg_response_time}ms`);
+            if (this.isUpdating) return;
+            this.isUpdating = true;
+
+            console.log('📊 Updating stats cards with data:', statsData);
+
+            // Update basic stats safely
+            this.updateStatValue('tokens-discovered', statsData.tokens_discovered);
+            this.updateStatValue('active-trades', statsData.active_trades);
+            this.updateStatValue('arbitrage-opportunities', statsData.arbitrage_opportunities);
+            this.updateStatValue('portfolio-value', this.formatCurrency(statsData.portfolio_value));
+
+            // Update additional stats
+            this.updateStatValue('portfolio-change', `${statsData.portfolio_change_24h || 0}%`);
+            this.updateStatValue('total-networks', statsData.total_networks || 0);
+            this.updateStatValue('avg-risk-score', (statsData.avg_risk_score || 0).toFixed(1));
+
+            // Update health indicators safely
+            if (statsData.health) {
+                this.updateHealthIndicators(statsData.health);
             }
-            
-            if (data.avg_risk_score) {
-                updateStatValue('avgRiskScore', data.avg_risk_score.toFixed(1));
+
+            // Update last updated timestamp
+            const lastUpdated = document.getElementById('last-updated');
+            if (lastUpdated) {
+                lastUpdated.textContent = new Date().toLocaleTimeString();
             }
-            
-            // Update progress bars
-            updateProgressBar('stat-tokens-progress', data.tokens_progress || 0);
-            
-            // Update network indicators
-            updateNetworkIndicators(data.network_status || {});
-            
-            // Update health indicators
-            updateHealthIndicators(data.health_status || {});
-            
-            // Update risk distribution
-            updateRiskDistribution(data.risk_distribution || {});
-            
-            state.lastUpdated = new Date();
-            updateLastUpdatedTime();
-            
-            // Remove error state from cards
-            document.querySelectorAll('.stat-card.error').forEach(card => {
-                card.classList.remove('error');
-            });
-            
+
+            console.log('✅ Stats cards updated successfully');
+
         } catch (error) {
             console.error('Failed to update stats cards:', error);
-            showError('Failed to update statistics');
+            console.error('StatsCards error: Failed to update statistics');
+        } finally {
+            this.isUpdating = false;
         }
     }
     
     /**
      * Update individual stat value
      */
-    function updateStatValue(statKey, value) {
-        const element = elements.stats[statKey];
-        if (element) {
-            const spinner = element.querySelector('.loading-spinner');
-            if (spinner) {
-                spinner.remove();
+    updateStatValue(statId, value) {
+        try {
+            const element = document.getElementById(`stat-${statId}`);
+            if (element) {
+                element.textContent = value || '0';
+                element.classList.add('updated');
+                setTimeout(() => element.classList.remove('updated'), 300);
             }
-            element.textContent = value;
+        } catch (error) {
+            console.error(`Error updating stat ${statId}:`, error);
         }
     }
     
@@ -1019,20 +1011,80 @@ window.StatsCards = (function() {
     
     /**
      * Update health indicators
+     * Replaces previous implementation (which used :contains()).
+     * Accepts two possible shapes:
+     *  - New: { services: { API: { status: 'healthy' }, ... } }
+     *  - Legacy: { api: 'healthy', websocket: 'healthy', database: 'healthy' }
      */
-    function updateHealthIndicators(healthStatus) {
-        const indicators = {
-            'API': healthStatus.api || 'healthy',
-            'WebSocket': healthStatus.websocket || 'healthy',
-            'Database': healthStatus.database || 'healthy'
-        };
-        
-        Object.entries(indicators).forEach(([service, status]) => {
-            const dot = document.querySelector(`.health-item:contains('${service}') .health-dot`);
-            if (dot) {
-                dot.className = `health-dot bg-${status === 'healthy' ? 'success' : 'danger'}`;
+    function updateHealthIndicators(healthData) {
+        try {
+            // Normalize to services shape
+            let services = {};
+            if (!healthData) {
+                console.warn('No health data provided');
+                return;
             }
-        });
+
+            if (healthData.services && typeof healthData.services === 'object') {
+                services = healthData.services;
+            } else {
+                // Legacy shape conversion
+                services = {
+                    API: { status: healthData.api || 'healthy' },
+                    WebSocket: { status: healthData.websocket || 'healthy' },
+                    Database: { status: healthData.database || 'healthy' }
+                };
+            }
+
+            Object.entries(services).forEach(([serviceName, serviceData]) => {
+                const status = (serviceData && serviceData.status) || 'unknown';
+
+                // Preferred: explicit data attribute if present
+                const dataEl = document.querySelector(`[data-health-service="${serviceName}"]`);
+                if (dataEl) {
+                    const healthDot = dataEl.querySelector('.health-dot');
+                    if (healthDot) {
+                        healthDot.classList.remove('status-healthy', 'status-warning', 'status-error');
+                        const newClass =
+                            status === 'healthy'
+                                ? 'status-healthy'
+                                : status === 'warning'
+                                ? 'status-warning'
+                                : 'status-error';
+                        healthDot.classList.add(newClass);
+                        healthDot.title = `${serviceName}: ${status}`;
+                    }
+                    return;
+                }
+
+                // Fallback: match based on label text inside .health-item
+                const healthItemsList = Array.from(document.querySelectorAll('.health-item'));
+                for (const item of healthItemsList) {
+                    const labelText = Array.from(item.childNodes)
+                        .filter(n => n.nodeType === Node.TEXT_NODE)
+                        .map(n => n.textContent.trim())
+                        .join(' ')
+                        .toLowerCase();
+                    if (labelText.includes(serviceName.toLowerCase())) {
+                        const healthDot = item.querySelector('.health-dot');
+                        if (healthDot) {
+                            healthDot.classList.remove('status-healthy', 'status-warning', 'status-error');
+                            const newClass =
+                                status === 'healthy'
+                                    ? 'status-healthy'
+                                    : status === 'warning'
+                                    ? 'status-warning'
+                                    : 'status-error';
+                            healthDot.classList.add(newClass);
+                            healthDot.title = `${serviceName}: ${status}`;
+                        }
+                        break;
+                    }
+                }
+            });
+        } catch (error) {
+            console.error('Error updating health indicators:', error);
+        }
     }
     
     /**
@@ -1215,15 +1267,20 @@ window.StatsCards = (function() {
     /**
      * Format currency values
      */
-    function formatCurrency(value) {
-        if (typeof value !== 'number') return value;
-        
-        if (value >= 1000000) {
-            return `$${(value / 1000000).toFixed(1)}M`;
-        } else if (value >= 1000) {
-            return `$${(value / 1000).toFixed(1)}K`;
-        } else {
-            return `$${value.toFixed(2)}`;
+    formatCurrency(value) {
+        try {
+            const num = parseFloat(value);
+            if (isNaN(num)) return '$0.00';
+            
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(num);
+        } catch (error) {
+            console.error('Error formatting currency:', error);
+            return '$0.00';
         }
     }
     

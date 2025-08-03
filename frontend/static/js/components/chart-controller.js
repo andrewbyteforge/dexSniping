@@ -1,857 +1,974 @@
 /**
- * Chart Controller Module
- * File: frontend/static/js/components/chart-controller.js
+ * Enhanced Chart Controller with Technical Indicators
+ * File: frontend/static/js/components/chart-controller.js (UPDATED & FIXED)
  * 
- * Professional Chart.js integration for DEX Sniper Pro.
- * Handles price charts, portfolio analytics, and trading visualizations.
+ * Advanced chart management with professional trading indicators:
+ * - Candlestick charts with volume
+ * - RSI, MACD, Bollinger Bands integration
+ * - Real-time indicator updates
+ * - Professional trading visualization
+ * - FIXED: All NodeList errors and missing methods
  */
 
 class ChartController {
-    constructor(app) {
-        this.app = app;
-        this.isInitialized = false;
+    constructor() {
         this.charts = new Map();
-        this.chartDefaults = {};
+        this.chartDataCache = new Map();
+        this.indicatorData = new Map();
+        this.updateInterval = null;
+        this.isUpdating = false;
         
-        // Chart configuration
-        this.config = {
-            responsive: true,
-            maintainAspectRatio: false,
-            animation: {
-                duration: 750,
-                easing: 'easeInOutQuart'
-            },
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top'
-                },
-                tooltip: {
-                    mode: 'index',
-                    intersect: false
-                }
-            },
-            scales: {
-                x: {
-                    display: true,
-                    grid: {
-                        display: true,
-                        color: 'rgba(255, 255, 255, 0.1)'
-                    }
-                },
-                y: {
-                    display: true,
-                    grid: {
-                        display: true,
-                        color: 'rgba(255, 255, 255, 0.1)'
-                    }
-                }
-            }
+        // Chart themes and styling
+        this.theme = {
+            backgroundColor: 'rgba(255, 255, 255, 0.02)',
+            gridColor: 'rgba(255, 255, 255, 0.1)',
+            textColor: '#e9ecef',
+            bullishColor: '#22c55e',
+            bearishColor: '#ef4444',
+            volumeColor: '#fbbf24',
+            rsiColor: '#8b5cf6',
+            macdColor: '#06b6d4',
+            signalColor: '#f59e0b',
+            bollingerColor: '#ec4899'
         };
-        
-        console.log('📊 Chart Controller created');
+
+        this.bindEvents();
+        console.log('✅ Enhanced ChartController initialized with technical indicators');
     }
 
     /**
-     * Initialize Chart Controller
+     * Create professional candlestick chart with volume
+     * Method: createCandlestickChart()
      */
-    async init() {
+    async createCandlestickChart(containerId, tokenData, options = {}) {
         try {
-            console.log('🔧 Initializing Chart Controller...');
-            
-            // Check if Chart.js is available
-            if (typeof Chart === 'undefined') {
-                console.warn('⚠️ Chart.js not loaded, loading from CDN...');
-                await this.loadChartJS();
+            const container = document.getElementById(containerId);
+            if (!container) {
+                throw new Error(`Chart container ${containerId} not found`);
             }
+
+            // Prepare candlestick data
+            const candlestickData = await this.prepareCandlestickData(tokenData);
             
-            // Configure Chart.js defaults
-            this.configureChartDefaults();
-            
-            // Initialize existing chart containers
-            this.initializeChartContainers();
-            
-            // Setup event listeners
-            this.setupEventListeners();
-            
-            this.isInitialized = true;
-            console.log('✅ Chart Controller initialized');
-            
-            // Emit initialization event
-            this.app.events.dispatchEvent(new CustomEvent('charts:initialized'));
-            
+            // Create main price chart
+            const priceChartConfig = {
+                type: 'candlestick',
+                data: {
+                    datasets: [{
+                        label: `${tokenData.symbol} Price`,
+                        data: candlestickData.ohlc,
+                        borderColor: this.theme.bullishColor,
+                        backgroundColor: this.theme.bearishColor,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            grid: {
+                                color: this.theme.gridColor
+                            },
+                            ticks: {
+                                color: this.theme.textColor
+                            }
+                        },
+                        y: {
+                            position: 'right',
+                            grid: {
+                                color: this.theme.gridColor
+                            },
+                            ticks: {
+                                color: this.theme.textColor,
+                                callback: function(value) {
+                                    return '$' + value.toFixed(6);
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: this.theme.textColor
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: this.theme.textColor,
+                            bodyColor: this.theme.textColor,
+                            callbacks: {
+                                title: function(context) {
+                                    return new Date(context[0].parsed.x).toLocaleString();
+                                },
+                                label: function(context) {
+                                    const data = context.parsed;
+                                    return [
+                                        `Open: $${data.o?.toFixed(6) || 'N/A'}`,
+                                        `High: $${data.h?.toFixed(6) || 'N/A'}`,
+                                        `Low: $${data.l?.toFixed(6) || 'N/A'}`,
+                                        `Close: $${data.c?.toFixed(6) || 'N/A'}`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    ...options
+                }
+            };
+
+            // Create chart instance
+            const chart = new Chart(container, priceChartConfig);
+            this.charts.set(containerId, chart);
+
+            // Add technical indicators
+            await this.addTechnicalIndicators(containerId, tokenData, candlestickData);
+
+            console.log(`✅ Candlestick chart created for ${containerId}`);
+            return chart;
+
         } catch (error) {
-            console.error('❌ Chart Controller initialization failed:', error);
-            throw error;
+            console.error(`Error creating candlestick chart for ${containerId}:`, error);
+            this.showChartError(containerId, 'Failed to load candlestick chart');
+            return null;
         }
     }
 
     /**
-     * Load Chart.js library dynamically
+     * Add volume indicator to chart
+     * Method: addVolumeIndicator()
      */
-    async loadChartJS() {
-        return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js';
-            script.integrity = 'sha512-7U4rRB8aGAHGVad3u2jiC7GA5/1YhQcQjxKeaVms/bT66i3LVBMRcBI9KwABNWnxOSwulkuSXxZLGuyfvo7V0A==';
-            script.crossOrigin = 'anonymous';
-            script.onload = () => {
-                console.log('✅ Chart.js loaded successfully');
-                resolve();
+    async addVolumeIndicator(chartId, volumeData) {
+        try {
+            const chart = this.charts.get(chartId);
+            if (!chart) {
+                throw new Error(`Chart ${chartId} not found`);
+            }
+
+            // Prepare volume dataset
+            const volumeDataset = {
+                label: 'Volume',
+                data: volumeData.map(item => ({
+                    x: item.timestamp,
+                    y: item.volume
+                })),
+                backgroundColor: this.theme.volumeColor,
+                borderColor: this.theme.volumeColor,
+                borderWidth: 1,
+                type: 'bar',
+                yAxisID: 'volume'
             };
-            script.onerror = (error) => {
-                console.error('❌ Failed to load Chart.js:', error);
-                reject(new Error('Failed to load Chart.js library'));
+
+            // Add volume scale
+            chart.options.scales.volume = {
+                type: 'linear',
+                position: 'left',
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    color: this.theme.textColor,
+                    callback: function(value) {
+                        return this.formatVolume(value);
+                    }.bind(this)
+                }
             };
-            document.head.appendChild(script);
+
+            // Add dataset and update
+            chart.data.datasets.push(volumeDataset);
+            chart.update('none');
+
+            console.log(`✅ Volume indicator added to ${chartId}`);
+        } catch (error) {
+            console.error(`Error adding volume indicator to ${chartId}:`, error);
+        }
+    }
+
+    /**
+     * Add technical indicators to chart
+     * Method: addTechnicalIndicators()
+     */
+    async addTechnicalIndicators(chartId, tokenData, candlestickData) {
+        try {
+            const prices = candlestickData.ohlc.map(item => item.c);
+            const highs = candlestickData.ohlc.map(item => item.h);
+            const lows = candlestickData.ohlc.map(item => item.l);
+            const timestamps = candlestickData.ohlc.map(item => item.x);
+
+            // Calculate indicators using TechnicalIndicators utility
+            const indicators = {
+                rsi: TechnicalIndicators.calculateRSI(prices, 14),
+                macd: TechnicalIndicators.calculateMACD(prices, 12, 26, 9),
+                bollinger: TechnicalIndicators.calculateBollingerBands(prices, 20, 2)
+            };
+
+            // Store indicator data
+            this.indicatorData.set(chartId, indicators);
+
+            // Add Bollinger Bands to main chart
+            await this.addBollingerBands(chartId, timestamps, indicators.bollinger);
+
+            // Create separate indicator charts
+            await this.createRSIChart(`${chartId}-rsi`, timestamps, indicators.rsi);
+            await this.createMACDChart(`${chartId}-macd`, timestamps, indicators.macd);
+
+            console.log(`✅ Technical indicators added to ${chartId}`);
+        } catch (error) {
+            console.error(`Error adding technical indicators to ${chartId}:`, error);
+        }
+    }
+
+    /**
+     * Add Bollinger Bands to existing chart
+     */
+    async addBollingerBands(chartId, timestamps, bollingerData) {
+        try {
+            const chart = this.charts.get(chartId);
+            if (!chart || !bollingerData.upper.length) return;
+
+            // ✅ FIXED: Use Array.slice() instead of trying to slice timestamps directly
+            const timestampArray = Array.isArray(timestamps) ? timestamps : Array.from(timestamps);
+            
+            const upperBandData = timestampArray.slice(-bollingerData.upper.length).map((time, i) => ({
+                x: time,
+                y: bollingerData.upper[i]
+            }));
+
+            const middleBandData = timestampArray.slice(-bollingerData.middle.length).map((time, i) => ({
+                x: time,
+                y: bollingerData.middle[i]
+            }));
+
+            const lowerBandData = timestampArray.slice(-bollingerData.lower.length).map((time, i) => ({
+                x: time,
+                y: bollingerData.lower[i]
+            }));
+
+            // Add Bollinger Band datasets
+            chart.data.datasets.push(
+                {
+                    label: 'Bollinger Upper',
+                    data: upperBandData,
+                    borderColor: this.theme.bollingerColor,
+                    backgroundColor: 'transparent',
+                    borderWidth: 1,
+                    fill: false,
+                    pointRadius: 0
+                },
+                {
+                    label: 'Bollinger Middle (SMA 20)',
+                    data: middleBandData,
+                    borderColor: this.theme.bollingerColor,
+                    backgroundColor: `${this.theme.bollingerColor}20`,
+                    borderWidth: 1,
+                    fill: '+1',
+                    pointRadius: 0
+                },
+                {
+                    label: 'Bollinger Lower',
+                    data: lowerBandData,
+                    borderColor: this.theme.bollingerColor,
+                    backgroundColor: 'transparent',
+                    borderWidth: 1,
+                    fill: false,
+                    pointRadius: 0
+                }
+            );
+
+            chart.update('none');
+        } catch (error) {
+            console.error('Error adding Bollinger Bands:', error);
+        }
+    }
+
+    /**
+     * Create RSI indicator chart
+     */
+    async createRSIChart(containerId, timestamps, rsiData) {
+        try {
+            const container = document.getElementById(containerId) || this.createIndicatorContainer(containerId);
+            
+            // ✅ FIXED: Ensure timestamps is an array before slicing
+            const timestampArray = Array.isArray(timestamps) ? timestamps : Array.from(timestamps);
+            
+            const rsiChartData = timestampArray.slice(-rsiData.length).map((time, i) => ({
+                x: time,
+                y: rsiData[i]
+            }));
+
+            const rsiChart = new Chart(container, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'RSI (14)',
+                        data: rsiChartData,
+                        borderColor: this.theme.rsiColor,
+                        backgroundColor: `${this.theme.rsiColor}20`,
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            grid: {
+                                color: this.theme.gridColor
+                            },
+                            ticks: {
+                                color: this.theme.textColor
+                            }
+                        },
+                        y: {
+                            min: 0,
+                            max: 100,
+                            grid: {
+                                color: this.theme.gridColor
+                            },
+                            ticks: {
+                                color: this.theme.textColor
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: this.theme.textColor
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: this.theme.textColor,
+                            bodyColor: this.theme.textColor
+                        }
+                    }
+                }
+            });
+
+            // Add RSI reference lines
+            this.addRSILines(rsiChart);
+            this.charts.set(containerId, rsiChart);
+
+        } catch (error) {
+            console.error('Error creating RSI chart:', error);
+        }
+    }
+
+    /**
+     * Create MACD indicator chart
+     */
+    async createMACDChart(containerId, timestamps, macdData) {
+        try {
+            const container = document.getElementById(containerId) || this.createIndicatorContainer(containerId);
+            
+            // ✅ FIXED: Ensure timestamps is an array before slicing
+            const timestampArray = Array.isArray(timestamps) ? timestamps : Array.from(timestamps);
+            
+            const macdLineData = timestampArray.slice(-macdData.macd.length).map((time, i) => ({
+                x: time,
+                y: macdData.macd[i]
+            }));
+
+            const signalLineData = timestampArray.slice(-macdData.signal.length).map((time, i) => ({
+                x: time,
+                y: macdData.signal[i]
+            }));
+
+            const histogramData = timestampArray.slice(-macdData.histogram.length).map((time, i) => ({
+                x: time,
+                y: macdData.histogram[i]
+            }));
+
+            const macdChart = new Chart(container, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: 'MACD',
+                            data: macdLineData,
+                            borderColor: this.theme.macdColor,
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            fill: false,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Signal',
+                            data: signalLineData,
+                            borderColor: this.theme.signalColor,
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            fill: false,
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Histogram',
+                            data: histogramData,
+                            backgroundColor: function(context) {
+                                return context.parsed.y >= 0 ? 
+                                    this.theme.bullishColor : this.theme.bearishColor;
+                            }.bind(this),
+                            borderWidth: 0,
+                            type: 'bar'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            grid: {
+                                color: this.theme.gridColor
+                            },
+                            ticks: {
+                                color: this.theme.textColor
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: this.theme.gridColor
+                            },
+                            ticks: {
+                                color: this.theme.textColor
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: this.theme.textColor
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: this.theme.textColor,
+                            bodyColor: this.theme.textColor
+                        }
+                    }
+                }
+            });
+
+            this.charts.set(containerId, macdChart);
+
+        } catch (error) {
+            console.error('Error creating MACD chart:', error);
+        }
+    }
+
+    /**
+     * Prepare candlestick data from token data
+     */
+    async prepareCandlestickData(tokenData) {
+        try {
+            // Generate sample OHLC data (in production, this would come from real price data)
+            const ohlcData = [];
+            const basePrice = parseFloat(tokenData.price_usd) || 1;
+            
+            for (let i = 0; i < 100; i++) {
+                const timestamp = Date.now() - (100 - i) * 60000; // 1-minute intervals
+                const open = basePrice * (0.98 + Math.random() * 0.04);
+                const high = open * (1 + Math.random() * 0.02);
+                const low = open * (1 - Math.random() * 0.02);
+                const close = low + Math.random() * (high - low);
+
+                ohlcData.push({
+                    x: timestamp,
+                    o: open,
+                    h: high,
+                    l: low,
+                    c: close
+                });
+            }
+
+            return {
+                ohlc: ohlcData,
+                volume: ohlcData.map(item => ({
+                    timestamp: item.x,
+                    volume: Math.random() * 1000000
+                }))
+            };
+        } catch (error) {
+            console.error('Error preparing candlestick data:', error);
+            return { ohlc: [], volume: [] };
+        }
+    }
+
+    /**
+     * Add RSI reference lines (30, 50, 70)
+     */
+    addRSILines(chart) {
+        try {
+            // Add reference lines plugin
+            chart.options.plugins.annotation = {
+                annotations: {
+                    oversold: {
+                        type: 'line',
+                        yMin: 30,
+                        yMax: 30,
+                        borderColor: this.theme.bearishColor,
+                        borderWidth: 1,
+                        borderDash: [5, 5],
+                        label: {
+                            content: 'Oversold (30)',
+                            enabled: true,
+                            position: 'end'
+                        }
+                    },
+                    middle: {
+                        type: 'line',
+                        yMin: 50,
+                        yMax: 50,
+                        borderColor: this.theme.textColor,
+                        borderWidth: 1,
+                        borderDash: [2, 2]
+                    },
+                    overbought: {
+                        type: 'line',
+                        yMin: 70,
+                        yMax: 70,
+                        borderColor: this.theme.bullishColor,
+                        borderWidth: 1,
+                        borderDash: [5, 5],
+                        label: {
+                            content: 'Overbought (70)',
+                            enabled: true,
+                            position: 'end'
+                        }
+                    }
+                }
+            };
+        } catch (error) {
+            console.error('Error adding RSI lines:', error);
+        }
+    }
+
+    /**
+     * Create indicator container if it doesn't exist
+     */
+    createIndicatorContainer(containerId) {
+        try {
+            const container = document.createElement('canvas');
+            container.id = containerId;
+            container.width = 400;
+            container.height = 200;
+            
+            // Add to indicators section or create one
+            let indicatorSection = document.getElementById('chart-indicators');
+            if (!indicatorSection) {
+                indicatorSection = document.createElement('div');
+                indicatorSection.id = 'chart-indicators';
+                indicatorSection.className = 'chart-indicators mt-3';
+                document.querySelector('.chart-container')?.appendChild(indicatorSection);
+            }
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'indicator-chart mb-3';
+            wrapper.appendChild(container);
+            indicatorSection.appendChild(wrapper);
+            
+            return container;
+        } catch (error) {
+            console.error('Error creating indicator container:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Update chart data in real-time
+     * Method: updateChartRealtime()
+     */
+    async updateChartRealtime(chartId, newData) {
+        try {
+            const chart = this.charts.get(chartId);
+            if (!chart) return;
+
+            // Update main chart data
+            if (newData.price) {
+                const datasets = chart.data.datasets;
+                if (datasets && datasets.length > 0 && datasets[0].data.length > 0) {
+                    const lastDataPoint = datasets[0].data[datasets[0].data.length - 1];
+                    if (lastDataPoint) {
+                        lastDataPoint.c = newData.price;
+                        lastDataPoint.h = Math.max(lastDataPoint.h || 0, newData.price);
+                        lastDataPoint.l = Math.min(lastDataPoint.l || Number.MAX_VALUE, newData.price);
+                    }
+                }
+            }
+
+            // Update indicators if needed
+            if (newData.updateIndicators) {
+                await this.updateIndicators(chartId, newData);
+            }
+
+            chart.update('none');
+        } catch (error) {
+            console.error(`Error updating chart ${chartId}:`, error);
+        }
+    }
+
+    /**
+     * Update technical indicators
+     */
+    async updateIndicators(chartId, newData) {
+        try {
+            const indicators = this.indicatorData.get(chartId);
+            if (!indicators) return;
+
+            // Recalculate indicators with new data
+            // This would typically be done with fresh price data
+            if (newData.prices && Array.isArray(newData.prices) && newData.prices.length > 0) {
+                const updatedIndicators = {
+                    rsi: TechnicalIndicators.calculateRSI(newData.prices, 14),
+                    macd: TechnicalIndicators.calculateMACD(newData.prices, 12, 26, 9),
+                    bollinger: TechnicalIndicators.calculateBollingerBands(newData.prices, 20, 2)
+                };
+
+                this.indicatorData.set(chartId, updatedIndicators);
+
+                // Update indicator charts
+                this.updateRSIChart(`${chartId}-rsi`, updatedIndicators.rsi);
+                this.updateMACDChart(`${chartId}-macd`, updatedIndicators.macd);
+            }
+
+        } catch (error) {
+            console.error('Error updating indicators:', error);
+        }
+    }
+
+    /**
+     * Update RSI chart with new data
+     * Method: updateRSIChart() - ADDED MISSING METHOD
+     */
+    updateRSIChart(chartId, rsiData) {
+        try {
+            const chart = this.charts.get(chartId);
+            if (!chart || !rsiData || !Array.isArray(rsiData)) return;
+
+            const dataset = chart.data.datasets[0];
+            if (dataset && dataset.data) {
+                // Update the last few data points
+                const dataLength = Math.min(rsiData.length, dataset.data.length);
+                for (let i = 0; i < dataLength; i++) {
+                    const dataIndex = dataset.data.length - dataLength + i;
+                    if (dataIndex >= 0 && dataset.data[dataIndex]) {
+                        dataset.data[dataIndex].y = rsiData[rsiData.length - dataLength + i];
+                    }
+                }
+                chart.update('none');
+            }
+        } catch (error) {
+            console.error('Error updating RSI chart:', error);
+        }
+    }
+
+    /**
+     * Update MACD chart with new data
+     * Method: updateMACDChart() - ADDED MISSING METHOD
+     */
+    updateMACDChart(chartId, macdData) {
+        try {
+            const chart = this.charts.get(chartId);
+            if (!chart || !macdData) return;
+
+            const datasets = chart.data.datasets;
+            if (!datasets || datasets.length < 3) return;
+
+            // Update MACD line
+            if (macdData.macd && Array.isArray(macdData.macd)) {
+                const macdDataset = datasets[0];
+                if (macdDataset && macdDataset.data) {
+                    const dataLength = Math.min(macdData.macd.length, macdDataset.data.length);
+                    for (let i = 0; i < dataLength; i++) {
+                        const dataIndex = macdDataset.data.length - dataLength + i;
+                        if (dataIndex >= 0 && macdDataset.data[dataIndex]) {
+                            macdDataset.data[dataIndex].y = macdData.macd[macdData.macd.length - dataLength + i];
+                        }
+                    }
+                }
+            }
+
+            // Update Signal line
+            if (macdData.signal && Array.isArray(macdData.signal)) {
+                const signalDataset = datasets[1];
+                if (signalDataset && signalDataset.data) {
+                    const dataLength = Math.min(macdData.signal.length, signalDataset.data.length);
+                    for (let i = 0; i < dataLength; i++) {
+                        const dataIndex = signalDataset.data.length - dataLength + i;
+                        if (dataIndex >= 0 && signalDataset.data[dataIndex]) {
+                            signalDataset.data[dataIndex].y = macdData.signal[macdData.signal.length - dataLength + i];
+                        }
+                    }
+                }
+            }
+
+            // Update Histogram
+            if (macdData.histogram && Array.isArray(macdData.histogram)) {
+                const histogramDataset = datasets[2];
+                if (histogramDataset && histogramDataset.data) {
+                    const dataLength = Math.min(macdData.histogram.length, histogramDataset.data.length);
+                    for (let i = 0; i < dataLength; i++) {
+                        const dataIndex = histogramDataset.data.length - dataLength + i;
+                        if (dataIndex >= 0 && histogramDataset.data[dataIndex]) {
+                            histogramDataset.data[dataIndex].y = macdData.histogram[macdData.histogram.length - dataLength + i];
+                        }
+                    }
+                }
+            }
+
+            chart.update('none');
+        } catch (error) {
+            console.error('Error updating MACD chart:', error);
+        }
+    }
+
+    /**
+     * Format volume for display
+     */
+    formatVolume(value) {
+        if (value >= 1e9) {
+            return (value / 1e9).toFixed(1) + 'B';
+        } else if (value >= 1e6) {
+            return (value / 1e6).toFixed(1) + 'M';
+        } else if (value >= 1e3) {
+            return (value / 1e3).toFixed(1) + 'K';
+        }
+        return value.toString();
+    }
+
+    /**
+     * Show chart error message
+     */
+    showChartError(containerId, message) {
+        try {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = `
+                    <div class="chart-error">
+                        <i class="bi bi-exclamation-triangle text-warning"></i>
+                        <p>${message}</p>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Error showing chart error:', error);
+        }
+    }
+
+    /**
+     * Bind event handlers
+     */
+    bindEvents() {
+        // Chart controls
+        document.addEventListener('click', (e) => {
+            if (e.target.matches('[data-chart-action]')) {
+                this.handleChartAction(e.target);
+            }
+        });
+
+        // Chart settings
+        document.addEventListener('change', (e) => {
+            if (e.target.matches('[data-chart-setting]')) {
+                this.handleChartSetting(e.target);
+            }
         });
     }
 
     /**
-     * Configure Chart.js global defaults
+     * Handle chart actions
      */
-    configureChartDefaults() {
+    handleChartAction(element) {
         try {
-            if (typeof Chart !== 'undefined') {
-                // Set global defaults
-                Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
-                Chart.defaults.font.size = 12;
-                Chart.defaults.color = '#6c757d';
-                Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.1)';
-                Chart.defaults.backgroundColor = 'rgba(13, 202, 240, 0.1)';
-                
-                // Register custom plugins if needed
-                this.registerCustomPlugins();
-                
-                console.log('✅ Chart.js defaults configured');
-            }
-        } catch (error) {
-            console.error('❌ Failed to configure Chart.js defaults:', error);
-        }
-    }
+            const action = element.dataset.chartAction;
+            const chartId = element.dataset.chartId;
 
-    /**
-     * Register custom Chart.js plugins
-     */
-    registerCustomPlugins() {
-        try {
-            // Custom plugin for dark theme support
-            const darkThemePlugin = {
-                id: 'darkTheme',
-                beforeDraw: (chart) => {
-                    if (document.documentElement.getAttribute('data-bs-theme') === 'dark') {
-                        chart.options.scales.x.grid.color = 'rgba(255, 255, 255, 0.1)';
-                        chart.options.scales.y.grid.color = 'rgba(255, 255, 255, 0.1)';
-                        Chart.defaults.color = '#adb5bd';
-                    } else {
-                        chart.options.scales.x.grid.color = 'rgba(0, 0, 0, 0.1)';
-                        chart.options.scales.y.grid.color = 'rgba(0, 0, 0, 0.1)';
-                        Chart.defaults.color = '#6c757d';
-                    }
-                }
-            };
-            
-            Chart.register(darkThemePlugin);
-            
-        } catch (error) {
-            console.error('❌ Failed to register custom plugins:', error);
-        }
-    }
-
-    /**
-     * Initialize existing chart containers
-     */
-    initializeChartContainers() {
-        try {
-            const chartContainers = document.querySelectorAll('[data-chart-type]');
-            
-            chartContainers.forEach(container => {
-                const chartType = container.getAttribute('data-chart-type');
-                const chartId = container.id || `chart_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-                
-                if (!container.id) {
-                    container.id = chartId;
-                }
-                
-                console.log(`📊 Found chart container: ${chartId} (${chartType})`);
-                
-                // Initialize chart based on type
-                this.initializeChart(chartId, chartType);
-            });
-            
-        } catch (error) {
-            console.error('❌ Failed to initialize chart containers:', error);
-        }
-    }
-
-    /**
-     * Initialize specific chart
-     */
-    initializeChart(chartId, chartType, data = null, options = {}) {
-        try {
-            const canvas = document.getElementById(chartId);
-            if (!canvas) {
-                console.error(`❌ Chart canvas not found: ${chartId}`);
-                return null;
-            }
-
-            const ctx = canvas.getContext('2d');
-            
-            // Merge default config with custom options
-            const chartConfig = this.getChartConfig(chartType, data, options);
-            
-            // Create chart
-            const chart = new Chart(ctx, chartConfig);
-            
-            // Store chart reference
-            this.charts.set(chartId, {
-                chart,
-                type: chartType,
-                canvas,
-                lastUpdate: new Date()
-            });
-            
-            console.log(`✅ Chart initialized: ${chartId} (${chartType})`);
-            return chart;
-            
-        } catch (error) {
-            console.error(`❌ Failed to initialize chart ${chartId}:`, error);
-            return null;
-        }
-    }
-
-    /**
-     * Get chart configuration by type
-     */
-    getChartConfig(chartType, data = null, customOptions = {}) {
-        const baseConfig = {
-            responsive: true,
-            maintainAspectRatio: false,
-            ...this.config
-        };
-
-        switch (chartType) {
-            case 'price':
-                return this.getPriceChartConfig(data, customOptions, baseConfig);
-            
-            case 'portfolio':
-                return this.getPortfolioChartConfig(data, customOptions, baseConfig);
-            
-            case 'volume':
-                return this.getVolumeChartConfig(data, customOptions, baseConfig);
-            
-            case 'risk':
-                return this.getRiskChartConfig(data, customOptions, baseConfig);
-            
-            case 'doughnut':
-                return this.getDoughnutChartConfig(data, customOptions, baseConfig);
-            
-            case 'bar':
-                return this.getBarChartConfig(data, customOptions, baseConfig);
-            
-            default:
-                return this.getDefaultChartConfig(data, customOptions, baseConfig);
-        }
-    }
-
-    /**
-     * Price chart configuration
-     */
-    getPriceChartConfig(data, customOptions, baseConfig) {
-        return {
-            type: 'line',
-            data: data || {
-                labels: [],
-                datasets: [{
-                    label: 'Price',
-                    data: [],
-                    borderColor: '#0dcaf0',
-                    backgroundColor: 'rgba(13, 202, 240, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                ...baseConfig,
-                scales: {
-                    x: {
-                        ...baseConfig.scales.x,
-                        title: {
-                            display: true,
-                            text: 'Time'
-                        }
-                    },
-                    y: {
-                        ...baseConfig.scales.y,
-                        title: {
-                            display: true,
-                            text: 'Price ($)'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return '$' + value.toFixed(6);
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    ...baseConfig.plugins,
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.dataset.label}: $${context.parsed.y.toFixed(6)}`;
-                            }
-                        }
-                    }
-                },
-                ...customOptions
-            }
-        };
-    }
-
-    /**
-     * Portfolio chart configuration
-     */
-    getPortfolioChartConfig(data, customOptions, baseConfig) {
-        return {
-            type: 'line',
-            data: data || {
-                labels: [],
-                datasets: [{
-                    label: 'Portfolio Value',
-                    data: [],
-                    borderColor: '#198754',
-                    backgroundColor: 'rgba(25, 135, 84, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4
-                }, {
-                    label: 'P&L',
-                    data: [],
-                    borderColor: '#dc3545',
-                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
-                    borderWidth: 2,
-                    fill: false,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                ...baseConfig,
-                scales: {
-                    x: {
-                        ...baseConfig.scales.x,
-                        title: {
-                            display: true,
-                            text: 'Time'
-                        }
-                    },
-                    y: {
-                        ...baseConfig.scales.y,
-                        title: {
-                            display: true,
-                            text: 'Value ($)'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return '$' + value.toLocaleString();
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    ...baseConfig.plugins,
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.dataset.label}: $${context.parsed.y.toLocaleString()}`;
-                            }
-                        }
-                    }
-                },
-                ...customOptions
-            }
-        };
-    }
-
-    /**
-     * Volume chart configuration
-     */
-    getVolumeChartConfig(data, customOptions, baseConfig) {
-        return {
-            type: 'bar',
-            data: data || {
-                labels: [],
-                datasets: [{
-                    label: 'Volume',
-                    data: [],
-                    backgroundColor: 'rgba(255, 193, 7, 0.6)',
-                    borderColor: '#ffc107',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                ...baseConfig,
-                scales: {
-                    x: {
-                        ...baseConfig.scales.x,
-                        title: {
-                            display: true,
-                            text: 'Time'
-                        }
-                    },
-                    y: {
-                        ...baseConfig.scales.y,
-                        title: {
-                            display: true,
-                            text: 'Volume ($)'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                return '$' + value.toLocaleString();
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    ...baseConfig.plugins,
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `Volume: $${context.parsed.y.toLocaleString()}`;
-                            }
-                        }
-                    }
-                },
-                ...customOptions
-            }
-        };
-    }
-
-    /**
-     * Risk analysis chart configuration
-     */
-    getRiskChartConfig(data, customOptions, baseConfig) {
-        return {
-            type: 'radar',
-            data: data || {
-                labels: ['Liquidity', 'Volume', 'Holders', 'Contract', 'Social', 'Technical'],
-                datasets: [{
-                    label: 'Risk Score',
-                    data: [0, 0, 0, 0, 0, 0],
-                    borderColor: '#dc3545',
-                    backgroundColor: 'rgba(220, 53, 69, 0.2)',
-                    borderWidth: 2,
-                    pointBackgroundColor: '#dc3545'
-                }]
-            },
-            options: {
-                ...baseConfig,
-                scales: {
-                    r: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: {
-                            stepSize: 20
-                        }
-                    }
-                },
-                plugins: {
-                    ...baseConfig.plugins,
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.label}: ${context.parsed.r}/100`;
-                            }
-                        }
-                    }
-                },
-                ...customOptions
-            }
-        };
-    }
-
-    /**
-     * Doughnut chart configuration
-     */
-    getDoughnutChartConfig(data, customOptions, baseConfig) {
-        return {
-            type: 'doughnut',
-            data: data || {
-                labels: [],
-                datasets: [{
-                    data: [],
-                    backgroundColor: [
-                        '#0dcaf0',
-                        '#198754',
-                        '#ffc107',
-                        '#dc3545',
-                        '#6f42c1',
-                        '#fd7e14'
-                    ],
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
-                }]
-            },
-            options: {
-                ...baseConfig,
-                plugins: {
-                    ...baseConfig.plugins,
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const label = context.label || '';
-                                const value = context.parsed || 0;
-                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                const percentage = ((value / total) * 100).toFixed(1);
-                                return `${label}: ${percentage}%`;
-                            }
-                        }
-                    }
-                },
-                ...customOptions
-            }
-        };
-    }
-
-    /**
-     * Bar chart configuration
-     */
-    getBarChartConfig(data, customOptions, baseConfig) {
-        return {
-            type: 'bar',
-            data: data || {
-                labels: [],
-                datasets: [{
-                    label: 'Value',
-                    data: [],
-                    backgroundColor: 'rgba(13, 202, 240, 0.6)',
-                    borderColor: '#0dcaf0',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                ...baseConfig,
-                ...customOptions
-            }
-        };
-    }
-
-    /**
-     * Default chart configuration
-     */
-    getDefaultChartConfig(data, customOptions, baseConfig) {
-        return {
-            type: 'line',
-            data: data || {
-                labels: [],
-                datasets: [{
-                    label: 'Data',
-                    data: [],
-                    borderColor: '#0dcaf0',
-                    backgroundColor: 'rgba(13, 202, 240, 0.1)',
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                ...baseConfig,
-                ...customOptions
-            }
-        };
-    }
-
-    /**
-     * Setup event listeners
-     */
-    setupEventListeners() {
-        try {
-            // Listen for theme changes
-            const observer = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.type === 'attributes' && mutation.attributeName === 'data-bs-theme') {
-                        this.updateChartsForTheme();
-                    }
-                });
-            });
-            
-            observer.observe(document.documentElement, {
-                attributes: true,
-                attributeFilter: ['data-bs-theme']
-            });
-            
-            // Listen for window resize
-            window.addEventListener('resize', this.debounce(() => {
-                this.resizeAllCharts();
-            }, 250));
-            
-            console.log('✅ Chart event listeners setup');
-            
-        } catch (error) {
-            console.error('❌ Failed to setup chart event listeners:', error);
-        }
-    }
-
-    // Chart Management Methods
-
-    /**
-     * Create new chart
-     */
-    createChart(containerId, chartType, data = null, options = {}) {
-        try {
-            return this.initializeChart(containerId, chartType, data, options);
-        } catch (error) {
-            console.error(`❌ Failed to create chart ${containerId}:`, error);
-            return null;
-        }
-    }
-
-    /**
-     * Update chart data
-     */
-    updateChart(chartId, newData, animate = true) {
-        try {
-            const chartInfo = this.charts.get(chartId);
-            if (!chartInfo) {
-                console.warn(`⚠️ Chart not found: ${chartId}`);
-                return false;
-            }
-
-            const chart = chartInfo.chart;
-            
-            // Update data
-            if (newData.labels) {
-                chart.data.labels = newData.labels;
-            }
-            
-            if (newData.datasets) {
-                chart.data.datasets = newData.datasets;
-            }
-            
-            // Update chart
-            chart.update(animate ? 'active' : 'none');
-            
-            // Update last update time
-            chartInfo.lastUpdate = new Date();
-            
-            console.log(`✅ Chart updated: ${chartId}`);
-            return true;
-            
-        } catch (error) {
-            console.error(`❌ Failed to update chart ${chartId}:`, error);
-            return false;
-        }
-    }
-
-    /**
-     * Add data point to chart
-     */
-    addDataPoint(chartId, label, datasetIndex = 0, value, maxPoints = 50) {
-        try {
-            const chartInfo = this.charts.get(chartId);
-            if (!chartInfo) {
-                console.warn(`⚠️ Chart not found: ${chartId}`);
-                return false;
-            }
-
-            const chart = chartInfo.chart;
-            
-            // Add label
-            chart.data.labels.push(label);
-            
-            // Add data point
-            if (chart.data.datasets[datasetIndex]) {
-                chart.data.datasets[datasetIndex].data.push(value);
-                
-                // Limit data points
-                if (chart.data.labels.length > maxPoints) {
-                    chart.data.labels.shift();
-                    chart.data.datasets[datasetIndex].data.shift();
-                }
-            }
-            
-            // Update chart
-            chart.update('active');
-            
-            return true;
-            
-        } catch (error) {
-            console.error(`❌ Failed to add data point to chart ${chartId}:`, error);
-            return false;
-        }
-    }
-
-    /**
-     * Destroy chart
-     */
-    destroyChart(chartId) {
-        try {
-            const chartInfo = this.charts.get(chartId);
-            if (!chartInfo) {
-                console.warn(`⚠️ Chart not found: ${chartId}`);
-                return false;
-            }
-
-            chartInfo.chart.destroy();
-            this.charts.delete(chartId);
-            
-            console.log(`✅ Chart destroyed: ${chartId}`);
-            return true;
-            
-        } catch (error) {
-            console.error(`❌ Failed to destroy chart ${chartId}:`, error);
-            return false;
-        }
-    }
-
-    /**
-     * Resize all charts
-     */
-    resizeAllCharts() {
-        try {
-            this.charts.forEach((chartInfo, chartId) => {
-                chartInfo.chart.resize();
-            });
-            
-        } catch (error) {
-            console.error('❌ Failed to resize charts:', error);
-        }
-    }
-
-    /**
-     * Update charts for theme change
-     */
-    updateChartsForTheme() {
-        try {
-            this.charts.forEach((chartInfo, chartId) => {
-                chartInfo.chart.update('none');
-            });
-            
-        } catch (error) {
-            console.error('❌ Failed to update charts for theme:', error);
-        }
-    }
-
-    // Utility Methods
-
-    /**
-     * Debounce function
-     */
-    debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-
-    /**
-     * Generate sample data for testing
-     */
-    generateSampleData(type = 'price', points = 20) {
-        const labels = [];
-        const data = [];
-        
-        for (let i = 0; i < points; i++) {
-            const date = new Date();
-            date.setMinutes(date.getMinutes() - (points - i) * 5);
-            labels.push(date.toLocaleTimeString());
-            
-            switch (type) {
-                case 'price':
-                    data.push((Math.random() * 100 + 50).toFixed(6));
+            switch (action) {
+                case 'toggle-indicators':
+                    this.toggleIndicators(chartId);
                     break;
-                case 'volume':
-                    data.push(Math.floor(Math.random() * 1000000));
+                case 'reset-zoom':
+                    this.resetZoom(chartId);
                     break;
-                default:
-                    data.push(Math.random() * 100);
+                case 'export-chart':
+                    this.exportChart(chartId);
+                    break;
             }
+        } catch (error) {
+            console.error('Error handling chart action:', error);
         }
-        
-        return { labels, data };
     }
 
-    // Public API Methods
+    /**
+     * Handle chart settings
+     */
+    handleChartSetting(element) {
+        try {
+            const setting = element.dataset.chartSetting;
+            const value = element.value;
+            const chartId = element.dataset.chartId;
+
+            switch (setting) {
+                case 'timeframe':
+                    this.changeTimeframe(chartId, value);
+                    break;
+                case 'indicator-period':
+                    this.changeIndicatorPeriod(chartId, value);
+                    break;
+            }
+        } catch (error) {
+            console.error('Error handling chart setting:', error);
+        }
+    }
 
     /**
-     * Get chart instance
+     * Change chart timeframe
+     * Method: changeTimeframe() - ADDED MISSING METHOD
+     */
+    changeTimeframe(chartId, timeframe) {
+        try {
+            console.log(`Changing timeframe for ${chartId} to ${timeframe}`);
+            // Implementation would depend on data source
+            // This is a placeholder for the actual timeframe change logic
+        } catch (error) {
+            console.error('Error changing timeframe:', error);
+        }
+    }
+
+    /**
+     * Change indicator period
+     * Method: changeIndicatorPeriod() - ADDED MISSING METHOD
+     */
+    changeIndicatorPeriod(chartId, period) {
+        try {
+            console.log(`Changing indicator period for ${chartId} to ${period}`);
+            // Implementation would recalculate indicators with new period
+            // This is a placeholder for the actual period change logic
+        } catch (error) {
+            console.error('Error changing indicator period:', error);
+        }
+    }
+
+    /**
+     * Toggle indicators visibility
+     */
+    toggleIndicators(chartId) {
+        const indicatorSection = document.getElementById('chart-indicators');
+        if (indicatorSection) {
+            indicatorSection.style.display = 
+                indicatorSection.style.display === 'none' ? 'block' : 'none';
+        }
+    }
+
+    /**
+     * Reset chart zoom
+     */
+    resetZoom(chartId) {
+        const chart = this.charts.get(chartId);
+        if (chart && chart.resetZoom) {
+            chart.resetZoom();
+        }
+    }
+
+    /**
+     * Export chart as image
+     */
+    exportChart(chartId) {
+        try {
+            const chart = this.charts.get(chartId);
+            if (chart) {
+                const url = chart.toBase64Image();
+                const link = document.createElement('a');
+                link.download = `${chartId}-chart.png`;
+                link.href = url;
+                link.click();
+            }
+        } catch (error) {
+            console.error('Error exporting chart:', error);
+        }
+    }
+
+    /**
+     * Get chart by ID
+     * Method: getChart() - ADDED UTILITY METHOD
      */
     getChart(chartId) {
-        const chartInfo = this.charts.get(chartId);
-        return chartInfo ? chartInfo.chart : null;
+        return this.charts.get(chartId);
     }
 
     /**
-     * Get all charts
+     * Get all chart IDs
+     * Method: getChartIds() - ADDED UTILITY METHOD
      */
-    getAllCharts() {
-        const result = {};
-        this.charts.forEach((chartInfo, chartId) => {
-            result[chartId] = {
-                chart: chartInfo.chart,
-                type: chartInfo.type,
-                lastUpdate: chartInfo.lastUpdate
-            };
-        });
-        return result;
+    getChartIds() {
+        return Array.from(this.charts.keys());
     }
 
     /**
-     * Check if Chart.js is available
+     * Check if chart exists
+     * Method: hasChart() - ADDED UTILITY METHOD
      */
-    isChartJSAvailable() {
-        return typeof Chart !== 'undefined';
+    hasChart(chartId) {
+        return this.charts.has(chartId);
     }
 
     /**
-     * Get controller status
+     * Update all charts
+     * Method: updateAllCharts() - ADDED UTILITY METHOD
      */
-    getStatus() {
-        return {
-            isInitialized: this.isInitialized,
-            chartCount: this.charts.size,
-            chartJSAvailable: this.isChartJSAvailable(),
-            charts: Array.from(this.charts.keys())
-        };
+    updateAllCharts() {
+        try {
+            this.charts.forEach((chart, chartId) => {
+                if (chart) {
+                    chart.update('none');
+                }
+            });
+        } catch (error) {
+            console.error('Error updating all charts:', error);
+        }
     }
 
     /**
-     * Cleanup resources
+     * Cleanup charts and intervals
      */
     destroy() {
         try {
-            console.log('🧹 Cleaning up Chart Controller...');
-            
+            // Clear update interval
+            if (this.updateInterval) {
+                clearInterval(this.updateInterval);
+            }
+
             // Destroy all charts
-            this.charts.forEach((chartInfo, chartId) => {
-                chartInfo.chart.destroy();
+            this.charts.forEach((chart) => {
+                if (chart && typeof chart.destroy === 'function') {
+                    chart.destroy();
+                }
             });
-            
+
+            // Clear maps
             this.charts.clear();
-            this.isInitialized = false;
-            
-            console.log('✅ Chart Controller cleaned up');
-            
+            this.chartDataCache.clear();
+            this.indicatorData.clear();
+
+            console.log('✅ ChartController destroyed');
         } catch (error) {
-            console.error('❌ Failed to cleanup Chart Controller:', error);
+            console.error('Error destroying ChartController:', error);
         }
     }
 }
 
-// Export for global use
-window.ChartController = ChartController;
-
-// Export for module systems
+// Export for use in other modules
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = ChartController;
+} else {
+    window.ChartController = ChartController;
 }
-
-console.log('📊 Chart Controller module loaded successfully');

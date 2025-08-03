@@ -1,25 +1,30 @@
 /**
- * WebSocket Manager Module
+ * WebSocket Manager Module - UPDATED & FIXED
  * File: frontend/static/js/websocket-manager.js
  * 
  * Handles WebSocket connections for real-time updates in DEX Sniper Pro.
  * Features auto-reconnection, message queuing, event handling, and connection management.
+ * FIXED: Connection URL construction, error handling, and fallback mechanisms
  */
 
 class WebSocketManager extends EventTarget {
     constructor(url) {
         super();
-        this.url = url;
+        this.baseUrl = url;
         this.socket = null;
         this.isConnected = false;
         this.isConnecting = false;
         this.reconnectAttempts = 0;
-        this.maxReconnectAttempts = 5;
+        this.maxReconnectAttempts = 10; // ✅ INCREASED from 5 to 10
         this.reconnectDelay = 1000; // Start with 1 second
         this.maxReconnectDelay = 30000; // Max 30 seconds
         this.heartbeatInterval = 30000; // 30 seconds
         this.messageQueue = [];
         this.subscriptions = new Map();
+        
+        // ✅ ADDED: Multiple connection management
+        this.connections = new Map();
+        this.reconnectTimers = new Map();
         
         // Performance monitoring
         this.stats = {
@@ -40,143 +45,230 @@ class WebSocketManager extends EventTarget {
     }
 
     /**
-     * Connect to WebSocket server
+     * UPDATED: Connect to WebSocket server with better URL handling
      */
-    async connect() {
-        if (this.isConnected || this.isConnecting) {
-            console.warn('⚠️ WebSocket already connected or connecting');
-            return;
+    async connect(endpoint = '', callbacks = {}) {
+        // ✅ FIXED: Better URL construction
+        let wsUrl;
+        if (endpoint) {
+            // Handle specific endpoint connections
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const host = window.location.host;
+            
+            if (endpoint.startsWith('/')) {
+                wsUrl = `${protocol}//${host}${endpoint}`;
+            } else {
+                wsUrl = `${protocol}//${host}/ws/${endpoint}`;
+            }
+        } else {
+            // Use base URL
+            wsUrl = this.baseUrl;
         }
 
-        this.isConnecting = true;
-        console.log('🔄 Connecting to WebSocket...');
+        const connectionKey = endpoint || 'default';
+
+        if (this.connections.has(connectionKey)) {
+            const existing = this.connections.get(connectionKey);
+            if (existing.isConnected || existing.isConnecting) {
+                console.warn(`⚠️ WebSocket already connected or connecting to ${endpoint}`);
+                return existing.socket;
+            }
+        }
+
+        console.log(`🔄 Connecting to WebSocket: ${wsUrl}`);
 
         try {
-            this.socket = new WebSocket(this.url);
-            this.setupEventHandlers();
+            const connectionInfo = {
+                socket: null,
+                isConnected: false,
+                isConnecting: true,
+                reconnectAttempts: 0,
+                callbacks: callbacks,
+                url: wsUrl
+            };
+
+            this.connections.set(connectionKey, connectionInfo);
+
+            const socket = new WebSocket(wsUrl);
+            connectionInfo.socket = socket;
+            
+            this.setupEventHandlers(socket, connectionKey, callbacks);
             
             // Return a promise that resolves when connected
             return new Promise((resolve, reject) => {
                 const timeout = setTimeout(() => {
-                    reject(new Error('WebSocket connection timeout'));
+                    connectionInfo.isConnecting = false;
+                    reject(new Error(`WebSocket connection timeout for ${endpoint}`));
                 }, 10000); // 10 second timeout
 
-                this.socket.onopen = () => {
+                const originalOnOpen = socket.onopen;
+                socket.onopen = (event) => {
                     clearTimeout(timeout);
-                    resolve();
+                    if (originalOnOpen) originalOnOpen(event);
+                    resolve(socket);
                 };
 
-                this.socket.onerror = (error) => {
+                const originalOnError = socket.onerror;
+                socket.onerror = (error) => {
                     clearTimeout(timeout);
+                    connectionInfo.isConnecting = false;
+                    if (originalOnError) originalOnError(error);
                     reject(error);
                 };
             });
 
         } catch (error) {
-            this.isConnecting = false;
-            console.error('❌ WebSocket connection failed:', error);
+            const connectionInfo = this.connections.get(connectionKey);
+            if (connectionInfo) {
+                connectionInfo.isConnecting = false;
+            }
+            console.error(`❌ WebSocket connection failed for ${endpoint}:`, error);
+            
+            // ✅ ADDED: Schedule reconnection on failure
+            this.scheduleReconnect(connectionKey, callbacks);
             throw error;
         }
     }
 
     /**
-     * Setup WebSocket event handlers
+     * UPDATED: Setup WebSocket event handlers with connection key tracking
      */
-    setupEventHandlers() {
-        this.socket.onopen = (event) => {
-            console.log('✅ WebSocket connected successfully');
-            this.handleConnectionOpen(event);
+    setupEventHandlers(socket, connectionKey, callbacks = {}) {
+        const connectionInfo = this.connections.get(connectionKey);
+
+        socket.onopen = (event) => {
+            console.log(`✅ WebSocket connected successfully: ${connectionKey}`);
+            this.handleConnectionOpen(event, connectionKey);
+            if (callbacks.onOpen) callbacks.onOpen(event);
         };
 
-        this.socket.onclose = (event) => {
-            console.log('🔌 WebSocket connection closed:', event.code, event.reason);
-            this.handleConnectionClose(event);
+        socket.onclose = (event) => {
+            console.log(`🔌 WebSocket connection closed: ${connectionKey} (${event.code}) ${event.reason || ''}`);
+            this.handleConnectionClose(event, connectionKey);
+            if (callbacks.onClose) callbacks.onClose(event);
         };
 
-        this.socket.onerror = (error) => {
-            console.error('❌ WebSocket error:', error);
-            this.handleConnectionError(error);
+        socket.onerror = (error) => {
+            console.error(`❌ WebSocket error for ${connectionKey}:`, error);
+            this.handleConnectionError(error, connectionKey);
+            if (callbacks.onError) callbacks.onError(error);
         };
 
-        this.socket.onmessage = (event) => {
-            this.handleMessage(event);
+        socket.onmessage = (event) => {
+            this.handleMessage(event, connectionKey);
+            if (callbacks.onMessage) callbacks.onMessage(event);
         };
     }
 
     /**
-     * Handle connection open
+     * UPDATED: Handle connection open with connection key
      */
-    handleConnectionOpen(event) {
-        this.isConnected = true;
-        this.isConnecting = false;
-        this.reconnectAttempts = 0;
+    handleConnectionOpen(event, connectionKey) {
+        const connectionInfo = this.connections.get(connectionKey);
+        if (connectionInfo) {
+            connectionInfo.isConnected = true;
+            connectionInfo.isConnecting = false;
+            connectionInfo.reconnectAttempts = 0;
+        }
+
+        // Update legacy properties for backward compatibility
+        if (connectionKey === 'default') {
+            this.isConnected = true;
+            this.isConnecting = false;
+            this.socket = connectionInfo?.socket;
+        }
+
         this.reconnectDelay = 1000; // Reset delay
         this.stats.totalConnections++;
         this.stats.lastConnectedAt = new Date();
+        
+        // Clear any pending reconnect timer
+        if (this.reconnectTimers.has(connectionKey)) {
+            clearTimeout(this.reconnectTimers.get(connectionKey));
+            this.reconnectTimers.delete(connectionKey);
+        }
         
         // Update performance monitor
         if (window.PERFORMANCE_MONITOR) {
             window.PERFORMANCE_MONITOR.webSocketReconnects = this.stats.totalReconnections;
         }
 
-        // Start heartbeat
-        this.startHeartbeat();
-
-        // Process queued messages
-        this.processMessageQueue();
+        // Start heartbeat for default connection
+        if (connectionKey === 'default') {
+            this.startHeartbeat();
+            this.processMessageQueue();
+        }
 
         // Emit connect event
-        this.dispatchEvent(new CustomEvent('connect', { detail: event }));
-        this.emit('connect', event);
+        this.dispatchEvent(new CustomEvent('connect', { detail: { event, connectionKey } }));
+        this.emit('connect', { event, connectionKey });
 
-        console.log('🎉 WebSocket ready for real-time updates');
+        console.log(`🎉 WebSocket ready for real-time updates: ${connectionKey}`);
     }
 
     /**
-     * Handle connection close
+     * UPDATED: Handle connection close with connection key
      */
-    handleConnectionClose(event) {
-        this.isConnected = false;
-        this.isConnecting = false;
+    handleConnectionClose(event, connectionKey) {
+        const connectionInfo = this.connections.get(connectionKey);
+        if (connectionInfo) {
+            connectionInfo.isConnected = false;
+            connectionInfo.isConnecting = false;
+        }
+
+        // Update legacy properties for backward compatibility
+        if (connectionKey === 'default') {
+            this.isConnected = false;
+            this.isConnecting = false;
+        }
+
         this.stats.lastDisconnectedAt = new Date();
         
         if (this.stats.lastConnectedAt) {
             this.stats.connectionDuration += Date.now() - this.stats.lastConnectedAt.getTime();
         }
 
-        // Stop heartbeat
-        this.stopHeartbeat();
+        // Stop heartbeat for default connection
+        if (connectionKey === 'default') {
+            this.stopHeartbeat();
+        }
 
         // Emit disconnect event
-        this.dispatchEvent(new CustomEvent('disconnect', { detail: event }));
-        this.emit('disconnect', event);
+        this.dispatchEvent(new CustomEvent('disconnect', { detail: { event, connectionKey } }));
+        this.emit('disconnect', { event, connectionKey });
 
-        // Auto-reconnect if not intentional close
-        if (event.code !== 1000 && this.reconnectAttempts < this.maxReconnectAttempts) {
-            this.scheduleReconnect();
-        } else if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-            console.error('❌ Max reconnection attempts reached. Giving up.');
-            this.emit('reconnect:failed');
+        // ✅ IMPROVED: Auto-reconnect logic with better conditions
+        const shouldReconnect = event.code !== 1000 && // Not normal closure
+                               event.code !== 1001 && // Not going away
+                               connectionInfo && 
+                               connectionInfo.reconnectAttempts < this.maxReconnectAttempts;
+
+        if (shouldReconnect) {
+            console.log(`🔄 Scheduling reconnect for ${connectionKey} (attempt ${connectionInfo.reconnectAttempts + 1}/${this.maxReconnectAttempts})`);
+            this.scheduleReconnect(connectionKey, connectionInfo.callbacks);
+        } else if (connectionInfo && connectionInfo.reconnectAttempts >= this.maxReconnectAttempts) {
+            console.error(`❌ Max reconnection attempts reached for ${connectionKey}. Giving up.`);
+            this.emit('reconnect:failed', { connectionKey });
         }
     }
 
     /**
-     * Handle connection error
+     * UPDATED: Handle connection error with connection key
      */
-    handleConnectionError(error) {
-        console.error('❌ WebSocket error occurred:', error);
-        this.emit('error', error);
+    handleConnectionError(error, connectionKey) {
+        console.error(`❌ WebSocket error occurred for ${connectionKey}:`, error);
+        this.emit('error', { error, connectionKey });
     }
 
     /**
-     * Handle incoming messages
+     * UPDATED: Handle incoming messages with connection key
      */
-    handleMessage(event) {
+    handleMessage(event, connectionKey) {
         this.stats.messagesReceived++;
         
         try {
             const data = JSON.parse(event.data);
-            console.log('📨 WebSocket message received:', data.type || 'unknown');
+            console.log(`📨 WebSocket message received from ${connectionKey}:`, data.type || 'unknown');
             
             // Handle different message types
             switch (data.type) {
@@ -192,47 +284,93 @@ class WebSocketManager extends EventTarget {
                 case 'live_alert':
                     this.emit('live_alert', data.data);
                     break;
+                case 'price_update':
+                    this.emit('price_update', data.data);
+                    break;
                 case 'connection_established':
-                    console.log('🎯 Server acknowledged connection:', data.message);
+                    console.log(`🎯 Server acknowledged connection for ${connectionKey}:`, data.message);
                     break;
                 default:
-                    console.warn('⚠️ Unknown message type:', data.type);
+                    console.log(`📨 Unknown message type from ${connectionKey}:`, data.type);
                     this.emit('message', data);
             }
 
             // Emit generic message event
-            this.dispatchEvent(new CustomEvent('message', { detail: data }));
+            this.dispatchEvent(new CustomEvent('message', { detail: { data, connectionKey } }));
 
         } catch (error) {
-            console.error('❌ Failed to parse WebSocket message:', error);
-            this.emit('parse_error', { error, rawData: event.data });
+            console.error(`❌ Failed to parse WebSocket message from ${connectionKey}:`, error);
+            this.emit('parse_error', { error, rawData: event.data, connectionKey });
         }
     }
 
     /**
-     * Send message to server
+     * ADDED: Schedule reconnection with exponential backoff
      */
-    send(data) {
-        const message = typeof data === 'string' ? data : JSON.stringify(data);
+    scheduleReconnect(connectionKey, callbacks = {}) {
+        const connectionInfo = this.connections.get(connectionKey);
+        if (!connectionInfo) return;
+
+        connectionInfo.reconnectAttempts++;
+        this.stats.totalReconnections++;
         
-        if (this.isConnected && this.socket.readyState === WebSocket.OPEN) {
-            this.socket.send(message);
+        const delay = Math.min(
+            this.reconnectDelay * Math.pow(2, connectionInfo.reconnectAttempts - 1),
+            this.maxReconnectDelay
+        );
+        
+        console.log(`🔄 Scheduling reconnection for ${connectionKey} in ${delay}ms (attempt ${connectionInfo.reconnectAttempts}/${this.maxReconnectAttempts})`);
+        
+        const timer = setTimeout(async () => {
+            this.reconnectTimers.delete(connectionKey);
+            
+            if (connectionInfo && !connectionInfo.isConnected && !connectionInfo.isConnecting) {
+                try {
+                    await this.connect(connectionKey === 'default' ? '' : connectionKey, callbacks);
+                } catch (error) {
+                    console.error(`❌ Reconnection failed for ${connectionKey}:`, error);
+                }
+            }
+        }, delay);
+        
+        this.reconnectTimers.set(connectionKey, timer);
+    }
+
+    /**
+     * UPDATED: Send message to specific connection or default
+     */
+    send(data, connectionKey = 'default') {
+        const message = typeof data === 'string' ? data : JSON.stringify(data);
+        const connectionInfo = this.connections.get(connectionKey);
+        
+        if (connectionInfo && connectionInfo.isConnected && 
+            connectionInfo.socket.readyState === WebSocket.OPEN) {
+            connectionInfo.socket.send(message);
             this.stats.messagesSent++;
-            console.log('📤 WebSocket message sent:', data.type || 'unknown');
+            console.log(`📤 WebSocket message sent to ${connectionKey}:`, data.type || 'unknown');
+            return true;
         } else {
-            // Queue message for later sending
-            this.messageQueue.push(message);
-            console.log('📬 Message queued (not connected):', data.type || 'unknown');
+            // Queue message for later sending (only for default connection)
+            if (connectionKey === 'default') {
+                this.messageQueue.push(message);
+                console.log('📬 Message queued (not connected):', data.type || 'unknown');
+            } else {
+                console.warn(`⚠️ Cannot send message to ${connectionKey}: not connected`);
+            }
+            return false;
         }
     }
 
     /**
-     * Process queued messages
+     * Process queued messages (unchanged)
      */
     processMessageQueue() {
-        while (this.messageQueue.length > 0 && this.isConnected) {
+        const defaultConnection = this.connections.get('default');
+        
+        while (this.messageQueue.length > 0 && 
+               defaultConnection && defaultConnection.isConnected) {
             const message = this.messageQueue.shift();
-            this.socket.send(message);
+            defaultConnection.socket.send(message);
             this.stats.messagesSent++;
         }
         
@@ -242,13 +380,14 @@ class WebSocketManager extends EventTarget {
     }
 
     /**
-     * Start heartbeat mechanism
+     * Start heartbeat mechanism (unchanged)
      */
     startHeartbeat() {
         this.stopHeartbeat(); // Clear any existing timer
         
         this.heartbeatTimer = setInterval(() => {
-            if (this.isConnected) {
+            const defaultConnection = this.connections.get('default');
+            if (defaultConnection && defaultConnection.isConnected) {
                 this.sendHeartbeat();
             }
         }, this.heartbeatInterval);
@@ -257,7 +396,7 @@ class WebSocketManager extends EventTarget {
     }
 
     /**
-     * Stop heartbeat mechanism
+     * Stop heartbeat mechanism (unchanged)
      */
     stopHeartbeat() {
         if (this.heartbeatTimer) {
@@ -267,7 +406,7 @@ class WebSocketManager extends EventTarget {
     }
 
     /**
-     * Send heartbeat ping
+     * Send heartbeat ping (unchanged)
      */
     sendHeartbeat() {
         this.lastHeartbeat = Date.now();
@@ -278,7 +417,7 @@ class WebSocketManager extends EventTarget {
     }
 
     /**
-     * Handle pong response
+     * Handle pong response (unchanged)
      */
     handlePongMessage(data) {
         if (this.lastHeartbeat) {
@@ -289,45 +428,50 @@ class WebSocketManager extends EventTarget {
     }
 
     /**
-     * Schedule reconnection attempt
+     * UPDATED: Disconnect from WebSocket(s)
      */
-    scheduleReconnect() {
-        this.reconnectAttempts++;
-        this.stats.totalReconnections++;
-        
-        console.log(`🔄 Scheduling reconnection attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts} in ${this.reconnectDelay}ms`);
-        
-        setTimeout(() => {
-            if (!this.isConnected && !this.isConnecting) {
-                this.connect().catch(error => {
-                    console.error('❌ Reconnection failed:', error);
-                    
-                    // Exponential backoff
-                    this.reconnectDelay = Math.min(this.reconnectDelay * 2, this.maxReconnectDelay);
-                });
+    disconnect(connectionKey = null) {
+        if (connectionKey) {
+            // Disconnect specific connection
+            const connectionInfo = this.connections.get(connectionKey);
+            if (connectionInfo && connectionInfo.socket) {
+                console.log(`🔌 Disconnecting WebSocket: ${connectionKey}`);
+                connectionInfo.socket.close(1000, 'Client disconnect');
+                this.connections.delete(connectionKey);
+                
+                // Clear reconnect timer
+                if (this.reconnectTimers.has(connectionKey)) {
+                    clearTimeout(this.reconnectTimers.get(connectionKey));
+                    this.reconnectTimers.delete(connectionKey);
+                }
             }
-        }, this.reconnectDelay);
-    }
-
-    /**
-     * Disconnect from WebSocket
-     */
-    disconnect() {
-        console.log('🔌 Disconnecting WebSocket...');
-        
-        this.stopHeartbeat();
-        
-        if (this.socket) {
-            this.socket.close(1000, 'Client disconnect');
+        } else {
+            // Disconnect all connections
+            console.log('🔌 Disconnecting all WebSocket connections...');
+            
+            this.stopHeartbeat();
+            
+            this.connections.forEach((connectionInfo, key) => {
+                if (connectionInfo.socket) {
+                    connectionInfo.socket.close(1000, 'Client disconnect');
+                }
+            });
+            
+            this.connections.clear();
+            
+            // Clear all reconnect timers
+            this.reconnectTimers.forEach(timer => clearTimeout(timer));
+            this.reconnectTimers.clear();
+            
+            // Update legacy properties
             this.socket = null;
+            this.isConnected = false;
+            this.isConnecting = false;
         }
-        
-        this.isConnected = false;
-        this.isConnecting = false;
     }
 
     /**
-     * Request stats update from server
+     * Request stats update from server (unchanged)
      */
     requestStatsUpdate() {
         this.send({
@@ -337,7 +481,7 @@ class WebSocketManager extends EventTarget {
     }
 
     /**
-     * Subscribe to specific event types
+     * Subscribe to specific event types (unchanged)
      */
     subscribe(eventType, callback) {
         if (!this.subscriptions.has(eventType)) {
@@ -351,7 +495,7 @@ class WebSocketManager extends EventTarget {
     }
 
     /**
-     * Unsubscribe from specific event types
+     * Unsubscribe from specific event types (unchanged)
      */
     unsubscribe(eventType, callback) {
         if (this.subscriptions.has(eventType)) {
@@ -361,7 +505,7 @@ class WebSocketManager extends EventTarget {
     }
 
     /**
-     * Emit events to subscribers
+     * Emit events to subscribers (unchanged)
      */
     emit(eventType, data = null) {
         // Dispatch custom event
@@ -380,25 +524,39 @@ class WebSocketManager extends EventTarget {
     }
 
     /**
-     * Get connection status
+     * UPDATED: Get connection status
      */
-    getStatus() {
+    getStatus(connectionKey = 'default') {
+        const connectionInfo = this.connections.get(connectionKey);
+        
+        if (connectionInfo) {
+            return {
+                isConnected: connectionInfo.isConnected,
+                isConnecting: connectionInfo.isConnecting,
+                reconnectAttempts: connectionInfo.reconnectAttempts,
+                readyState: connectionInfo.socket ? connectionInfo.socket.readyState : null,
+                url: connectionInfo.url
+            };
+        }
+        
         return {
-            isConnected: this.isConnected,
-            isConnecting: this.isConnecting,
-            reconnectAttempts: this.reconnectAttempts,
-            readyState: this.socket ? this.socket.readyState : null,
-            url: this.url
+            isConnected: false,
+            isConnecting: false,
+            reconnectAttempts: 0,
+            readyState: null,
+            url: null
         };
     }
 
     /**
-     * Get performance statistics
+     * UPDATED: Get performance statistics
      */
     getStats() {
         return {
             ...this.stats,
             queuedMessages: this.messageQueue.length,
+            activeConnections: this.connections.size,
+            connectionKeys: Array.from(this.connections.keys()),
             subscriptions: Object.fromEntries(
                 Array.from(this.subscriptions.entries()).map(([key, value]) => [key, value.size])
             )
@@ -406,20 +564,26 @@ class WebSocketManager extends EventTarget {
     }
 
     /**
-     * Test connection by sending a ping
+     * Test connection by sending a ping (updated)
      */
-    testConnection() {
-        if (this.isConnected) {
-            this.sendHeartbeat();
+    testConnection(connectionKey = 'default') {
+        const connectionInfo = this.connections.get(connectionKey);
+        
+        if (connectionInfo && connectionInfo.isConnected) {
+            if (connectionKey === 'default') {
+                this.sendHeartbeat();
+            } else {
+                this.send({ type: 'ping', timestamp: new Date().toISOString() }, connectionKey);
+            }
             return true;
         } else {
-            console.warn('⚠️ Cannot test connection - not connected');
+            console.warn(`⚠️ Cannot test connection ${connectionKey} - not connected`);
             return false;
         }
     }
 
     /**
-     * Reset connection statistics
+     * Reset connection statistics (unchanged)
      */
     resetStats() {
         this.stats = {
@@ -435,28 +599,35 @@ class WebSocketManager extends EventTarget {
     }
 
     /**
-     * Force reconnection
+     * UPDATED: Force reconnection
      */
-    forceReconnect() {
-        console.log('🔄 Forcing WebSocket reconnection...');
+    forceReconnect(connectionKey = 'default') {
+        console.log(`🔄 Forcing WebSocket reconnection for: ${connectionKey}`);
         
-        if (this.socket) {
-            this.socket.close();
+        const connectionInfo = this.connections.get(connectionKey);
+        if (connectionInfo) {
+            const callbacks = connectionInfo.callbacks;
+            
+            // Close existing connection
+            if (connectionInfo.socket) {
+                connectionInfo.socket.close();
+            }
+            
+            // Reset connection state
+            connectionInfo.isConnected = false;
+            connectionInfo.isConnecting = false;
+            connectionInfo.reconnectAttempts = 0;
+            
+            // Attempt reconnection
+            this.connect(connectionKey === 'default' ? '' : connectionKey, callbacks)
+                .catch(error => {
+                    console.error(`❌ Forced reconnection failed for ${connectionKey}:`, error);
+                });
         }
-        
-        // Reset connection state
-        this.isConnected = false;
-        this.isConnecting = false;
-        this.reconnectAttempts = 0;
-        
-        // Attempt reconnection
-        this.connect().catch(error => {
-            console.error('❌ Forced reconnection failed:', error);
-        });
     }
 
     /**
-     * Enable debug mode with verbose logging
+     * Enable debug mode with verbose logging (unchanged)
      */
     enableDebug() {
         this.debugMode = true;
@@ -471,7 +642,7 @@ class WebSocketManager extends EventTarget {
     }
 
     /**
-     * Get WebSocket connection quality metrics
+     * Get WebSocket connection quality metrics (unchanged)
      */
     getConnectionQuality() {
         const now = Date.now();
