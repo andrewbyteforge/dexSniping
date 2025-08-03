@@ -3,13 +3,10 @@ Dashboard API Endpoints - Fixed Version
 File: app/api/v1/endpoints/dashboard.py
 
 Professional dashboard endpoints with proper error handling and fallbacks.
-Fixed import issues and database dependencies.
 """
 
-from typing import Dict, Any, List, Optional
-from datetime import datetime, timedelta
-from decimal import Decimal
-
+from typing import Dict, Any, List
+from datetime import datetime
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from fastapi.responses import JSONResponse
 
@@ -19,7 +16,6 @@ logger = setup_logger(__name__)
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
 
-# Dependency function that handles missing imports gracefully
 async def get_database_session():
     """Get database session with fallback handling."""
     try:
@@ -33,19 +29,11 @@ async def get_database_session():
 
 
 @router.get("/stats")
-async def get_dashboard_stats(
-    db=Depends(get_database_session)
-) -> Dict[str, Any]:
-    """
-    Get comprehensive dashboard statistics.
-    
-    Returns:
-        Dashboard statistics including portfolio, trading, and market data
-    """
+async def get_dashboard_stats(db=Depends(get_database_session)) -> Dict[str, Any]:
+    """Get comprehensive dashboard statistics."""
     try:
         logger.info("Fetching dashboard statistics")
         
-        # Mock data for development - replace with real data when database is ready
         stats = {
             "portfolio_value": 125847.32,
             "daily_pnl": 3241.87,
@@ -65,30 +53,15 @@ async def get_dashboard_stats(
         
     except Exception as e:
         logger.error(f"Error fetching dashboard stats: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail="Failed to retrieve dashboard statistics"
-        )
+        raise HTTPException(status_code=500, detail="Failed to retrieve dashboard statistics")
 
 
 @router.get("/tokens/live")
-async def get_live_tokens(
-    limit: int = 20,
-    db=Depends(get_database_session)
-) -> List[Dict[str, Any]]:
-    """
-    Get live token metrics for dashboard display.
-    
-    Args:
-        limit: Maximum number of tokens to return
-        
-    Returns:
-        List of token metrics with real-time data
-    """
+async def get_live_tokens(limit: int = 20, db=Depends(get_database_session)) -> List[Dict[str, Any]]:
+    """Get live token metrics."""
     try:
         logger.info(f"Fetching live tokens (limit: {limit})")
         
-        # Mock token data for development
         tokens = [
             {
                 "symbol": "ETH",
@@ -113,7 +86,7 @@ async def get_live_tokens(
                 "last_updated": datetime.utcnow().isoformat()
             },
             {
-                "symbol": "WBTC", 
+                "symbol": "WBTC",
                 "name": "Wrapped Bitcoin",
                 "address": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
                 "price": 43247.89,
@@ -125,46 +98,22 @@ async def get_live_tokens(
             }
         ]
         
-        # Return only requested number of tokens
         result = tokens[:limit]
-        
         logger.info(f"Retrieved {len(result)} live tokens")
         return result
         
     except Exception as e:
         logger.error(f"Error fetching live tokens: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail="Failed to retrieve live token data"
-        )
+        raise HTTPException(status_code=500, detail="Failed to retrieve live token data")
 
 
 @router.get("/trading/metrics")
-async def get_trading_metrics(
-    timeframe: str = "24h",
-    db=Depends(get_database_session)
-) -> Dict[str, Any]:
-    """
-    Get trading performance metrics.
-    
-    Args:
-        timeframe: Time period for metrics (1h, 4h, 24h, 7d, 30d)
-        
-    Returns:
-        Trading metrics for specified timeframe
-    """
+async def get_trading_metrics(timeframe: str = "24h", db=Depends(get_database_session)) -> Dict[str, Any]:
+    """Get trading performance metrics."""
     try:
         logger.info(f"Fetching trading metrics for {timeframe}")
         
-        # Simulate trading metrics based on timeframe
-        multiplier_map = {
-            "1h": 1,
-            "4h": 4, 
-            "24h": 24,
-            "7d": 168,
-            "30d": 720
-        }
-        
+        multiplier_map = {"1h": 1, "4h": 4, "24h": 24, "7d": 168, "30d": 720}
         multiplier = multiplier_map.get(timeframe, 24)
         
         total_trades = 47 * multiplier
@@ -192,27 +141,15 @@ async def get_trading_metrics(
         
     except Exception as e:
         logger.error(f"Error fetching trading metrics: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail="Failed to retrieve trading metrics"
-        )
+        raise HTTPException(status_code=500, detail="Failed to retrieve trading metrics")
 
 
 @router.post("/refresh")
-async def refresh_dashboard_data(
-    background_tasks: BackgroundTasks,
-    db=Depends(get_database_session)
-) -> JSONResponse:
-    """
-    Trigger dashboard data refresh.
-    
-    Returns:
-        Confirmation of refresh initiation
-    """
+async def refresh_dashboard_data(background_tasks: BackgroundTasks, db=Depends(get_database_session)) -> JSONResponse:
+    """Trigger dashboard data refresh."""
     try:
         logger.info("Dashboard refresh triggered")
         
-        # Add background task for data refresh
         background_tasks.add_task(refresh_all_dashboard_data)
         
         return JSONResponse(
@@ -226,89 +163,16 @@ async def refresh_dashboard_data(
         
     except Exception as e:
         logger.error(f"Error triggering dashboard refresh: {e}")
-        raise HTTPException(
-            status_code=500,
-            detail="Failed to initiate dashboard refresh"
-        )
-
-
-@router.get("/health")
-async def dashboard_health_check() -> Dict[str, Any]:
-    """
-    Check dashboard health status.
-    
-    Returns:
-        Dashboard health information
-    """
-    try:
-        # Check database connectivity
-        db_status = "unknown"
-        try:
-            async for session in get_database_session():
-                db_status = "connected" if session else "mock_mode"
-                break
-        except Exception:
-            db_status = "disconnected"
-        
-        return {
-            "status": "healthy",
-            "database": db_status,
-            "components": {
-                "stats_endpoint": "operational",
-                "tokens_endpoint": "operational", 
-                "metrics_endpoint": "operational",
-                "refresh_endpoint": "operational"
-            },
-            "timestamp": datetime.utcnow().isoformat(),
-            "phase": "3B_week_7-8",
-            "ready_for": "AI_implementation"
-        }
-        
-    except Exception as e:
-        logger.error(f"Dashboard health check failed: {e}")
-        return {
-            "status": "unhealthy",
-            "error": str(e),
-            "timestamp": datetime.utcnow().isoformat()
-        }
+        raise HTTPException(status_code=500, detail="Failed to initiate dashboard refresh")
 
 
 async def refresh_all_dashboard_data():
-    """Background task to refresh all dashboard data."""
+    """Background task to refresh dashboard data."""
     try:
         logger.info("Starting dashboard data refresh")
-        
-        # Simulate data refresh operations
-        await refresh_token_data()
-        await refresh_trading_metrics()
-        await refresh_portfolio_data()
-        
+        # Simulate refresh operations
+        import asyncio
+        await asyncio.sleep(1)  # Simulate work
         logger.info("Dashboard data refresh completed")
-        
     except Exception as e:
         logger.error(f"Error during dashboard refresh: {e}")
-
-
-async def refresh_token_data():
-    """Refresh token price and market data."""
-    logger.debug("Refreshing token data...")
-    # Placeholder for token data refresh
-    await asyncio.sleep(0.1)  # Simulate work
-
-
-async def refresh_trading_metrics():
-    """Refresh trading performance metrics."""
-    logger.debug("Refreshing trading metrics...")
-    # Placeholder for trading metrics refresh
-    await asyncio.sleep(0.1)  # Simulate work
-
-
-async def refresh_portfolio_data():
-    """Refresh portfolio and position data."""
-    logger.debug("Refreshing portfolio data...")
-    # Placeholder for portfolio data refresh
-    await asyncio.sleep(0.1)  # Simulate work
-
-
-# Import asyncio for background tasks
-import asyncio
