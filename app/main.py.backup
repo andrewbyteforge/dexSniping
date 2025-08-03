@@ -1,0 +1,92 @@
+"""
+Refactored Main Application Entry Point
+File: main.py
+
+Clean main entry point that delegates to appropriate modules.
+Compatible with existing app/main.py structure.
+"""
+
+import uvicorn
+from pathlib import Path
+import sys
+
+# Add project root to Python path
+project_root = Path(__file__).parent
+sys.path.insert(0, str(project_root))
+
+from app.utils.logger import setup_logger
+
+logger = setup_logger(__name__)
+
+
+def create_application():
+    """
+    Create the FastAPI application using existing app/main.py structure.
+    
+    Returns:
+        FastAPI: Configured application instance
+    """
+    try:
+        # Import the existing app from app/main.py
+        from app.main import app
+        
+        logger.info("FastAPI application loaded from app/main.py")
+        return app
+        
+    except ImportError as error:
+        logger.error(f"Failed to import app from app/main.py: {error}")
+        raise RuntimeError(f"Application import failed: {error}")
+    except Exception as error:
+        logger.error(f"Failed to create FastAPI application: {error}")
+        raise RuntimeError(f"Application creation failed: {error}")
+
+
+def main() -> None:
+    """
+    Main application entry point.
+    
+    Creates and configures the FastAPI application, then starts the server.
+    """
+    try:
+        # Create the FastAPI application
+        app = create_application()
+        
+        # Server configuration
+        server_config = {
+            "app": "main:create_application",  # Use factory function
+            "factory": True,
+            "host": "127.0.0.1",
+            "port": 8000,
+            "reload": True,
+            "log_level": "info",
+            "access_log": True,
+        }
+        
+        logger.info("Starting DEX Sniper Pro Trading Bot Server...")
+        logger.info(f"Dashboard: http://127.0.0.1:8000/dashboard")
+        logger.info(f"API Docs: http://127.0.0.1:8000/docs")
+        
+        # Start the server
+        uvicorn.run(**server_config)
+        
+    except KeyboardInterrupt:
+        logger.info("Server shutdown requested by user")
+    except Exception as error:
+        logger.error(f"Failed to start server: {error}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for monitoring."""
+    return {
+        "status": "healthy",
+        "service": "DEX Sniper Pro Trading Bot",
+        "version": "3.1.0",
+        "phase": "3B - Refactored Architecture",
+        "timestamp": "2025-08-03T00:00:00Z",
+        "dashboard": "/dashboard",
+        "api_docs": "/docs"
+    }

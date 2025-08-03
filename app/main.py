@@ -1,57 +1,64 @@
-"""
-Refactored Main Application Entry Point
-File: main.py
-
-Clean main entry point that delegates to appropriate modules.
-"""
-
-import uvicorn
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from pathlib import Path
-import sys
 
-# Add project root to Python path
-project_root = Path(__file__).parent
-sys.path.insert(0, str(project_root))
+app = FastAPI(title="DEX Sniper Pro API")
 
-from app.server.application import create_application
-from app.utils.logger import setup_logger
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-logger = setup_logger(__name__)
+templates = Jinja2Templates(directory="frontend/templates")
 
+if Path("frontend/static").exists():
+    app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
 
-def main() -> None:
-    """
-    Main application entry point.
-    
-    Creates and configures the FastAPI application, then starts the server.
-    """
-    try:
-        # Create the FastAPI application
-        app = create_application()
-        
-        # Server configuration
-        server_config = {
-            "app": app,
-            "host": "127.0.0.1",
-            "port": 8000,
-            "reload": True,
-            "log_level": "info",
-            "access_log": True,
-        }
-        
-        logger.info("Starting DEX Sniper Pro Trading Bot Server...")
-        logger.info(f"Dashboard: http://127.0.0.1:8000/dashboard")
-        logger.info(f"API Docs: http://127.0.0.1:8000/docs")
-        
-        # Start the server
-        uvicorn.run(**server_config)
-        
-    except KeyboardInterrupt:
-        logger.info("Server shutdown requested by user")
-    except Exception as error:
-        logger.error(f"Failed to start server: {error}")
-        sys.exit(1)
+# Include both API routers
+from app.api.v1.endpoints.dashboard import dashboard_router, tokens_router
+app.include_router(dashboard_router, prefix="/api/v1")
+app.include_router(tokens_router, prefix="/api/v1")
 
+@app.get("/")
+async def root():
+    return {
+        "message": "🤖 DEX Sniper Pro Trading Bot API",
+        "version": "1.0.0",
+        "status": "running",
+        "dashboard": "/dashboard",
+        "docs": "/docs"
+    }
 
-if __name__ == "__main__":
-    main()
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for monitoring."""
+    return {
+        "status": "healthy",
+        "service": "DEX Sniper Pro Trading Bot",
+        "version": "3.1.0",
+        "phase": "3B - Refactored Architecture",
+        "dashboard": "/dashboard",
+        "api_docs": "/docs"
+    }
+
+@app.get("/dashboard")
+async def serve_dashboard(request: Request):
+    return templates.TemplateResponse("pages/dashboard.html", {"request": request})
+
+# Sidebar navigation - all redirect to dashboard for now
+@app.get("/token-discovery")
+async def token_discovery(request: Request):
+    return templates.TemplateResponse("pages/dashboard.html", {"request": request})
+
+@app.get("/live-trading")
+async def live_trading(request: Request):
+    return templates.TemplateResponse("pages/dashboard.html", {"request": request})
+
+@app.get("/portfolio")
+async def portfolio(request: Request):
+    return templates.TemplateResponse("pages/dashboard.html", {"request": request})

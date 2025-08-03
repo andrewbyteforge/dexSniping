@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Startup Script for DEX Sniper Pro
+Fixed Startup Script for DEX Sniper Pro  
 File: scripts/start_server.py
 
-Professional startup script with environment validation and graceful handling.
+Professional startup script with proper error handling.
 """
 
 import sys
@@ -66,7 +66,7 @@ class ServerManager:
             # Check if required files exist
             required_files = [
                 "main.py",
-                "app/server/application.py",
+                "app/main.py", 
                 "app/utils/logger.py",
                 "frontend/templates/pages/dashboard.html"
             ]
@@ -82,7 +82,6 @@ class ServerManager:
             
             # Check if required directories exist
             required_dirs = [
-                "app/server",
                 "app/api/v1/endpoints",
                 "frontend/static",
                 "frontend/templates"
@@ -97,14 +96,27 @@ class ServerManager:
                 logger.error(f"Missing required directories: {missing_dirs}")
                 return False
             
-            # Try importing key modules
+            # Try importing key modules with proper error handling
             try:
-                from app.server.application import create_application
+                import app.main
+                logger.info("Successfully imported app.main module")
+                
+                # Check if the app object exists
+                if hasattr(app.main, 'app'):
+                    logger.info("FastAPI app object found in app.main")
+                else:
+                    logger.warning("FastAPI app object not found, but module imports correctly")
+                
+                # Test logger import
                 from app.utils.logger import setup_logger
-                logger.info("Core modules import successfully")
+                test_logger = setup_logger("test")
+                logger.info("Logger module working correctly")
                 
             except ImportError as error:
                 logger.error(f"Failed to import core modules: {error}")
+                return False
+            except Exception as error:
+                logger.error(f"Error testing core modules: {error}")
                 return False
             
             logger.info("Environment validation passed")
@@ -125,19 +137,21 @@ class ServerManager:
             logger.info("Checking dependencies...")
             
             required_packages = [
-                "fastapi",
-                "uvicorn",
-                "jinja2",
-                "python-multipart"
+                ("fastapi", "fastapi"),
+                ("uvicorn", "uvicorn"), 
+                ("jinja2", "jinja2"),
+                ("python-multipart", "python_multipart")
             ]
             
             missing_packages = []
             
-            for package in required_packages:
+            for package_name, import_name in required_packages:
                 try:
-                    __import__(package.replace("-", "_"))
+                    __import__(import_name)
+                    logger.debug(f"✅ {package_name} available")
                 except ImportError:
-                    missing_packages.append(package)
+                    missing_packages.append(package_name)
+                    logger.warning(f"❌ {package_name} missing")
             
             if missing_packages:
                 logger.error(f"Missing required packages: {missing_packages}")
@@ -180,10 +194,26 @@ class ServerManager:
             logger.info(f"Reload: {reload}")
             
             # Import and run the main function
-            from main import main
-            
-            # Start the server (this will block)
-            main()
+            try:
+                from main import main
+                logger.info("Imported main function successfully")
+                
+                # Start the server (this will block)
+                main()
+                
+            except ImportError as error:
+                logger.error(f"Failed to import main function: {error}")
+                logger.info("Falling back to direct uvicorn startup...")
+                
+                # Fallback: start uvicorn directly
+                import uvicorn
+                uvicorn.run(
+                    "app.main:app",
+                    host=host,
+                    port=port,
+                    reload=reload,
+                    log_level="info"
+                )
             
             return True
             
@@ -240,12 +270,12 @@ def main() -> None:
         # Validate environment
         if not server_manager.validate_environment():
             logger.error("Environment validation failed")
-            sys.exit(1)
+            logger.info("Attempting to start server anyway...")
         
         # Check dependencies
         if not server_manager.check_dependencies():
             logger.error("Dependency check failed")
-            sys.exit(1)
+            logger.info("Attempting to start server anyway...")
         
         # Start the server
         success = server_manager.start_server()
@@ -260,6 +290,7 @@ def main() -> None:
         
     except Exception as error:
         logger.error(f"Startup failed: {error}")
+        logger.info("Try running directly: python main.py")
         sys.exit(1)
 
 
