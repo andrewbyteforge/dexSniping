@@ -437,3 +437,197 @@ def create_validation_error(message: str, error_code: str = None, **details) -> 
         error_code=error_code or ErrorCodes.VALIDATION_FAILED,
         details=details
     )
+
+"""
+Core Exceptions
+File: app/core/exceptions.py
+
+Custom exceptions for the DEX Sniper Pro trading platform.
+Comprehensive exception hierarchy for all trading operations.
+"""
+
+
+class TradingError(Exception):
+    """Base exception for all trading operations."""
+    
+    def __init__(self, message: str, error_code: str = None):
+        """
+        Initialize trading error.
+        
+        Args:
+            message: Error description
+            error_code: Optional error code for categorization
+        """
+        super().__init__(message)
+        self.message = message
+        self.error_code = error_code
+
+
+class WalletError(TradingError):
+    """Wallet-related errors and exceptions."""
+    pass
+
+
+class DEXError(TradingError):
+    """DEX integration and protocol errors."""
+    pass
+
+
+class NetworkError(TradingError):
+    """Network connection and blockchain communication errors."""
+    pass
+
+
+class ConnectionError(NetworkError):
+    """Connection-specific network errors."""
+    pass
+
+
+class InsufficientFundsError(TradingError):
+    """Insufficient funds for trading operation."""
+    pass
+
+
+class InvalidAddressError(WalletError):
+    """Invalid wallet or contract address format."""
+    pass
+
+
+class TransactionError(TradingError):
+    """Transaction execution and blockchain errors."""
+    pass
+
+
+class SecurityError(WalletError):
+    """Security-related wallet and authentication errors."""
+    pass
+
+
+class RiskLimitExceededError(TradingError):
+    """Risk management limit exceeded."""
+    pass
+
+
+class StrategyError(TradingError):
+    """Trading strategy execution errors."""
+    pass
+
+
+class PortfolioError(TradingError):
+    """Portfolio management and tracking errors."""
+    pass
+
+
+class OrderExecutionError(TradingError):
+    """Order placement and execution errors."""
+    pass
+
+
+class InvalidOrderError(TradingError):
+    """Invalid order parameters or configuration."""
+    pass
+
+
+class SlippageExceededError(TradingError):
+    """Slippage exceeded acceptable tolerance limits."""
+    pass
+
+
+class InsufficientLiquidityError(DEXError):
+    """Insufficient liquidity for trade execution."""
+    pass
+
+
+class PriceImpactError(DEXError):
+    """Price impact too high for safe execution."""
+    pass
+
+
+class GasEstimationError(NetworkError):
+    """Gas estimation failed for transaction."""
+    pass
+
+
+class ContractError(NetworkError):
+    """Smart contract interaction error."""
+    pass
+
+
+class ValidationError(TradingError):
+    """Data validation and format errors."""
+    pass
+
+
+class ConfigurationError(TradingError):
+    """Configuration and setup errors."""
+    pass
+
+
+class AuthenticationError(SecurityError):
+    """Authentication and authorization errors."""
+    pass
+
+
+class RateLimitError(NetworkError):
+    """API rate limit exceeded."""
+    pass
+
+
+class TimeoutError(NetworkError):
+    """Operation timeout exceeded."""
+    pass
+
+
+class MarketDataError(TradingError):
+    """Market data retrieval and processing errors."""
+    pass
+
+
+class AnalysisError(TradingError):
+    """Market analysis and calculation errors."""
+    pass
+
+
+class WebSocketError(NetworkError):
+    """WebSocket connection and communication errors."""
+    pass
+
+
+class DatabaseError(TradingError):
+    """Database operations and connectivity errors."""
+    pass
+
+
+# Exception mapping for HTTP status codes
+EXCEPTION_STATUS_MAP = {
+    ValidationError: 400,
+    InvalidOrderError: 400,
+    InvalidAddressError: 400,
+    AuthenticationError: 401,
+    SecurityError: 403,
+    InsufficientFundsError: 402,
+    RateLimitError: 429,
+    TimeoutError: 408,
+    InsufficientLiquidityError: 503,
+    SlippageExceededError: 503,
+    NetworkError: 503,
+    ConnectionError: 503,
+    TradingError: 500
+}
+
+
+def get_http_status_for_exception(exception: Exception) -> int:
+    """
+    Get appropriate HTTP status code for exception.
+    
+    Args:
+        exception: Exception instance
+        
+    Returns:
+        int: HTTP status code
+    """
+    for exc_type, status_code in EXCEPTION_STATUS_MAP.items():
+        if isinstance(exception, exc_type):
+            return status_code
+    
+    return 500  # Default to internal server error
