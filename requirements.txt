@@ -196,3 +196,34 @@ eth-brownie==1.20.0
 # redis==5.0.1
 # celery==5.3.4
 # prometheus-client==0.19.0
+
+
+# Optimized Requirements - Phase 4B Working Setup
+# File: requirements.txt
+
+# Core Framework - Required
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+jinja2==3.1.2
+python-multipart==0.0.6
+
+# Web3 Stack - Latest compatible versions
+web3==6.12.0
+eth-account==0.9.0
+eth-utils==2.2.2
+eth-abi==4.2.1
+
+# Server-Sent Events for live streaming
+sse-starlette==1.6.5
+
+# Async & HTTP
+aiohttp==3.9.1
+httpx==0.25.2
+
+# Utilities
+python-dotenv==1.0.0
+
+# Development
+pytest==7.4.3
+pytest-asyncio==0.21.1
