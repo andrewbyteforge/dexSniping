@@ -301,30 +301,49 @@ class RPCAuthenticationTester:
             if not self.network_manager:
                 self.network_manager = NetworkManagerFixed()
             
-            # Test connecting to an unsupported network
+            # Test connecting to an unsupported network (should handle gracefully)
             try:
-                # This should fail gracefully
+                logger.info("🧪 Testing unsupported network handling...")
+                # This should return False, not raise an exception
                 unsupported_success = await self.network_manager.connect_to_network("unsupported_network")
-                unsupported_handled = not unsupported_success  # Should return False, not raise exception
+                unsupported_handled = not unsupported_success  # Should return False
+                logger.info(f"✅ Unsupported network handled correctly: {not unsupported_success}")
             except Exception as e:
-                # Should handle exceptions gracefully
-                unsupported_handled = "Unsupported network" in str(e) or "Network connection failed" in str(e)
+                # Should not raise exception, but if it does, check if it's handled gracefully
+                unsupported_handled = "Unsupported network" in str(e) or "Invalid network" in str(e)
+                logger.info(f"⚠️ Exception raised but handled: {str(e)[:100]}")
             
-            # Test network status handling
+            # Test network status handling (should not raise exceptions)
             try:
+                logger.info("🧪 Testing network status handling...")
                 status = self.network_manager.get_network_status(NetworkType.ETHEREUM)
                 status_handling = True  # Should not raise exception
-            except Exception:
+                logger.info("✅ Network status handling works")
+            except Exception as e:
                 status_handling = False
+                logger.error(f"❌ Network status handling failed: {e}")
             
-            # Test disconnect handling
+            # Test disconnect handling (should not raise exceptions)
             try:
+                logger.info("🧪 Testing disconnect handling...")
                 await self.network_manager.disconnect_all()
                 disconnect_handling = True  # Should not raise exception
-            except Exception:
+                logger.info("✅ Disconnect handling works")
+            except Exception as e:
                 disconnect_handling = False
+                logger.error(f"❌ Disconnect handling failed: {e}")
             
-            success = unsupported_handled and status_handling and disconnect_handling
+            # Test invalid network type handling
+            try:
+                logger.info("🧪 Testing invalid network type handling...")
+                invalid_result = await self.network_manager.connect_to_network(12345)  # Invalid type
+                invalid_handled = not invalid_result  # Should return False
+                logger.info(f"✅ Invalid network type handled correctly: {not invalid_result}")
+            except Exception as e:
+                invalid_handled = True  # Exception is also acceptable
+                logger.info(f"⚠️ Invalid type handled with exception: {str(e)[:50]}")
+            
+            success = unsupported_handled and status_handling and disconnect_handling and invalid_handled
             
             self.test_results.append({
                 "test": "error_handling_fallback",
@@ -332,6 +351,7 @@ class RPCAuthenticationTester:
                 "unsupported_network_handled": unsupported_handled,
                 "status_handling": status_handling,
                 "disconnect_handling": disconnect_handling,
+                "invalid_type_handled": invalid_handled,
                 "message": "Error handling and fallback work correctly" if success else "Error handling issues"
             })
             

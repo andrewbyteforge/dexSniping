@@ -236,31 +236,40 @@ class NetworkManagerFixed:
         else:
             logger.info("🔓 No API keys configured - using public RPC endpoints only")
     
-    async def connect_to_network(self, network_type: NetworkType) -> bool:
+    async def connect_to_network(self, network_type) -> bool:
         """
         Connect to a blockchain network with proper fallback handling.
         
         Args:
-            network_type: The network to connect to
+            network_type: The network to connect to (NetworkType enum or string)
             
         Returns:
             bool: True if connection successful
         """
         try:
             if not WEB3_AVAILABLE:
-                logger.warning(f"⚠️ Web3 not available - cannot connect to {network_type.value}")
+                logger.warning(f"⚠️ Web3 not available - cannot connect to {network_type}")
                 return False
             
-            # Handle invalid network types gracefully
+            # Handle string network types by trying to convert to enum
+            if isinstance(network_type, str):
+                try:
+                    # Try to find matching NetworkType
+                    network_type = NetworkType(network_type.lower())
+                except ValueError:
+                    logger.warning(f"⚠️ Unsupported network type: {network_type}")
+                    return False
+            
+            # Validate that we have a proper NetworkType
             if not isinstance(network_type, NetworkType):
-                logger.error(f"❌ Unsupported network type: {network_type}")
+                logger.warning(f"⚠️ Invalid network type: {type(network_type)} - {network_type}")
                 return False
             
             logger.info(f"🔗 Connecting to {network_type.value}...")
             
             config = self.network_configs.get(network_type)
             if not config:
-                logger.error(f"❌ Unsupported network: {network_type}")
+                logger.warning(f"⚠️ No configuration found for network: {network_type.value}")
                 return False
             
             # Try to establish connection with proper fallback
@@ -273,13 +282,20 @@ class NetworkManagerFixed:
                 return True
             else:
                 await self._update_network_status(network_type, False, None, "No working RPC endpoints")
-                logger.error(f"❌ Failed to connect to {network_type.value} - no working endpoints")
+                logger.warning(f"⚠️ Failed to connect to {network_type.value} - no working endpoints")
                 return False
                 
         except Exception as e:
             error_msg = str(e)
-            logger.error(f"❌ Connection to {network_type.value} failed: {error_msg}")
-            await self._update_network_status(network_type, False, None, error_msg)
+            logger.warning(f"⚠️ Connection to {network_type} failed: {error_msg}")
+            
+            # Try to update status if we have a valid network type
+            try:
+                if isinstance(network_type, NetworkType):
+                    await self._update_network_status(network_type, False, None, error_msg)
+            except:
+                pass  # Don't let status update failures break the method
+                
             return False
     
     async def _establish_connection_with_fallback(self, config: NetworkConfig) -> Optional[AsyncWeb3]:
@@ -528,7 +544,7 @@ async def initialize_network_manager() -> bool:
 # Export commonly used components
 __all__ = [
     "NetworkManagerFixed",
-    "NetworkType",
+    "NetworkType", 
     "NetworkConfig",
     "NetworkStatus",
     "ProviderType",
