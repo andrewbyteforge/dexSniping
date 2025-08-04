@@ -1,15 +1,15 @@
 """
-Network Manager - Fixed RPC Authentication
+Network Manager - Fixed RPC Authentication with Enhanced Error Handling
 File: app/core/blockchain/network_manager_fixed.py
 
-Professional blockchain network manager with proper RPC fallback handling.
-Fixes authentication issues by prioritizing public endpoints when API keys unavailable.
+Professional blockchain network manager with proper RPC fallback handling
+and comprehensive error validation to prevent type errors.
 """
 
 import asyncio
 import os
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Union
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -84,185 +84,228 @@ class NetworkStatus:
 
 class NetworkManagerFixed:
     """
-    Fixed Network Manager with proper RPC fallback handling.
+    Fixed Network Manager with enhanced error handling and RPC fallback.
     
     Prioritizes public RPC endpoints to avoid authentication issues,
-    only uses private endpoints when API keys are properly configured.
+    includes comprehensive input validation to prevent type errors.
     """
     
     def __init__(self):
-        """Initialize the network manager with proper fallback handling."""
-        self.connections: Dict[NetworkType, AsyncWeb3] = {}
-        self.network_configs: Dict[NetworkType, NetworkConfig] = {}
+        """Initialize the network manager with enhanced error handling."""
+        logger.info("🔗 Initializing NetworkManagerFixed with enhanced validation...")
+        
+        # Initialize collections
+        self.connections: Dict[NetworkType, Optional[AsyncWeb3]] = {}
         self.network_status: Dict[NetworkType, NetworkStatus] = {}
-        self.api_keys: Dict[ProviderType, Optional[str]] = {}
+        self.network_configs: Dict[NetworkType, NetworkConfig] = {}
         
-        # Initialize network configurations
-        self._setup_network_configs()
+        # Setup network configurations
+        self._setup_network_configurations()
         
-        # Load API keys (optional)
-        self._load_api_keys()
+        # Initialize status for all networks
+        self._initialize_network_status()
         
-        logger.info("🔗 Network Manager initialized with public RPC priority")
+        logger.info("✅ NetworkManagerFixed initialized successfully")
     
-    def _setup_network_configs(self) -> None:
-        """Setup network configurations with public RPC priority."""
-        self.network_configs = {
-            NetworkType.ETHEREUM: NetworkConfig(
+    def _setup_network_configurations(self) -> None:
+        """Setup configurations for all supported networks."""
+        try:
+            # Ethereum Mainnet Configuration
+            self.network_configs[NetworkType.ETHEREUM] = NetworkConfig(
                 network_type=NetworkType.ETHEREUM,
                 name="Ethereum Mainnet",
                 chain_id=1,
-                native_currency="Ethereum",
-                currency_symbol="ETH",  
+                native_currency="Ether",
+                currency_symbol="ETH",
                 currency_decimals=18,
-                # PUBLIC RPC URLs - NO API KEY REQUIRED (PRIORITY)
+                
+                # Public RPC endpoints (prioritized)
                 public_rpc_urls=[
                     "https://eth.llamarpc.com",
-                    "https://ethereum.publicnode.com",
                     "https://rpc.ankr.com/eth",
+                    "https://ethereum.publicnode.com",
                     "https://eth-mainnet.public.blastapi.io",
-                    "https://ethereum-rpc.publicnode.com",
-                    "https://1rpc.io/eth",
-                    "https://rpc.payload.de"
+                    "https://rpc.flashbots.net"
                 ],
-                # PRIVATE RPC URLs - REQUIRE API KEYS (FALLBACK ONLY)
+                
+                # Private RPC endpoints (require API keys)
                 private_rpc_urls=[
-                    "https://mainnet.infura.io/v3/{infura_key}",
-                    "https://eth-mainnet.g.alchemy.com/v2/{alchemy_key}",
-                    "https://rpc.quicknode.pro/{quicknode_key}"
+                    "https://mainnet.infura.io/v3/{api_key}",
+                    "https://eth-mainnet.alchemyapi.io/v2/{api_key}",
+                    "https://eth-mainnet.g.alchemy.com/v2/{api_key}"
                 ],
+                
                 explorer_url="https://etherscan.io",
-                max_gas_price_gwei=200,
+                max_gas_price_gwei=100.0,
                 block_time_seconds=12.0
-            ),
+            )
             
-            NetworkType.POLYGON: NetworkConfig(
+            # Polygon Configuration
+            self.network_configs[NetworkType.POLYGON] = NetworkConfig(
                 network_type=NetworkType.POLYGON,
                 name="Polygon Mainnet",
                 chain_id=137,
-                native_currency="Polygon",
+                native_currency="MATIC",
                 currency_symbol="MATIC",
                 currency_decimals=18,
-                # PUBLIC RPC URLs - NO API KEY REQUIRED (PRIORITY)
+                
                 public_rpc_urls=[
                     "https://polygon-rpc.com",
-                    "https://rpc-mainnet.matic.network",
-                    "https://matic-mainnet.chainstacklabs.com",
-                    "https://rpc-mainnet.maticvigil.com",
-                    "https://polygon-mainnet.public.blastapi.io",
+                    "https://rpc.ankr.com/polygon",
                     "https://polygon.llamarpc.com",
-                    "https://1rpc.io/matic"
+                    "https://polygon.publicnode.com"
                 ],
-                # PRIVATE RPC URLs - REQUIRE API KEYS (FALLBACK ONLY) 
+                
                 private_rpc_urls=[
-                    "https://polygon-mainnet.infura.io/v3/{infura_key}",
-                    "https://polygon-mainnet.g.alchemy.com/v2/{alchemy_key}"
+                    "https://polygon-mainnet.infura.io/v3/{api_key}",
+                    "https://polygon-mainnet.g.alchemy.com/v2/{api_key}"
                 ],
+                
                 explorer_url="https://polygonscan.com",
-                max_gas_price_gwei=500,
+                max_gas_price_gwei=50.0,
                 block_time_seconds=2.0
-            ),
+            )
             
-            NetworkType.BSC: NetworkConfig(
+            # Binance Smart Chain Configuration
+            self.network_configs[NetworkType.BSC] = NetworkConfig(
                 network_type=NetworkType.BSC,
                 name="Binance Smart Chain",
                 chain_id=56,
-                native_currency="Binance Coin",
+                native_currency="BNB",
                 currency_symbol="BNB",
                 currency_decimals=18,
-                # PUBLIC RPC URLs - NO API KEY REQUIRED (PRIORITY)
+                
                 public_rpc_urls=[
                     "https://bsc-dataseed.binance.org",
                     "https://bsc-dataseed1.defibit.io",
                     "https://bsc-dataseed1.ninicoin.io",
-                    "https://bsc.publicnode.com",
-                    "https://bsc-mainnet.public.blastapi.io",
-                    "https://1rpc.io/bnb",
-                    "https://bsc.rpc.blxrbdn.com"
+                    "https://rpc.ankr.com/bsc"
                 ],
-                # PRIVATE RPC URLs - REQUIRE API KEYS (FALLBACK ONLY)
+                
                 private_rpc_urls=[
-                    "https://proud-silent-river.bsc.quiknode.pro/{quicknode_key}/"
+                    "https://speedy-nodes-nyc.moralis.io/{api_key}/bsc/mainnet"
                 ],
+                
                 explorer_url="https://bscscan.com",
-                max_gas_price_gwei=20,
+                max_gas_price_gwei=20.0,
                 block_time_seconds=3.0
-            ),
+            )
             
-            NetworkType.ARBITRUM: NetworkConfig(
+            # Arbitrum Configuration
+            self.network_configs[NetworkType.ARBITRUM] = NetworkConfig(
                 network_type=NetworkType.ARBITRUM,
                 name="Arbitrum One",
                 chain_id=42161,
-                native_currency="Ethereum",
+                native_currency="Ether",
                 currency_symbol="ETH",
                 currency_decimals=18,
-                # PUBLIC RPC URLs - NO API KEY REQUIRED (PRIORITY)
+                
                 public_rpc_urls=[
                     "https://arb1.arbitrum.io/rpc",
-                    "https://arbitrum.publicnode.com",
-                    "https://arbitrum-one.public.blastapi.io",
-                    "https://1rpc.io/arb",
+                    "https://rpc.ankr.com/arbitrum",
                     "https://arbitrum.llamarpc.com",
-                    "https://rpc.arb1.arbitrum.gateway.fm"
+                    "https://arbitrum.publicnode.com"
                 ],
-                # PRIVATE RPC URLs - REQUIRE API KEYS (FALLBACK ONLY)
+                
                 private_rpc_urls=[
-                    "https://arbitrum-mainnet.infura.io/v3/{infura_key}",
-                    "https://arb-mainnet.g.alchemy.com/v2/{alchemy_key}"
+                    "https://arbitrum-mainnet.infura.io/v3/{api_key}",
+                    "https://arb-mainnet.g.alchemy.com/v2/{api_key}"
                 ],
+                
                 explorer_url="https://arbiscan.io",
-                max_gas_price_gwei=5,
+                max_gas_price_gwei=5.0,
                 block_time_seconds=0.25
             )
-        }
+            
+            logger.info(f"✅ Network configurations setup complete: {len(self.network_configs)} networks")
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to setup network configurations: {e}")
+            raise NetworkError(f"Network configuration setup failed: {e}")
     
-    def _load_api_keys(self) -> None:
-        """Load API keys from environment variables (optional)."""
-        self.api_keys = {
-            ProviderType.INFURA: os.getenv("INFURA_API_KEY"),
-            ProviderType.ALCHEMY: os.getenv("ALCHEMY_API_KEY"),
-            ProviderType.QUICKNODE: os.getenv("QUICKNODE_API_KEY"),
-            ProviderType.MORALIS: os.getenv("MORALIS_API_KEY")
-        }
-        
-        # Log available API keys (without exposing the keys)
-        available_keys = [
-            provider.value for provider, key in self.api_keys.items() 
-            if key is not None and len(key) > 0
-        ]
-        
-        if available_keys:
-            logger.info(f"🔑 API keys available for: {available_keys}")
-        else:
-            logger.info("🔓 No API keys configured - using public RPC endpoints only")
+    def _initialize_network_status(self) -> None:
+        """Initialize status tracking for all networks."""
+        try:
+            for network_type in self.network_configs:
+                self.network_status[network_type] = NetworkStatus(
+                    network_type=network_type,
+                    is_connected=False,
+                    last_checked=datetime.utcnow()
+                )
+            
+            logger.info("✅ Network status tracking initialized")
+            
+        except Exception as e:
+            logger.error(f"❌ Failed to initialize network status: {e}")
     
-    async def connect_to_network(self, network_type) -> bool:
+    def _validate_network_type(self, network_input: Any) -> Optional[NetworkType]:
         """
-        Connect to a blockchain network with proper fallback handling.
+        Validate and convert network input to NetworkType enum.
         
         Args:
-            network_type: The network to connect to (NetworkType enum or string)
+            network_input: Input that should represent a network type
             
         Returns:
-            bool: True if connection successful
+            NetworkType if valid, None if invalid
         """
         try:
-            if not WEB3_AVAILABLE:
-                logger.warning(f"⚠️ Web3 not available - cannot connect to {network_type}")
+            # Handle None input
+            if network_input is None:
+                logger.warning("⚠️ Network type is None")
+                return None
+            
+            # Handle NetworkType enum (already valid)
+            if isinstance(network_input, NetworkType):
+                return network_input
+            
+            # Handle string input
+            if isinstance(network_input, str):
+                try:
+                    # Try direct enum conversion
+                    return NetworkType(network_input.lower())
+                except ValueError:
+                    # Try matching by value
+                    for network_type in NetworkType:
+                        if network_type.value.lower() == network_input.lower():
+                            return network_type
+                    
+                    logger.warning(f"⚠️ Unknown network string: '{network_input}'")
+                    return None
+            
+            # Handle integer input (INVALID - this was causing the error)
+            if isinstance(network_input, int):
+                logger.warning(f"⚠️ Invalid network type - received integer: {network_input}")
+                logger.info("💡 Network types must be strings (e.g., 'ethereum') or NetworkType enums")
+                return None
+            
+            # Handle other invalid types
+            logger.warning(f"⚠️ Invalid network type - unsupported type: {type(network_input)} - {network_input}")
+            return None
+            
+        except Exception as e:
+            logger.error(f"❌ Error validating network type: {e}")
+            return None
+    
+    async def connect_to_network(self, network_input: Any) -> bool:
+        """
+        Connect to a blockchain network with enhanced validation.
+        
+        Args:
+            network_input: The network to connect to (string, NetworkType, or other)
+            
+        Returns:
+            bool: True if connection successful, False otherwise
+        """
+        try:
+            # Validate network type first
+            network_type = self._validate_network_type(network_input)
+            
+            if network_type is None:
+                logger.warning(f"⚠️ Cannot connect - invalid network type: {network_input}")
                 return False
             
-            # Handle string network types by trying to convert to enum
-            if isinstance(network_type, str):
-                try:
-                    # Try to find matching NetworkType
-                    network_type = NetworkType(network_type.lower())
-                except ValueError:
-                    logger.warning(f"⚠️ Unsupported network type: {network_type}")
-                    return False
-            
-            # Validate that we have a proper NetworkType
-            if not isinstance(network_type, NetworkType):
-                logger.warning(f"⚠️ Invalid network type: {type(network_type)} - {network_type}")
+            if not WEB3_AVAILABLE:
+                logger.warning(f"⚠️ Web3 not available - cannot connect to {network_type.value}")
                 return False
             
             logger.info(f"🔗 Connecting to {network_type.value}...")
@@ -287,14 +330,14 @@ class NetworkManagerFixed:
                 
         except Exception as e:
             error_msg = str(e)
-            logger.warning(f"⚠️ Connection to {network_type} failed: {error_msg}")
+            logger.warning(f"⚠️ Connection to {network_input} failed: {error_msg}")
             
             # Try to update status if we have a valid network type
-            try:
-                if isinstance(network_type, NetworkType):
+            if network_type and isinstance(network_type, NetworkType):
+                try:
                     await self._update_network_status(network_type, False, None, error_msg)
-            except:
-                pass  # Don't let status update failures break the method
+                except Exception:
+                    pass  # Don't let status update failures break the method
                 
             return False
     
@@ -310,167 +353,174 @@ class NetworkManagerFixed:
         Returns:
             AsyncWeb3 connection or None
         """
-        # PRIORITY 1: Try public RPC endpoints first (no authentication required)
-        logger.info(f"🔓 Trying public RPC endpoints for {config.name}...")
-        
-        for i, rpc_url in enumerate(config.public_rpc_urls):
-            try:
-                logger.info(f"🔄 Testing public RPC #{i+1}: {rpc_url[:50]}...")
-                
-                connection = await self._test_rpc_connection(rpc_url, config)
-                if connection:
-                    logger.info(f"✅ Connected via public RPC: {rpc_url[:50]}...")
-                    return connection
-                    
-            except Exception as e:
-                logger.warning(f"⚠️ Public RPC #{i+1} failed: {str(e)[:100]}")
-                continue
-        
-        # PRIORITY 2: Try private RPC endpoints with API keys (if available)
-        if any(self.api_keys.values()):
-            logger.info(f"🔑 Trying private RPC endpoints for {config.name}...")
-            
-            private_urls = self._build_private_rpc_urls(config.private_rpc_urls)
-            
-            for i, rpc_url in enumerate(private_urls):
-                try:
-                    logger.info(f"🔄 Testing private RPC #{i+1}: {rpc_url[:50]}...")
-                    
-                    connection = await self._test_rpc_connection(rpc_url, config)
-                    if connection:
-                        logger.info(f"✅ Connected via private RPC: {rpc_url[:50]}...")
-                        return connection
-                        
-                except Exception as e:
-                    logger.warning(f"⚠️ Private RPC #{i+1} failed: {str(e)[:100]}")
-                    continue
-        else:
-            logger.info("🔓 No API keys available - skipping private RPC endpoints")
-        
-        # No working endpoints found
-        logger.error(f"❌ No working RPC endpoints found for {config.name}")
-        return None
-    
-    def _build_private_rpc_urls(self, url_templates: List[str]) -> List[str]:
-        """Build private RPC URLs with API keys."""
-        urls = []
-        
-        for template in url_templates:
-            # Replace API key placeholders
-            url = template
-            
-            if "{infura_key}" in url and self.api_keys.get(ProviderType.INFURA):
-                urls.append(url.replace("{infura_key}", self.api_keys[ProviderType.INFURA]))
-            
-            if "{alchemy_key}" in url and self.api_keys.get(ProviderType.ALCHEMY):
-                urls.append(url.replace("{alchemy_key}", self.api_keys[ProviderType.ALCHEMY]))
-            
-            if "{quicknode_key}" in url and self.api_keys.get(ProviderType.QUICKNODE):
-                urls.append(url.replace("{quicknode_key}", self.api_keys[ProviderType.QUICKNODE]))
-            
-            if "{moralis_key}" in url and self.api_keys.get(ProviderType.MORALIS):
-                urls.append(url.replace("{moralis_key}", self.api_keys[ProviderType.MORALIS]))
-        
-        return urls
-    
-    async def _test_rpc_connection(self, rpc_url: str, config: NetworkConfig) -> Optional[AsyncWeb3]:
-        """
-        Test a single RPC connection.
-        
-        Args:
-            rpc_url: RPC endpoint URL
-            config: Network configuration
-            
-        Returns:
-            AsyncWeb3 connection if successful, None otherwise
-        """
         try:
-            # Create Web3 instance with timeout
-            provider = AsyncHTTPProvider(rpc_url, request_kwargs={'timeout': 10})
-            web3 = AsyncWeb3(provider)
+            all_endpoints = []
             
-            # Add PoA middleware for networks that need it
-            if config.network_type in [NetworkType.BSC, NetworkType.POLYGON]:
-                web3.middleware_onion.inject(geth_poa_middleware, layer=0)
+            # Prioritize public endpoints (no API key required)
+            all_endpoints.extend(config.public_rpc_urls)
             
-            # Test connection by getting latest block
-            latest_block = await asyncio.wait_for(web3.eth.block_number, timeout=10)
-            
-            if latest_block > 0:
-                # Verify chain ID matches
-                chain_id = await asyncio.wait_for(web3.eth.chain_id, timeout=5)
-                if chain_id == config.chain_id:
-                    return web3
+            # Add private endpoints if API keys are available
+            for private_url in config.private_rpc_urls:
+                if "{api_key}" in private_url:
+                    # Check for API keys in environment variables
+                    api_key = None
+                    
+                    if "infura" in private_url.lower():
+                        api_key = os.getenv("INFURA_API_KEY")
+                    elif "alchemy" in private_url.lower():
+                        api_key = os.getenv("ALCHEMY_API_KEY")
+                    elif "moralis" in private_url.lower():
+                        api_key = os.getenv("MORALIS_API_KEY")
+                    
+                    if api_key:
+                        all_endpoints.append(private_url.format(api_key=api_key))
+                        logger.info(f"✅ Added private RPC endpoint with API key")
+                    else:
+                        logger.info(f"ℹ️ Skipping private endpoint - no API key available")
                 else:
-                    logger.warning(f"⚠️ Chain ID mismatch: expected {config.chain_id}, got {chain_id}")
-                    return None
-            else:
-                logger.warning(f"⚠️ Invalid block number: {latest_block}")
-                return None
-                
-        except asyncio.TimeoutError:
-            logger.warning(f"⚠️ RPC timeout: {rpc_url[:50]}...")
+                    all_endpoints.append(private_url)
+            
+            # Try each endpoint until one works
+            for i, rpc_url in enumerate(all_endpoints):
+                try:
+                    logger.info(f"🔄 Trying RPC endpoint {i+1}/{len(all_endpoints)}: {self._mask_url(rpc_url)}")
+                    
+                    # Create Web3 instance
+                    provider = AsyncHTTPProvider(rpc_url)
+                    w3 = AsyncWeb3(provider)
+                    
+                    # Add middleware for PoA networks if needed
+                    if config.network_type in [NetworkType.BSC, NetworkType.POLYGON]:
+                        w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+                    
+                    # Test connection with timeout
+                    is_connected = await asyncio.wait_for(w3.is_connected(), timeout=10.0)
+                    
+                    if is_connected:
+                        # Verify we can get block info
+                        latest_block = await asyncio.wait_for(w3.eth.block_number, timeout=10.0)
+                        logger.info(f"✅ Connected to {config.name} (Block: {latest_block})")
+                        return w3
+                    else:
+                        logger.warning(f"⚠️ Connection test failed for: {self._mask_url(rpc_url)}")
+                        
+                except asyncio.TimeoutError:
+                    logger.warning(f"⚠️ Timeout connecting to: {self._mask_url(rpc_url)}")
+                except Exception as e:
+                    logger.warning(f"⚠️ Error with endpoint {self._mask_url(rpc_url)}: {str(e)[:100]}")
+            
+            logger.warning(f"❌ All RPC endpoints failed for {config.name}")
             return None
+            
         except Exception as e:
-            logger.warning(f"⚠️ RPC connection failed: {str(e)[:100]}")
+            logger.error(f"❌ Connection establishment failed: {e}")
             return None
+    
+    def _mask_url(self, url: str) -> str:
+        """Mask sensitive information in URLs for logging."""
+        try:
+            # Replace API keys with asterisks
+            import re
+            
+            # Pattern for API keys (32+ character alphanumeric strings)
+            pattern = r'[a-zA-Z0-9]{32,}'
+            masked_url = re.sub(pattern, '***API_KEY***', url)
+            
+            return masked_url
+        except Exception:
+            return url[:50] + "..." if len(url) > 50 else url
     
     async def _update_network_status(
         self, 
         network_type: NetworkType, 
-        is_connected: bool,
+        is_connected: bool, 
         connection: Optional[AsyncWeb3] = None,
         error_message: Optional[str] = None
     ) -> None:
-        """Update network status information."""
+        """Update network status with current information."""
         try:
+            status = NetworkStatus(
+                network_type=network_type,
+                is_connected=is_connected,
+                last_checked=datetime.utcnow(),
+                error_message=error_message
+            )
+            
             if is_connected and connection:
-                # Get current block and other metrics
-                latest_block = await connection.eth.block_number
-                
-                # Try to get gas price (may not be available on all networks)
                 try:
+                    # Get additional network info
+                    status.latest_block = await connection.eth.block_number
                     gas_price_wei = await connection.eth.gas_price
-                    gas_price_gwei = float(gas_price_wei) / 1e9
-                except:
-                    gas_price_gwei = 0.0
-                
-                self.network_status[network_type] = NetworkStatus(
-                    network_type=network_type,
-                    is_connected=True,
-                    latest_block=latest_block,
-                    gas_price_gwei=gas_price_gwei,
-                    response_time_ms=0.0,  # TODO: Implement response time measurement
-                    provider_url="connected",
-                    last_checked=datetime.utcnow(),
-                    error_message=None
-                )
-            else:
-                self.network_status[network_type] = NetworkStatus(
-                    network_type=network_type,
-                    is_connected=False,
-                    latest_block=0,
-                    gas_price_gwei=0.0,
-                    response_time_ms=0.0,
-                    provider_url="none",
-                    last_checked=datetime.utcnow(),
-                    error_message=error_message
-                )
-                
+                    status.gas_price_gwei = float(gas_price_wei) / 10**9
+                    
+                except Exception as e:
+                    logger.warning(f"⚠️ Could not fetch network details: {e}")
+            
+            self.network_status[network_type] = status
+            
         except Exception as e:
             logger.error(f"❌ Failed to update network status: {e}")
     
-    async def get_web3_instance(self, network_type: NetworkType) -> Optional[AsyncWeb3]:
+    async def disconnect_from_network(self, network_input: Any) -> bool:
+        """
+        Disconnect from a specific network.
+        
+        Args:
+            network_input: Network to disconnect from
+            
+        Returns:
+            bool: True if disconnection successful
+        """
+        try:
+            network_type = self._validate_network_type(network_input)
+            
+            if network_type is None:
+                logger.warning(f"⚠️ Cannot disconnect - invalid network type: {network_input}")
+                return False
+            
+            if network_type in self.connections:
+                # Clean up connection
+                del self.connections[network_type]
+                
+                # Update status
+                self.network_status[network_type] = NetworkStatus(
+                    network_type=network_type,
+                    is_connected=False,
+                    last_checked=datetime.utcnow(),
+                    error_message="Manually disconnected"
+                )
+                
+                logger.info(f"✅ Disconnected from {network_type.value}")
+                return True
+            else:
+                logger.info(f"ℹ️ Not connected to {network_type.value}")
+                return True
+                
+        except Exception as e:
+            logger.error(f"❌ Error disconnecting from network: {e}")
+            return False
+    
+    def get_web3_instance(self, network_input: Any) -> Optional[AsyncWeb3]:
         """
         Get Web3 instance for a network.
         
         Args:
-            network_type: Network to get instance for
+            network_input: Network to get instance for
             
         Returns:
             AsyncWeb3 instance or None
         """
-        return self.connections.get(network_type)
+        try:
+            network_type = self._validate_network_type(network_input)
+            
+            if network_type is None:
+                return None
+            
+            return self.connections.get(network_type)
+            
+        except Exception as e:
+            logger.error(f"❌ Error getting Web3 instance: {e}")
+            return None
     
     async def disconnect_all(self) -> None:
         """Disconnect from all networks."""
@@ -479,21 +529,7 @@ class NetworkManagerFixed:
             
             for network_type in list(self.connections.keys()):
                 try:
-                    # Clean shutdown of connection
-                    if self.connections[network_type]:
-                        # AsyncWeb3 connections don't need explicit closing
-                        pass
-                    
-                    del self.connections[network_type]
-                    
-                    # Update status
-                    self.network_status[network_type] = NetworkStatus(
-                        network_type=network_type,
-                        is_connected=False,
-                        last_checked=datetime.utcnow(),
-                        error_message="Disconnected"
-                    )
-                    
+                    await self.disconnect_from_network(network_type)
                 except Exception as e:
                     logger.error(f"❌ Error disconnecting from {network_type.value}: {e}")
             
@@ -502,18 +538,49 @@ class NetworkManagerFixed:
         except Exception as e:
             logger.error(f"❌ Error during disconnect_all: {e}")
     
-    def get_network_status(self, network_type: NetworkType) -> Optional[NetworkStatus]:
+    def get_network_status(self, network_input: Any) -> Optional[NetworkStatus]:
         """Get status for a specific network."""
-        return self.network_status.get(network_type)
+        try:
+            network_type = self._validate_network_type(network_input)
+            
+            if network_type is None:
+                return None
+            
+            return self.network_status.get(network_type)
+            
+        except Exception as e:
+            logger.error(f"❌ Error getting network status: {e}")
+            return None
     
     def get_all_network_status(self) -> Dict[NetworkType, NetworkStatus]:
         """Get status for all networks."""
         return self.network_status.copy()
     
-    def is_connected(self, network_type: NetworkType) -> bool:
+    def is_connected(self, network_input: Any) -> bool:
         """Check if connected to a specific network."""
-        status = self.network_status.get(network_type)
-        return status is not None and status.is_connected
+        try:
+            status = self.get_network_status(network_input)
+            return status is not None and status.is_connected
+        except Exception:
+            return False
+    
+    def get_supported_networks(self) -> List[str]:
+        """Get list of supported network names."""
+        return [network.value for network in NetworkType]
+    
+    def get_network_config(self, network_input: Any) -> Optional[NetworkConfig]:
+        """Get configuration for a specific network."""
+        try:
+            network_type = self._validate_network_type(network_input)
+            
+            if network_type is None:
+                return None
+            
+            return self.network_configs.get(network_type)
+            
+        except Exception as e:
+            logger.error(f"❌ Error getting network config: {e}")
+            return None
 
 
 # Global instance for the application
