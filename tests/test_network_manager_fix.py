@@ -9,15 +9,31 @@ invalid input types properly and prevent the integer type error.
 import asyncio
 import sys
 import traceback
+import json
 from typing import Dict, Any, List
 from datetime import datetime
+from pathlib import Path
 
-from app.utils.logger import setup_logger
-from app.core.blockchain.network_manager_fixed import (
-    NetworkManagerFixed, NetworkType, get_network_manager
-)
+# Add the parent directory to Python path FIRST, before any app imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
-logger = setup_logger(__name__)
+# Now import the app modules AFTER setting the path
+try:
+    from app.utils.logger import setup_logger
+    from app.core.blockchain.network_manager_fixed import (
+        NetworkManagerFixed, NetworkType, get_network_manager
+    )
+    from app.core.wallet.enhanced_wallet_manager import (
+        EnhancedWalletManager, WalletType, get_enhanced_wallet_manager
+    )
+    logger = setup_logger(__name__)
+except ImportError as e:
+    print(f"❌ Import error: {e}")
+    print("💡 Make sure you're running from the project root directory")
+    print("💡 Command: python tests/test_phase_4b_integration.py")
+    print(f"💡 Current working directory: {Path.cwd()}")
+    print(f"💡 Script location: {Path(__file__).parent.parent}")
+    sys.exit(1)
 
 
 class NetworkManagerFixTester:

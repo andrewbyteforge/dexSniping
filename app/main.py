@@ -1029,3 +1029,4 @@ __description__ = "Professional trading bot with clean Phase 4B architecture and
 
 # Export application
 __all__ = ["app"]
+
