@@ -239,29 +239,6 @@
     
     function updateDashboardStats(data) {
         try {
-            console.log('📊 Updating dashboard stats with:', data);
-            
-            // Helper function to safely format values
-            function safeFormat(value, type = 'number') {
-                if (value === null || value === undefined) return '0';
-                
-                switch (type) {
-                    case 'currency':
-                        if (typeof value === 'string' && value.includes('$')) return value;
-                        return formatCurrency(parseFloat(value) || 0);
-                    
-                    case 'percentage':
-                        if (typeof value === 'string' && value.includes('%')) return value;
-                        return (parseFloat(value) || 0).toFixed(1) + '%';
-                    
-                    case 'number':
-                        if (typeof value === 'string') return value;
-                        return (parseFloat(value) || 0).toString();
-                    
-                    default:
-                        return value.toString();
-                }
-            }
             // Update portfolio value
             const portfolioElement = document.getElementById('portfolioValue');
             if (portfolioElement && data.portfolio_value) {
@@ -280,25 +257,25 @@
             // Update success rate
             const successElement = document.getElementById('successRate');
             if (successElement && data.success_rate !== undefined) {
-                successElement.textContent = safeFormat(data.success_rate, 'percentage');
+                successElement.textContent = data.success_rate.toFixed(1) + '%';
             }
             
             // Update quick success rate
             const quickSuccessElement = document.getElementById('quickSuccessRate');
             if (quickSuccessElement && data.success_rate !== undefined) {
-                quickSuccessElement.textContent = safeFormat(data.success_rate, 'percentage');
+                quickSuccessElement.textContent = data.success_rate.toFixed(1) + '%';
             }
             
             // Update active trades
             const tradesElement = document.getElementById('activeTrades');
             if (tradesElement && data.trades_today !== undefined) {
-                tradesElement.textContent = data.active_trades || data.trades_today || 0;
+                tradesElement.textContent = data.trades_today;
             }
             
             // Update uptime
             const uptimeElement = document.getElementById('uptime');
             if (uptimeElement && data.uptime_percent !== undefined) {
-                uptimeElement.textContent = data.system_uptime || '0 hours';
+                uptimeElement.textContent = data.uptime_percent.toFixed(1) + '%';
             }
             
             console.log('✅ Dashboard stats updated successfully');
