@@ -91,7 +91,7 @@ class TradeRecord:
     gas_used: Optional[int]
     gas_price_gwei: Optional[Decimal]
     slippage_percent: Decimal
-    profit_loss_usd: Optional[Decimal]
+    profit_loss_usd: Optional[Decimal] = None  # Make optional with default
     created_at: datetime = field(default_factory=datetime.utcnow)
     executed_at: Optional[datetime] = None
     
@@ -211,9 +211,9 @@ class PersistenceManager:
             return False
     
     async def _create_tables(self):
-        """Create all required database tables."""
+        """Create all required database tables with corrected SQL syntax."""
         
-        # Trades table
+        # Trades table - Fixed INDEX syntax
         await self._connection.execute("""
             CREATE TABLE IF NOT EXISTS trades (
                 trade_id TEXT PRIMARY KEY,
@@ -232,11 +232,21 @@ class PersistenceManager:
                 slippage_percent REAL NOT NULL,
                 profit_loss_usd REAL,
                 created_at TEXT NOT NULL,
-                executed_at TEXT,
-                INDEX(wallet_address),
-                INDEX(created_at),
-                INDEX(status)
+                executed_at TEXT
             )
+        """)
+        
+        # Create indexes separately
+        await self._connection.execute("""
+            CREATE INDEX IF NOT EXISTS idx_trades_wallet ON trades(wallet_address)
+        """)
+        
+        await self._connection.execute("""
+            CREATE INDEX IF NOT EXISTS idx_trades_created_at ON trades(created_at)
+        """)
+        
+        await self._connection.execute("""
+            CREATE INDEX IF NOT EXISTS idx_trades_status ON trades(status)
         """)
         
         # Portfolio snapshots table
@@ -250,10 +260,17 @@ class PersistenceManager:
                 top_holdings TEXT NOT NULL,
                 profit_loss_24h REAL NOT NULL,
                 network TEXT NOT NULL,
-                created_at TEXT NOT NULL,
-                INDEX(wallet_address),
-                INDEX(created_at)
+                created_at TEXT NOT NULL
             )
+        """)
+        
+        # Create indexes separately
+        await self._connection.execute("""
+            CREATE INDEX IF NOT EXISTS idx_portfolios_wallet ON portfolios(wallet_address)
+        """)
+        
+        await self._connection.execute("""
+            CREATE INDEX IF NOT EXISTS idx_portfolios_created_at ON portfolios(created_at)
         """)
         
         # Wallet sessions table
@@ -267,10 +284,17 @@ class PersistenceManager:
                 last_activity TEXT NOT NULL,
                 is_active BOOLEAN DEFAULT 1,
                 permissions TEXT NOT NULL DEFAULT '[]',
-                metadata TEXT NOT NULL DEFAULT '{}',
-                INDEX(wallet_address),
-                INDEX(is_active)
+                metadata TEXT NOT NULL DEFAULT '{}'
             )
+        """)
+        
+        # Create indexes separately
+        await self._connection.execute("""
+            CREATE INDEX IF NOT EXISTS idx_wallets_address ON wallets(wallet_address)
+        """)
+        
+        await self._connection.execute("""
+            CREATE INDEX IF NOT EXISTS idx_wallets_active ON wallets(is_active)
         """)
         
         # Trading opportunities table
@@ -289,11 +313,21 @@ class PersistenceManager:
                 confidence_score REAL NOT NULL,
                 discovered_at TEXT NOT NULL,
                 expires_at TEXT,
-                status TEXT DEFAULT 'active',
-                INDEX(token_address),
-                INDEX(discovered_at),
-                INDEX(risk_score)
+                status TEXT DEFAULT 'active'
             )
+        """)
+        
+        # Create indexes separately
+        await self._connection.execute("""
+            CREATE INDEX IF NOT EXISTS idx_opportunities_token ON opportunities(token_address)
+        """)
+        
+        await self._connection.execute("""
+            CREATE INDEX IF NOT EXISTS idx_opportunities_discovered ON opportunities(discovered_at)
+        """)
+        
+        await self._connection.execute("""
+            CREATE INDEX IF NOT EXISTS idx_opportunities_risk ON opportunities(risk_score)
         """)
         
         # Configuration settings table
