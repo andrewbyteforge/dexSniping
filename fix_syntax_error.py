@@ -1,188 +1,57 @@
-{% extends "base/layout.html" %}
+"""
+Fix Dashboard Syntax Error
+File: fix_syntax_error.py
 
-{% block title %}Dashboard{% endblock %}
+Replaces the broken JavaScript in dashboard with a clean, working version.
+"""
 
-{% block page_title %}Professional Trading Dashboard{% endblock %}
-{% block page_subtitle %}Real-time DEX monitoring and AI-powered analysis{% endblock %}
+import os
+from pathlib import Path
 
-{% block content %}
-<!-- Dashboard Status Banner -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="alert alert-success d-flex align-items-center">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            <strong>Status:</strong>
-            <span class="ms-2">
-                <span class="live-indicator">
-                    <i class="bi bi-dot text-success"></i>
-                </span>
-                APIs operational, data loading successfully
-            </span>
-            <div class="ms-auto">
-                <small>Last update: <span id="lastUpdateTime">--</span></small>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Dashboard Stats Cards -->
-<div class="row mb-4">
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card stats-card h-100 shadow">
-            <div class="card-body text-center">
-                <i class="bi bi-wallet2 fs-1 mb-3"></i>
-                <h3 class="mb-2" id="portfolioValue">Loading...</h3>
-                <p class="mb-0 opacity-75">Portfolio Value</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card stats-card h-100 shadow">
-            <div class="card-body text-center">
-                <i class="bi bi-graph-up fs-1 mb-3"></i>
-                <h3 class="mb-2" id="dailyPnL">Loading...</h3>
-                <p class="mb-0 opacity-75">Daily P&L</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card stats-card h-100 shadow">
-            <div class="card-body text-center">
-                <i class="bi bi-activity fs-1 mb-3"></i>
-                <h3 class="mb-2" id="successRate">Loading...</h3>
-                <p class="mb-0 opacity-75">Success Rate</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-lg-3 col-md-6 mb-3">
-        <div class="card stats-card h-100 shadow">
-            <div class="card-body text-center">
-                <i class="bi bi-lightning fs-1 mb-3"></i>
-                <h3 class="mb-2" id="activeTrades">Loading...</h3>
-                <p class="mb-0 opacity-75">Active Trades</p>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Main Dashboard Content -->
-<div class="row mb-4">
-    <!-- Live Token Discovery -->
-    <div class="col-lg-8 mb-4">
-        <div class="card shadow">
-            <div class="card-header bg-white">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="bi bi-search text-primary"></i> Live Token Discovery
-                    </h5>
-                    <div>
-                        <button class="btn btn-sm btn-outline-primary" onclick="refreshTokens()">
-                            <i class="bi bi-arrow-clockwise"></i> Refresh
-                        </button>
-                        <button class="btn btn-sm btn-outline-info ms-2" onclick="showDiscoverySettings()">
-                            <i class="bi bi-gear"></i> Settings
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="tokensList">
-                    <div class="text-center text-muted">
-                        <div class="spinner-border spinner-border-sm me-2"></div>
-                        Loading tokens...
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+def fix_dashboard_syntax():
+    """Fix the syntax error in dashboard JavaScript."""
     
-    <!-- Quick Stats Sidebar -->
-    <div class="col-lg-4 mb-4">
-        <div class="card shadow">
-            <div class="card-header bg-white">
-                <h5 class="mb-0">
-                    <i class="bi bi-graph-up text-success"></i> Quick Stats
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="d-flex justify-content-between mb-3">
-                    <span>API Status:</span>
-                    <span class="badge bg-success" id="apiStatus">Operational</span>
-                </div>
-                <div class="d-flex justify-content-between mb-3">
-                    <span>Tokens Scanned:</span>
-                    <span id="tokensScanned">0</span>
-                </div>
-                <div class="d-flex justify-content-between mb-3">
-                    <span>Networks:</span>
-                    <span>4 Active</span>
-                </div>
-                <div class="d-flex justify-content-between mb-3">
-                    <span>Success Rate:</span>
-                    <span class="text-success" id="quickSuccessRate">89.4%</span>
-                </div>
-                <div class="d-flex justify-content-between">
-                    <span>Uptime:</span>
-                    <span class="text-success" id="uptime">99.8%</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- AI Risk Assessment Widget -->
-        <div class="card shadow mt-4">
-            <div class="card-header bg-white">
-                <h5 class="mb-0">
-                    <i class="bi bi-robot text-info"></i> AI Risk Assessment
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="text-center">
-                    <div class="badge bg-warning fs-6 px-3 py-2 mb-3">
-                        Phase 3B Complete
-                    </div>
-                    <p class="small text-muted">
-                        AI-powered honeypot detection and risk scoring ready for implementation.
-                    </p>
-                    <button class="btn btn-outline-info btn-sm" onclick="showAIFeatures()">
-                        <i class="bi bi-arrow-right"></i> Learn More
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- System Information -->
-<div class="row">
-    <div class="col-12">
-        <div class="card shadow">
-            <div class="card-header bg-white">
-                <h5 class="mb-0">
-                    <i class="bi bi-info-circle text-info"></i> System Information
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3">
-                        <strong>Phase:</strong> 3B Week 7-8 Complete
-                    </div>
-                    <div class="col-md-3">
-                        <strong>Status:</strong> <span class="text-success">Operational</span>
-                    </div>
-                    <div class="col-md-3">
-                        <strong>Version:</strong> 3.1.0
-                    </div>
-                    <div class="col-md-3">
-                        <strong>Next:</strong> Phase 3C Mobile
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block extra_js %}
+    # Find dashboard file
+    dashboard_files = [
+        "frontend/templates/pages/dashboard.html",
+        "templates/dashboard.html",
+        "app/templates/dashboard.html"
+    ]
+    
+    dashboard_path = None
+    for file_path in dashboard_files:
+        if Path(file_path).exists():
+            dashboard_path = Path(file_path)
+            break
+    
+    if not dashboard_path:
+        print("❌ Could not find dashboard.html file")
+        return False
+    
+    print(f"✅ Found dashboard at: {dashboard_path}")
+    
+    try:
+        # Read current content
+        content = dashboard_path.read_text(encoding='utf-8')
+        
+        # Create backup
+        backup_path = dashboard_path.with_suffix('.html.syntax_backup')
+        backup_path.write_text(content, encoding='utf-8')
+        print(f"✅ Created backup: {backup_path}")
+        
+        # Find the {% block extra_js %} section and replace the entire script
+        start_marker = "{% block extra_js %}"
+        end_marker = "{% endblock %}"
+        
+        start_pos = content.find(start_marker)
+        end_pos = content.find(end_marker, start_pos)
+        
+        if start_pos == -1 or end_pos == -1:
+            print("❌ Could not find JavaScript block markers")
+            return False
+        
+        # Clean JavaScript replacement
+        new_js_block = '''{% block extra_js %}
 <script>
     // Global variables
     let dashboardData = {};
@@ -309,14 +178,6 @@
         }
     }
     
-        function formatPrice(value, decimals) {
-        decimals = decimals || 6;
-        if (value === null || value === undefined) return '0.00';
-        const num = parseFloat(value);
-        if (isNaN(num)) return '0.00';
-        return num.toFixed(decimals);
-    }
-    
     function displayTokens(tokens) {
         const container = document.getElementById('tokensList');
         if (!container) return;
@@ -338,7 +199,7 @@
             html += '    <div>';
             html += '      <div class="d-flex align-items-center">';
             html += '        <span class="badge bg-primary me-2">' + symbol + '</span>';
-            html += '        <small class="text-muted">$' + formatPrice(price) + '</small>';
+            html += '        <small class="text-muted">$' + (price ? price.toFixed(6) : '0.00') + '</small>';
             html += '      </div>';
             html += '      <div class="small text-muted mt-1">';
             html += '        <i class="bi bi-droplet"></i> ' + formatLiquidity(liquidity);
@@ -347,10 +208,10 @@
             html += '    </div>';
             html += '    <div class="text-end">';
             html += '      <span class="badge ' + badgeClass + '">';
-            html += '        ' + (isPositive ? '+' : '') + formatPrice(priceChange, 2) + '%';
+            html += '        ' + (isPositive ? '+' : '') + (priceChange ? priceChange.toFixed(2) : '0.00') + '%';
             html += '      </span>';
             html += '      <div class="small text-muted mt-1">';
-            html += '        Risk: <span class="badge bg-secondary">' + formatPrice(riskScore, 1) + '</span>';
+            html += '        Risk: <span class="badge bg-secondary">' + (riskScore ? riskScore.toFixed(1) : '0.0') + '</span>';
             html += '      </div>';
             html += '    </div>';
             html += '  </div>';
@@ -432,4 +293,28 @@
 
     console.log('✅ Clean dashboard script loaded');
 </script>
-{% endblock %}
+{% endblock %}'''
+
+        # Replace the entire JavaScript block
+        content = content[:start_pos] + new_js_block + content[end_pos + len(end_marker):]
+
+        # Write the updated content back
+        dashboard_path.write_text(content, encoding='utf-8')
+
+        print("✅ Fixed JavaScript syntax errors!")
+        print("\nNext steps:")
+        print("1. Restart server: uvicorn app.main:app --reload")
+        print("2. Refresh dashboard: http://127.0.0.1:8000/dashboard")
+        print("3. Check console for: '✅ Clean dashboard script loaded'")
+
+        return True
+
+    except Exception as e:
+        print(f"❌ Error fixing syntax: {e}")
+        return False
+
+
+if __name__ == "__main__":
+    print("Fix Dashboard Syntax Error")
+    print("=" * 30)
+    fix_dashboard_syntax()
