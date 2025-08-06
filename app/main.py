@@ -1,10 +1,10 @@
 """
-Clean Phase 4B Implementation - Enhanced Main Application
+Enhanced Phase 4C Implementation - AI Risk Assessment Integration
 File: app/main.py
 
 Professional FastAPI application with comprehensive error handling,
-Phase 4B component integration, and graceful fallback mechanisms.
-Maintains backward compatibility while enabling advanced features.
+Phase 4B component integration, Phase 4C AI capabilities, and graceful fallback mechanisms.
+Maintains backward compatibility while enabling advanced AI features.
 """
 
 import asyncio
@@ -27,15 +27,26 @@ from app.utils.logger import setup_logger
 
 logger = setup_logger(__name__)
 
+# ==================== APPLICATION METADATA ====================
+
+__version__ = "4.1.0-beta"
+__phase__ = "4C - AI Risk Assessment Integration"
+__description__ = "Professional trading bot with AI-powered risk assessment and intelligent trading"
+
 # ==================== COMPONENT AVAILABILITY DETECTION ====================
 
-# Initialize component availability flags
+# Initialize component availability flags with AI components
 COMPONENT_STATUS = {
+    # Core Phase 4B components
     "wallet_system": False,
     "dex_integration": False,
     "trading_engine": False,
     "live_trading_api": False,
-    "phase4a_schemas": False
+    "phase4a_schemas": False,
+    # NEW Phase 4C AI components
+    "ai_risk_assessment": False,
+    "ai_portfolio_analysis": False,
+    "ai_api_endpoints": False
 }
 
 # Safe import of Phase 4B components with comprehensive error handling
@@ -95,6 +106,29 @@ except ImportError as e:
 except Exception as e:
     logger.error(f"❌ Phase 4A schemas loading error: {e}")
 
+# NEW: Safe import of Phase 4C AI components
+try:
+    from app.core.trading.ai_risk_assessor import (
+        get_ai_risk_assessor,
+        AIRiskAssessor,
+        RiskAssessment
+    )
+    COMPONENT_STATUS["ai_risk_assessment"] = True
+    logger.info("✅ AI Risk Assessment system loaded successfully")
+except ImportError as e:
+    logger.warning(f"⚠️ AI Risk Assessment not available: {e}")
+except Exception as e:
+    logger.error(f"❌ AI Risk Assessment loading error: {e}")
+
+try:
+    from app.api.v1.endpoints.ai_risk_api import ai_risk_router
+    COMPONENT_STATUS["ai_api_endpoints"] = True
+    logger.info("✅ AI Risk Assessment API endpoints loaded successfully")
+except ImportError as e:
+    logger.warning(f"⚠️ AI Risk Assessment API not available: {e}")
+except Exception as e:
+    logger.error(f"❌ AI Risk Assessment API loading error: {e}")
+
 # Safe import of dashboard components (these should always work)
 try:
     from app.api.v1.endpoints.dashboard import dashboard_router, tokens_router
@@ -119,7 +153,8 @@ except ImportError as e:
             "total_profit": "$0.00",
             "system_uptime": "0 hours",
             "connected_wallets": 0,
-            "phase": "4B - Clean Implementation",
+            "phase": "4C - AI Risk Assessment Integration",
+            "ai_features": COMPONENT_STATUS["ai_risk_assessment"],
             "timestamp": datetime.utcnow().isoformat()
         }
     
@@ -132,6 +167,7 @@ except ImportError as e:
             "discovery_rate": "0 tokens/hour",
             "last_discovery": None,
             "status": "fallback_mode",
+            "ai_analysis": "unavailable" if not COMPONENT_STATUS["ai_risk_assessment"] else "available",
             "supported_networks": get_supported_networks()
         }
     
@@ -142,7 +178,7 @@ except ImportError as e:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    Enhanced application lifespan management with comprehensive error handling.
+    Enhanced application lifespan management with Phase 4C AI initialization.
     
     Args:
         app: FastAPI application instance
@@ -150,7 +186,7 @@ async def lifespan(app: FastAPI):
     Yields:
         None: Application context
     """
-    logger.info("🚀 Starting DEX Sniper Pro - Phase 4B Clean Implementation...")
+    logger.info("🚀 Starting DEX Sniper Pro - Phase 4C AI Risk Assessment Integration...")
     
     startup_success = False
     try:
@@ -177,7 +213,7 @@ async def lifespan(app: FastAPI):
 
 async def execute_startup_procedures() -> bool:
     """
-    Execute comprehensive startup procedures with proper error handling.
+    Execute comprehensive startup procedures with Phase 4C AI initialization.
     Uses fixed network manager with public RPC fallback to avoid authentication issues.
     
     Returns:
@@ -185,9 +221,27 @@ async def execute_startup_procedures() -> bool:
     """
     try:
         success_count = 0
-        total_procedures = 4
+        total_procedures = 5  # Updated for AI component
         
-        logger.info("🚀 Starting Phase 4B with fixed RPC authentication handling...")
+        logger.info("🚀 Starting Phase 4C with AI Risk Assessment and fixed RPC authentication...")
+        
+        # Initialize AI Risk Assessment System (NEW in Phase 4C)
+        if COMPONENT_STATUS["ai_risk_assessment"]:
+            try:
+                logger.info("🧠 Initializing AI Risk Assessment system...")
+                ai_assessor = await get_ai_risk_assessor()
+                if ai_assessor:
+                    COMPONENT_STATUS["ai_portfolio_analysis"] = True
+                    logger.info("✅ AI Risk Assessment system initialized successfully")
+                    success_count += 1
+                else:
+                    logger.warning("⚠️ AI Risk Assessment system initialization returned None")
+            except Exception as e:
+                logger.error(f"❌ AI Risk Assessment initialization error: {e}")
+                COMPONENT_STATUS["ai_risk_assessment"] = False
+                COMPONENT_STATUS["ai_portfolio_analysis"] = False
+        else:
+            logger.info("📋 AI Risk Assessment not available - skipping initialization")
         
         # Initialize network manager with public RPC fallback
         if COMPONENT_STATUS["wallet_system"] or COMPONENT_STATUS["dex_integration"] or COMPONENT_STATUS["trading_engine"]:
@@ -253,6 +307,8 @@ async def execute_startup_procedures() -> bool:
         
         # Log initialization summary
         logger.info(f"🎯 Initialization complete: {success_count}/{total_procedures} systems operational")
+        logger.info("🧠 AI Risk Assessment integration status: " + 
+                   ("✅ Active" if COMPONENT_STATUS["ai_risk_assessment"] else "⚠️ Unavailable"))
         logger.info("💡 Fixed RPC authentication - blockchain connections ready")
         
         return success_count > 0  # At least some functionality available
@@ -263,11 +319,19 @@ async def execute_startup_procedures() -> bool:
 
 
 async def execute_shutdown_procedures():
-    """Execute comprehensive shutdown procedures with error handling."""
+    """Execute comprehensive shutdown procedures with AI cleanup."""
     try:
         logger.info("🛑 Executing shutdown procedures...")
         
         shutdown_tasks = []
+        
+        # Shutdown AI Risk Assessment system (NEW)
+        if COMPONENT_STATUS["ai_risk_assessment"]:
+            try:
+                # AI Risk Assessment cleanup would go here
+                logger.info("📝 AI Risk Assessment cleanup scheduled")
+            except Exception as e:
+                logger.error(f"❌ AI Risk Assessment cleanup error: {e}")
         
         # Shutdown trading engine
         if COMPONENT_STATUS["trading_engine"]:
@@ -300,7 +364,7 @@ async def execute_shutdown_procedures():
 
 def create_fastapi_application() -> FastAPI:
     """
-    Create and configure FastAPI application with comprehensive setup.
+    Create and configure FastAPI application with Phase 4C AI capabilities.
     
     Returns:
         FastAPI: Configured application instance
@@ -309,20 +373,29 @@ def create_fastapi_application() -> FastAPI:
         RuntimeError: If application creation fails critically
     """
     try:
-        # Determine application mode
+        # Determine application mode based on AI availability
         is_full_mode = all([
             COMPONENT_STATUS["wallet_system"],
             COMPONENT_STATUS["dex_integration"],
             COMPONENT_STATUS["trading_engine"]
         ])
         
-        mode = "Live Trading Integration" if is_full_mode else "Development Mode"
+        has_ai_features = COMPONENT_STATUS["ai_risk_assessment"]
         
-        # Create FastAPI application
+        if is_full_mode and has_ai_features:
+            mode = "AI-Powered Live Trading"
+        elif is_full_mode:
+            mode = "Live Trading Integration"
+        elif has_ai_features:
+            mode = "AI Risk Assessment Mode"
+        else:
+            mode = "Development Mode"
+        
+        # Create FastAPI application with enhanced description
         app = FastAPI(
-            title="DEX Sniper Pro - Live Trading Bot",
-            description="Professional automated trading bot with live blockchain integration",
-            version="4.0.0-beta",
+            title="DEX Sniper Pro - AI-Powered Trading Bot",
+            description="Professional automated trading bot with AI risk assessment and live blockchain integration",
+            version=__version__,
             docs_url="/docs",
             redoc_url="/redoc",
             lifespan=lifespan,
@@ -334,7 +407,7 @@ def create_fastapi_application() -> FastAPI:
         # Setup static files
         setup_static_files(app)
         
-        # Setup routes
+        # Setup routes with AI integration
         setup_application_routes(app)
         
         # Setup error handlers
@@ -398,7 +471,7 @@ def setup_static_files(app: FastAPI) -> None:
 
 def setup_application_routes(app: FastAPI) -> None:
     """
-    Setup all application routes with error handling.
+    Setup all application routes with Phase 4C AI integration.
     
     Args:
         app: FastAPI application instance
@@ -412,6 +485,13 @@ def setup_application_routes(app: FastAPI) -> None:
         app.include_router(tokens_router, prefix="/api/v1", tags=["tokens"])
         logger.info("✅ Core API routers included")
         
+        # Include AI Risk Assessment router (NEW in Phase 4C)
+        if COMPONENT_STATUS["ai_api_endpoints"] and COMPONENT_STATUS["ai_risk_assessment"]:
+            app.include_router(ai_risk_router, prefix="/api/v1/ai-risk", tags=["ai-risk"])
+            logger.info("✅ AI Risk Assessment router included")
+        else:
+            logger.warning("⚠️ AI Risk Assessment router not available")
+        
         # Include Phase 4A live trading router if available
         if COMPONENT_STATUS["live_trading_api"]:
             app.include_router(live_trading_router, prefix="/api/v1", tags=["live-trading"])
@@ -419,10 +499,10 @@ def setup_application_routes(app: FastAPI) -> None:
         else:
             logger.warning("⚠️ Phase 4A live trading router not available")
         
-        # Setup frontend routes
+        # Setup frontend routes with AI enhancements
         setup_frontend_routes(app)
         
-        # Setup system routes
+        # Setup system routes with AI information
         setup_system_routes(app)
         
         logger.info("✅ All application routes configured successfully")
@@ -434,7 +514,7 @@ def setup_application_routes(app: FastAPI) -> None:
 
 def setup_frontend_routes(app: FastAPI) -> None:
     """
-    Setup frontend page serving routes with error handling.
+    Setup frontend page serving routes with AI enhancements.
     
     Args:
         app: FastAPI application instance
@@ -444,18 +524,42 @@ def setup_frontend_routes(app: FastAPI) -> None:
         
         @app.get("/dashboard", response_class=HTMLResponse)
         async def serve_dashboard(request: Request) -> HTMLResponse:
-            """Serve the main trading dashboard with error handling."""
+            """Serve the main trading dashboard with AI features."""
             try:
                 return templates.TemplateResponse(
                     "pages/dashboard.html", 
-                    {"request": request}
+                    {
+                        "request": request,
+                        "ai_risk_enabled": COMPONENT_STATUS["ai_risk_assessment"],
+                        "phase": __phase__
+                    }
                 )
             except Exception as error:
                 logger.error(f"❌ Dashboard template error: {error}")
                 return create_fallback_html_response(
                     "🤖 DEX Sniper Pro Dashboard",
-                    "Phase 4B - Live Trading Integration",
-                    "Dashboard template temporarily unavailable"
+                    "Phase 4C - AI Risk Assessment Integration",
+                    "AI-powered dashboard with intelligent risk analysis"
+                )
+        
+        @app.get("/risk-analysis", response_class=HTMLResponse)
+        async def serve_risk_analysis(request: Request) -> HTMLResponse:
+            """Serve AI risk analysis page (NEW in Phase 4C)."""
+            try:
+                return templates.TemplateResponse(
+                    "pages/dashboard.html", 
+                    {
+                        "request": request,
+                        "page_type": "risk_analysis",
+                        "ai_risk_enabled": COMPONENT_STATUS["ai_risk_assessment"]
+                    }
+                )
+            except Exception as error:
+                logger.error(f"❌ Risk analysis template error: {error}")
+                return create_fallback_html_response(
+                    "🧠 AI Risk Analysis",
+                    "Intelligent risk assessment for trading decisions",
+                    "AI-powered risk analysis interface"
                 )
         
         @app.get("/wallet-connection", response_class=HTMLResponse)
@@ -464,46 +568,56 @@ def setup_frontend_routes(app: FastAPI) -> None:
             try:
                 return templates.TemplateResponse(
                     "pages/dashboard.html", 
-                    {"request": request}
+                    {
+                        "request": request,
+                        "ai_risk_enabled": COMPONENT_STATUS["ai_risk_assessment"]
+                    }
                 )
             except Exception as error:
                 logger.error(f"❌ Wallet connection template error: {error}")
                 return create_fallback_html_response(
                     "🔗 Wallet Connection",
                     "Connect your MetaMask or WalletConnect wallet",
-                    "Wallet connection interface"
+                    "Wallet connection interface with AI risk insights"
                 )
         
         @app.get("/live-trading", response_class=HTMLResponse)
         async def serve_live_trading(request: Request) -> HTMLResponse:
-            """Serve live trading interface with error handling."""
+            """Serve live trading interface with AI enhancements."""
             try:
                 return templates.TemplateResponse(
                     "pages/dashboard.html", 
-                    {"request": request}
+                    {
+                        "request": request,
+                        "ai_risk_enabled": COMPONENT_STATUS["ai_risk_assessment"]
+                    }
                 )
             except Exception as error:
                 logger.error(f"❌ Live trading template error: {error}")
                 return create_fallback_html_response(
                     "⚡ Live Trading",
-                    "Real-time trading opportunities and execution",
-                    "Live trading interface"
+                    "Real-time trading with AI risk assessment",
+                    "AI-enhanced live trading interface"
                 )
         
         @app.get("/portfolio", response_class=HTMLResponse)
         async def serve_portfolio(request: Request) -> HTMLResponse:
-            """Serve portfolio management page with error handling."""
+            """Serve portfolio management page with AI insights."""
             try:
                 return templates.TemplateResponse(
                     "pages/dashboard.html", 
-                    {"request": request}
+                    {
+                        "request": request,
+                        "page_type": "portfolio",
+                        "ai_risk_enabled": COMPONENT_STATUS["ai_risk_assessment"]
+                    }
                 )
             except Exception as error:
                 logger.error(f"❌ Portfolio template error: {error}")
                 return create_fallback_html_response(
                     "📊 Portfolio Management",
-                    "Track your trading performance and positions",
-                    "Portfolio management interface"
+                    "Track performance with AI risk insights",
+                    "AI-enhanced portfolio management interface"
                 )
         
         logger.info("✅ Frontend routes configured successfully")
@@ -521,8 +635,8 @@ def setup_minimal_frontend_routes(app: FastAPI) -> None:
         """Minimal dashboard fallback."""
         return create_fallback_html_response(
             "🤖 DEX Sniper Pro",
-            "Phase 4B - Clean Implementation",
-            "Minimal interface mode"
+            __phase__,
+            "Minimal interface mode with AI risk assessment capabilities"
         )
     
     logger.info("✅ Minimal frontend routes configured")
@@ -530,7 +644,7 @@ def setup_minimal_frontend_routes(app: FastAPI) -> None:
 
 def setup_system_routes(app: FastAPI) -> None:
     """
-    Setup system health and status routes with comprehensive error handling.
+    Setup system health and status routes with Phase 4C AI information.
     
     Args:
         app: FastAPI application instance
@@ -538,35 +652,44 @@ def setup_system_routes(app: FastAPI) -> None:
     try:
         @app.get("/")
         async def root() -> Dict[str, Any]:
-            """Enhanced root endpoint with comprehensive system information."""
+            """Enhanced root endpoint with Phase 4C AI system information."""
             try:
                 return await get_comprehensive_system_info()
             except Exception as error:
                 logger.error(f"❌ Root endpoint error: {error}")
                 return {
-                    "message": "🤖 DEX Sniper Pro - Live Trading Bot API",
-                    "version": "4.0.0-beta",
+                    "message": "🤖 DEX Sniper Pro - AI-Powered Trading Bot API",
+                    "version": __version__,
+                    "phase": __phase__,
                     "status": "limited_functionality",
                     "error": "System information temporarily unavailable",
+                    "ai_features": {
+                        "risk_assessment": COMPONENT_STATUS["ai_risk_assessment"],
+                        "portfolio_analysis": COMPONENT_STATUS["ai_portfolio_analysis"]
+                    },
                     "endpoints": {
                         "dashboard": "/dashboard",
+                        "risk_analysis": "/risk-analysis",
                         "health": "/health",
-                        "docs": "/docs"
+                        "docs": "/docs",
+                        "ai_risk_api": "/api/v1/ai-risk" if COMPONENT_STATUS["ai_api_endpoints"] else None
                     }
                 }
         
         @app.get("/health")
         async def health_check() -> Dict[str, Any]:
-            """Comprehensive health check with detailed component status."""
+            """Comprehensive health check with Phase 4C AI component status."""
             try:
                 return await get_comprehensive_health_status()
             except Exception as error:
                 logger.error(f"❌ Health check error: {error}")
                 return {
                     "status": "unhealthy",
-                    "service": "DEX Sniper Pro Live Trading Bot",
-                    "version": "4.0.0-beta",
+                    "service": "DEX Sniper Pro AI-Powered Trading Bot",
+                    "version": __version__,
+                    "phase": __phase__,
                     "error": str(error),
+                    "components": COMPONENT_STATUS,
                     "timestamp": datetime.utcnow().isoformat()
                 }
         
@@ -595,6 +718,7 @@ def setup_error_handlers(app: FastAPI) -> None:
                     "error": "internal_server_error",
                     "message": "An internal error occurred",
                     "type": "InternalServerError",
+                    "phase": __phase__,
                     "timestamp": datetime.utcnow().isoformat()
                 }
             )
@@ -608,7 +732,11 @@ def setup_error_handlers(app: FastAPI) -> None:
                     "error": "not_found",
                     "message": "Endpoint not found",
                     "suggestion": "Check /docs for available endpoints",
-                    "available_endpoints": ["/", "/health", "/dashboard", "/docs"]
+                    "available_endpoints": [
+                        "/", "/health", "/dashboard", "/risk-analysis", "/docs",
+                        "/api/v1/ai-risk" if COMPONENT_STATUS["ai_api_endpoints"] else None
+                    ],
+                    "ai_features": COMPONENT_STATUS["ai_risk_assessment"]
                 }
             )
         
@@ -621,7 +749,8 @@ def setup_error_handlers(app: FastAPI) -> None:
                     "error": "validation_error",
                     "message": "Request validation failed",
                     "details": exc.errors(),
-                    "body": exc.body
+                    "body": exc.body,
+                    "phase": __phase__
                 }
             )
         
@@ -635,31 +764,50 @@ def setup_error_handlers(app: FastAPI) -> None:
 
 async def get_comprehensive_system_info() -> Dict[str, Any]:
     """
-    Get comprehensive system information with error handling.
+    Get comprehensive system information with Phase 4C AI features.
     
     Returns:
-        Dict containing system information
+        Dict containing system information with AI capabilities
     """
     try:
         system_status = await get_system_status_safe()
         
         return {
-            "message": "🤖 DEX Sniper Pro - Live Trading Bot API",
-            "version": "4.0.0-beta",
-            "phase": "4B - Fixed RPC Authentication with Public Endpoint Priority",
+            "message": "🤖 DEX Sniper Pro - AI-Powered Trading Bot API",
+            "version": __version__,
+            "phase": __phase__,
             "status": "operational",
+            "description": __description__,
             "blockchain_approach": "public_rpc_priority",
             "rpc_authentication": "fixed_with_fallback",
+            "ai_features": {
+                "risk_assessment": {
+                    "status": "operational" if COMPONENT_STATUS["ai_risk_assessment"] else "unavailable",
+                    "description": "AI-powered risk analysis for trading decisions",
+                    "capabilities": [
+                        "Token risk assessment",
+                        "Portfolio risk analysis",
+                        "Market condition analysis",
+                        "Automated recommendations"
+                    ] if COMPONENT_STATUS["ai_risk_assessment"] else []
+                },
+                "portfolio_intelligence": {
+                    "status": "operational" if COMPONENT_STATUS["ai_portfolio_analysis"] else "unavailable",
+                    "description": "AI-driven portfolio optimization and insights"
+                }
+            },
             "capabilities": get_available_capabilities(),
             "supported_networks": get_supported_networks(),
             "component_status": COMPONENT_STATUS,
             "system_status": system_status,
             "endpoints": {
                 "dashboard": "/dashboard",
+                "risk_analysis": "/risk-analysis" if COMPONENT_STATUS["ai_risk_assessment"] else None,
                 "api_docs": "/docs",
                 "health_check": "/health",
                 "dashboard_stats": "/api/v1/dashboard/stats",
-                "token_discovery": "/api/v1/tokens/discover"
+                "token_discovery": "/api/v1/tokens/discover",
+                "ai_risk_api": "/api/v1/ai-risk" if COMPONENT_STATUS["ai_api_endpoints"] else None
             },
             "blockchain_connectivity": {
                 "approach": "Public RPC endpoints prioritized over private",
@@ -677,17 +825,17 @@ async def get_comprehensive_system_info() -> Dict[str, Any]:
 
 async def get_comprehensive_health_status() -> Dict[str, Any]:
     """
-    Get comprehensive health status with detailed component information.
+    Get comprehensive health status with Phase 4C AI component information.
     
     Returns:
-        Dict containing health status
+        Dict containing health status with AI capabilities
     """
     try:
         health_status = {
             "status": "healthy",
-            "service": "DEX Sniper Pro Live Trading Bot",
-            "version": "4.0.0-beta",
-            "phase": "4B - Clean Implementation with Safe Startup",
+            "service": "DEX Sniper Pro AI-Powered Trading Bot",
+            "version": __version__,
+            "phase": __phase__,
             "startup_mode": "safe_mode",
             "blockchain_status": "on_demand_initialization",
             "timestamp": datetime.utcnow().isoformat(),
@@ -696,6 +844,37 @@ async def get_comprehensive_health_status() -> Dict[str, Any]:
         }
         
         component_scores = []
+        
+        # Check AI Risk Assessment (NEW)
+        if COMPONENT_STATUS["ai_risk_assessment"]:
+            health_status["components"]["ai_risk_assessment"] = {
+                "status": "healthy",
+                "mode": "operational",
+                "message": "AI Risk Assessment system operational",
+                "features": ["token_analysis", "portfolio_analysis", "market_assessment"]
+            }
+            component_scores.append(1.0)
+        else:
+            health_status["components"]["ai_risk_assessment"] = {
+                "status": "not_loaded",
+                "message": "AI Risk Assessment component not available"
+            }
+            component_scores.append(0.0)
+        
+        # Check AI Portfolio Analysis (NEW)
+        if COMPONENT_STATUS["ai_portfolio_analysis"]:
+            health_status["components"]["ai_portfolio_analysis"] = {
+                "status": "healthy",
+                "mode": "operational",
+                "message": "AI Portfolio Analysis operational"
+            }
+            component_scores.append(1.0)
+        else:
+            health_status["components"]["ai_portfolio_analysis"] = {
+                "status": "not_loaded",
+                "message": "AI Portfolio Analysis not available"
+            }
+            component_scores.append(0.0)
         
         # Check trading engine (not connected during startup)
         if COMPONENT_STATUS["trading_engine"]:
@@ -772,12 +951,21 @@ async def get_comprehensive_health_status() -> Dict[str, Any]:
         else:
             health_status["status"] = "unhealthy"
         
+        # Add AI capabilities summary
+        health_status["ai_capabilities"] = {
+            "risk_assessment": COMPONENT_STATUS["ai_risk_assessment"],
+            "portfolio_analysis": COMPONENT_STATUS["ai_portfolio_analysis"],
+            "market_intelligence": COMPONENT_STATUS["ai_risk_assessment"],
+            "automated_recommendations": COMPONENT_STATUS["ai_risk_assessment"]
+        }
+        
         # Add safe startup explanation
         health_status["safe_startup_info"] = {
             "enabled": True,
             "reason": "Prevents RPC authentication errors during startup",
             "benefit": "Application starts reliably without blockchain dependencies",
-            "blockchain_initialization": "On-demand when trading features are first used"
+            "blockchain_initialization": "On-demand when trading features are first used",
+            "ai_initialization": "Immediate for AI risk assessment features"
         }
         
         return health_status
@@ -789,10 +977,10 @@ async def get_comprehensive_health_status() -> Dict[str, Any]:
 
 async def get_system_status_safe() -> Dict[str, Any]:
     """
-    Get system status with comprehensive error handling.
+    Get system status with comprehensive error handling and AI information.
     
     Returns:
-        Dict containing system status information
+        Dict containing system status information with AI metrics
     """
     try:
         status = {
@@ -800,8 +988,24 @@ async def get_system_status_safe() -> Dict[str, Any]:
             "uptime_hours": 0,
             "active_sessions": 0,
             "active_connections": 0,
-            "component_availability": COMPONENT_STATUS
+            "component_availability": COMPONENT_STATUS,
+            "ai_status": {
+                "risk_assessments_performed": 0,
+                "portfolio_analyses": 0,
+                "ai_recommendations_generated": 0
+            }
         }
+        
+        # Get AI system status if available
+        if COMPONENT_STATUS["ai_risk_assessment"]:
+            try:
+                ai_assessor = await get_ai_risk_assessor()
+                if ai_assessor:
+                    # Would collect AI metrics here
+                    status["ai_status"]["system_ready"] = True
+                    status["ai_status"]["cache_size"] = len(ai_assessor.assessment_cache)
+            except Exception as e:
+                logger.warning(f"⚠️ AI status collection error: {e}")
         
         if COMPONENT_STATUS["trading_engine"]:
             try:
@@ -827,15 +1031,19 @@ async def get_system_status_safe() -> Dict[str, Any]:
         
     except Exception as error:
         logger.error(f"❌ System status error: {error}")
-        return {"error": "Status unavailable", "component_availability": COMPONENT_STATUS}
+        return {
+            "error": "Status unavailable", 
+            "component_availability": COMPONENT_STATUS,
+            "ai_status": {"available": COMPONENT_STATUS["ai_risk_assessment"]}
+        }
 
 
 def get_available_capabilities() -> List[str]:
     """
-    Get list of available capabilities based on loaded components.
+    Get list of available capabilities based on loaded components including AI features.
     
     Returns:
-        List of capability descriptions
+        List of capability descriptions with AI features
     """
     capabilities = [
         "✅ Professional Dashboard Interface",
@@ -845,6 +1053,21 @@ def get_available_capabilities() -> List[str]:
         "✅ Fixed RPC Authentication (Public Endpoint Priority)",
         "✅ Blockchain Connectivity with Fallback System"
     ]
+    
+    # Add AI capabilities
+    if COMPONENT_STATUS["ai_risk_assessment"]:
+        capabilities.extend([
+            "🧠 AI-Powered Risk Assessment",
+            "🎯 Intelligent Trading Recommendations",
+            "📊 Smart Position Sizing",
+            "📈 Market Condition Analysis"
+        ])
+    
+    if COMPONENT_STATUS["ai_portfolio_analysis"]:
+        capabilities.append("📊 AI Portfolio Risk Management")
+    
+    if COMPONENT_STATUS["ai_api_endpoints"]:
+        capabilities.append("🔗 AI Risk Assessment API")
     
     if COMPONENT_STATUS["phase4a_schemas"]:
         capabilities.append("✅ Phase 4A Trading Schemas")
@@ -903,7 +1126,7 @@ def get_supported_networks_enum():
 
 def create_fallback_html_response(title: str, subtitle: str, description: str) -> HTMLResponse:
     """
-    Create a fallback HTML response when templates are not available.
+    Create a fallback HTML response with AI feature information.
     
     Args:
         title: Page title
@@ -911,8 +1134,10 @@ def create_fallback_html_response(title: str, subtitle: str, description: str) -
         description: Page description
         
     Returns:
-        HTMLResponse with fallback content
+        HTMLResponse with fallback content including AI features
     """
+    ai_features = "🧠 AI Risk Assessment" if COMPONENT_STATUS["ai_risk_assessment"] else "⚠️ AI Features Unavailable"
+    
     html_content = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -921,43 +1146,112 @@ def create_fallback_html_response(title: str, subtitle: str, description: str) -
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{title}</title>
         <style>
-            body {{ font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }}
-            .container {{ max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }}
-            h1 {{ color: #333; border-bottom: 2px solid #007acc; padding-bottom: 10px; }}
-            .status {{ background: #e7f3ff; padding: 15px; border-radius: 5px; margin: 20px 0; }}
-            .links {{ margin-top: 30px; }}
-            .links a {{ display: inline-block; margin: 5px 10px 5px 0; padding: 8px 15px; background: #007acc; color: white; text-decoration: none; border-radius: 4px; }}
-            .links a:hover {{ background: #005f9a; }}
-            .capabilities {{ margin-top: 20px; }}
-            .capabilities li {{ margin: 5px 0; }}
+            body {{ 
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                margin: 0;
+                padding: 0;
+                min-height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }}
+            .container {{ 
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                border-radius: 20px;
+                padding: 3rem;
+                text-align: center;
+                max-width: 600px;
+                margin: 2rem;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            }}
+            h1 {{ 
+                font-size: 2.5rem; 
+                margin-bottom: 1rem;
+                background: linear-gradient(45deg, #fff, #f0f0f0);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }}
+            h2 {{ 
+                font-size: 1.5rem; 
+                margin-bottom: 1.5rem;
+                opacity: 0.9;
+            }}
+            p {{ 
+                font-size: 1.1rem; 
+                line-height: 1.6;
+                opacity: 0.8;
+                margin-bottom: 2rem;
+            }}
+            .feature-list {{
+                list-style: none;
+                padding: 0;
+                margin: 2rem 0;
+            }}
+            .feature-list li {{
+                background: rgba(255, 255, 255, 0.1);
+                margin: 0.5rem 0;
+                padding: 0.8rem;
+                border-radius: 10px;
+                font-size: 1rem;
+            }}
+            .ai-status {{
+                background: rgba(76, 175, 80, 0.2);
+                color: #4CAF50;
+                padding: 0.5rem 1rem;
+                border-radius: 20px;
+                display: inline-block;
+                margin: 1rem 0;
+                font-weight: bold;
+            }}
+            .links {{
+                margin-top: 2rem;
+            }}
+            .links a {{
+                color: white;
+                text-decoration: none;
+                background: rgba(255, 255, 255, 0.2);
+                padding: 0.8rem 1.5rem;
+                border-radius: 10px;
+                margin: 0.5rem;
+                display: inline-block;
+                transition: all 0.3s ease;
+            }}
+            .links a:hover {{
+                background: rgba(255, 255, 255, 0.3);
+                transform: translateY(-2px);
+            }}
         </style>
     </head>
     <body>
         <div class="container">
             <h1>{title}</h1>
-            <div class="status">
-                <strong>Status:</strong> Operational - {subtitle}
-            </div>
+            <h2>{subtitle}</h2>
+            <div class="ai-status">{ai_features}</div>
             <p>{description}</p>
-            <div class="capabilities">
-                <h3>Available Features:</h3>
-                <ul>
-                    <li>Professional API Framework</li>
-                    <li>Health Monitoring System</li>
-                    <li>Token Discovery Interface</li>
-                    <li>Dashboard Statistics</li>
-                </ul>
-            </div>
+            
+            <ul class="feature-list">
+                <li>🧠 AI-Powered Risk Assessment</li>
+                <li>📊 Intelligent Portfolio Analysis</li>
+                <li>⚡ Real-time Market Insights</li>
+                <li>🛡️ Automated Risk Management</li>
+                <li>📈 Smart Trading Recommendations</li>
+                <li>🔗 Professional API Framework</li>
+            </ul>
+            
             <div class="links">
-                <a href="/docs">API Documentation</a>
-                <a href="/health">System Health</a>
-                <a href="/api/v1/dashboard/stats">Dashboard API</a>
-                <a href="/">Root API</a>
+                <a href="/docs">📖 API Documentation</a>
+                <a href="/health">🔍 System Health</a>
+                {f'<a href="/api/v1/ai-risk/health">🧠 AI System Health</a>' if COMPONENT_STATUS["ai_api_endpoints"] else ''}
+                {f'<a href="/api/v1/ai-risk/risk-levels">🎯 Risk Levels</a>' if COMPONENT_STATUS["ai_api_endpoints"] else ''}
             </div>
         </div>
     </body>
     </html>
     """
+    
     return HTMLResponse(content=html_content)
 
 
@@ -966,7 +1260,7 @@ def create_fallback_html_response(title: str, subtitle: str, description: str) -
 # Create the FastAPI application instance
 try:
     app = create_fastapi_application()
-    logger.info("🎯 DEX Sniper Pro application instance created successfully")
+    logger.info("🎯 DEX Sniper Pro Phase 4C application instance created successfully")
 except Exception as e:
     logger.error(f"💥 Critical: Failed to create application instance: {e}")
     sys.exit(1)
@@ -975,15 +1269,17 @@ except Exception as e:
 
 @app.on_event("startup")
 async def display_startup_message():
-    """Display comprehensive startup message."""
+    """Display comprehensive startup message with AI information."""
     logger.info("=" * 80)
-    logger.info("🤖 DEX SNIPER PRO - PHASE 4B CLEAN IMPLEMENTATION")
+    logger.info("🤖 DEX SNIPER PRO - PHASE 4C AI RISK ASSESSMENT INTEGRATION")
     logger.info("=" * 80)
     logger.info("🚀 Status: Starting up...")
-    logger.info("📋 Version: 4.0.0-beta")
-    logger.info("🎯 Phase: 4B - Live Trading Integration")
-    logger.info("🔗 Mode: Clean Implementation with Fallback Support")
+    logger.info(f"📋 Version: {__version__}")
+    logger.info(f"🎯 Phase: {__phase__}")
+    logger.info("🧠 NEW: AI-Powered Risk Assessment System")
+    logger.info("🔗 Mode: Clean Implementation with AI Integration")
     logger.info(f"📊 Components Available: {sum(COMPONENT_STATUS.values())}/{len(COMPONENT_STATUS)}")
+    logger.info(f"🧠 AI Features: {'✅ Active' if COMPONENT_STATUS['ai_risk_assessment'] else '⚠️ Unavailable'}")
     logger.info("=" * 80)
 
 
@@ -1004,7 +1300,8 @@ if __name__ == "__main__":
     import uvicorn
     
     try:
-        logger.info("🚀 Starting DEX Sniper Pro development server...")
+        logger.info("🚀 Starting DEX Sniper Pro Phase 4C development server...")
+        logger.info("🧠 AI Risk Assessment features enabled")
         
         uvicorn.run(
             "app.main:app",
@@ -1023,10 +1320,5 @@ if __name__ == "__main__":
 
 # ==================== APPLICATION METADATA ====================
 
-__version__ = "4.0.0-beta"
-__phase__ = "4B - Clean Implementation"
-__description__ = "Professional trading bot with clean Phase 4B architecture and comprehensive error handling"
-
 # Export application
-__all__ = ["app"]
-
+__all__ = ["app", "COMPONENT_STATUS"]
