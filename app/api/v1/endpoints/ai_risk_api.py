@@ -35,7 +35,7 @@ class TokenRiskRequest(BaseModel):
     amount_usd: float = Field(..., gt=0, description="Trade amount in USD")
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "token_symbol": "ETH",
                 "token_address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
@@ -59,7 +59,7 @@ class RiskAssessmentResponse(BaseModel):
     timestamp: str
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "token_symbol": "ETH",
                 "overall_risk": "medium",
@@ -94,7 +94,7 @@ class PortfolioRiskSummaryResponse(BaseModel):
     timestamp: str
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "overall_risk": "medium",
                 "total_positions": 5,
@@ -115,7 +115,7 @@ class BatchRiskRequest(BaseModel):
     tokens: List[TokenRiskRequest] = Field(..., description="List of tokens to assess")
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "tokens": [
                     {
