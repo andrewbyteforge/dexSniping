@@ -66,9 +66,6 @@ def create_application():
 try:
     app = create_application()
 
-except Exception as e:
-    logger.error(f"Error: {e}")
-    raise
 # Failsafe dashboard route
 def main():
     """Main entry point for development server."""
@@ -97,7 +94,6 @@ if __name__ == "__main__":
     main()
 
 # Failsafe dashboard route
-from fastapi import Request
 @app.get("/dashboard-fixed", response_class=HTMLResponse)
 async def dashboard_fixed(request: Request):
     """Failsafe dashboard route."""

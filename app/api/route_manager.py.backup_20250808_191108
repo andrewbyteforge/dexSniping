@@ -16,7 +16,6 @@ from datetime import datetime
 
 from app.utils.logger import setup_logger
 from app.core.system_info import SystemInfoProvider
-import requests
 
 logger = setup_logger(__name__)
 
@@ -127,88 +126,50 @@ class RouteManager:
         """Setup frontend routes using the ORIGINAL working template approach."""
         
         @app.get("/dashboard", response_class=HTMLResponse)
-        @router.get("/dashboard", response_class=HTMLResponse)
         async def serve_dashboard(request: Request) -> HTMLResponse:
-            """Serve the main trading dashboard with sidebar."""
-        from fastapi import APIRouter
-
-        router = APIRouter()        
-
-        try:
-                logger.info("Serving dashboard with proper sidebar layout")
-                
-                # Check template exists
-                if not Path("frontend/templates/pages/dashboard.html").exists():
-                    logger.error("Dashboard template not found!")
-                    # Create a simple redirect to fix
-                    return HTMLResponse("""
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>Dashboard Setup</title>
-                        <style>
-                            body { font-family: Arial; padding: 50px; text-align: center; }
-                            .message { background: #f0f0f0; padding: 30px; border-radius: 10px; }
-                        </style>
-                    </head>
-                    <body>
-                        <div class="message">
-                            <h2>Dashboard template missing!</h2>
-                            <p>Run: <code>python cleanup_dashboard.py</code> to fix</p>
-                            <p>Then restart the server</p>
-                        </div>
-                    </body>
-                    </html>
-                    """)
-                
+            """Serve the main trading dashboard - ORIGINAL VERSION."""
+            try:
                 if self.templates:
                     return self.templates.TemplateResponse(
-                        "pages/dashboard.html",
-                        {"request": requests}
+                        "pages/dashboard.html", 
+                        {"request": request}
                     )
                 else:
                     raise Exception("Templates not initialized")
-                    
-        except Exception as error:
-            logger.error(f"Dashboard error: {error}")
-            # Return error page, not landing page
-            return HTMLResponse(f"""
-            <html>
-            <head><title>Dashboard Error</title></head>
-            <body style="padding: 50px; font-family: Arial;">
-                <h1>Dashboard Loading Error</h1>
-                <p>Error: {error}</p>
-                <p>Please check that frontend/templates/pages/dashboard.html exists.</p>
-            </body>
-            </html>
-            """, status_code=500)
-
-@app.get("/", response_class=HTMLResponse)  
-async def root_redirect(request: Request) -> HTMLResponse:
-    """Root redirect to dashboard - ORIGINAL VERSION."""
-    return await serve_dashboard(request)
-
-@app.get("/risk-analysis", response_class=HTMLResponse)
-async def serve_risk_analysis(request: Request) -> HTMLResponse:
-    """Serve risk analysis - redirect to dashboard for now."""
-    return await serve_dashboard(request)
-
-@app.get("/live-trading", response_class=HTMLResponse)
-async def serve_live_trading(request: Request) -> HTMLResponse:
-    """Serve live trading - redirect to dashboard for now."""
-    return await serve_dashboard(request)
-
-@app.get("/portfolio", response_class=HTMLResponse)
-async def serve_portfolio(request: Request) -> HTMLResponse:
-    """Serve portfolio - redirect to dashboard for now."""
-    return await serve_dashboard(request)
-
-@app.get("/wallet-connection", response_class=HTMLResponse)
-async def serve_wallet_connection(request: Request) -> HTMLResponse:
-    """Serve wallet connection - redirect to dashboard for now."""
-    return await serve_dashboard(request)
-
-logger.info("Frontend routes configured with ORIGINAL template approach")
+            except Exception as error:
+                logger.error(f"Dashboard template error: {error}")
+                # Simple error response instead of complex fallback
+                return HTMLResponse(
+                    content=f"<h1>Dashboard Error</h1><p>{error}</p>",
+                    status_code=500
+                )
+        
+        @app.get("/", response_class=HTMLResponse)  
+        async def root_redirect(request: Request) -> HTMLResponse:
+            """Root redirect to dashboard - ORIGINAL VERSION."""
+            return await serve_dashboard(request)
+        
+        @app.get("/risk-analysis", response_class=HTMLResponse)
+        async def serve_risk_analysis(request: Request) -> HTMLResponse:
+            """Serve risk analysis - redirect to dashboard for now."""
+            return await serve_dashboard(request)
+        
+        @app.get("/live-trading", response_class=HTMLResponse)
+        async def serve_live_trading(request: Request) -> HTMLResponse:
+            """Serve live trading - redirect to dashboard for now."""
+            return await serve_dashboard(request)
+        
+        @app.get("/portfolio", response_class=HTMLResponse)
+        async def serve_portfolio(request: Request) -> HTMLResponse:
+            """Serve portfolio - redirect to dashboard for now."""
+            return await serve_dashboard(request)
+        
+        @app.get("/wallet-connection", response_class=HTMLResponse)
+        async def serve_wallet_connection(request: Request) -> HTMLResponse:
+            """Serve wallet connection - redirect to dashboard for now."""
+            return await serve_dashboard(request)
+        
+        logger.info("Frontend routes configured with ORIGINAL template approach")
 
     def _setup_system_routes(self, app: FastAPI, component_status: Dict[str, bool]) -> None:
         """Setup system health and status routes."""

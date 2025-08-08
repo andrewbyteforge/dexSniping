@@ -66,10 +66,23 @@ def create_application():
 try:
     app = create_application()
 
-except Exception as e:
-    logger.error(f"Error: {e}")
-    raise
 # Failsafe dashboard route
+@app.get("/dashboard-fixed", response_class=HTMLResponse)
+async def dashboard_fixed(request: Request):
+    """Failsafe dashboard route."""
+    from fastapi.templating import Jinja2Templates
+    templates = Jinja2Templates(directory="frontend/templates")
+    return templates.TemplateResponse("pages/dashboard.html", {"request": request})
+
+except Exception as e:
+    logger.error(f"Application creation failed: {e}")
+    sys.exit(1)
+
+
+# Export application metadata and instance
+__all__ = ["app", "__version__", "__phase__", "__description__"]
+
+
 def main():
     """Main entry point for development server."""
     import uvicorn
@@ -95,17 +108,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# Failsafe dashboard route
-from fastapi import Request
-@app.get("/dashboard-fixed", response_class=HTMLResponse)
-async def dashboard_fixed(request: Request):
-    """Failsafe dashboard route."""
-    from fastapi.templating import Jinja2Templates
-    from fastapi.responses import HTMLResponse
-    from fastapi import Request
-    templates = Jinja2Templates(directory="frontend/templates")
-    try:
-        return templates.TemplateResponse("pages/dashboard.html", {"request": request})
-    except Exception as e:
-        return HTMLResponse(f"<h1>Error: {e}</h1><p>Check that frontend/templates/pages/dashboard.html exists</p>")

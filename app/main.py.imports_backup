@@ -97,7 +97,6 @@ if __name__ == "__main__":
     main()
 
 # Failsafe dashboard route
-from fastapi import Request
 @app.get("/dashboard-fixed", response_class=HTMLResponse)
 async def dashboard_fixed(request: Request):
     """Failsafe dashboard route."""
