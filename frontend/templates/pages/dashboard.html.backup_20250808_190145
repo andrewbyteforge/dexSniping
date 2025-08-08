@@ -1,0 +1,435 @@
+{% extends "base/layout.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block page_title %}Professional Trading Dashboard{% endblock %}
+{% block page_subtitle %}Real-time DEX monitoring and AI-powered analysis{% endblock %}
+
+{% block content %}
+<!-- Dashboard Status Banner -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-success d-flex align-items-center">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <strong>Status:</strong>
+            <span class="ms-2">
+                <span class="live-indicator">
+                    <i class="bi bi-dot text-success"></i>
+                </span>
+                APIs operational, data loading successfully
+            </span>
+            <div class="ms-auto">
+                <small>Last update: <span id="lastUpdateTime">--</span></small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dashboard Stats Cards -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card stats-card h-100 shadow">
+            <div class="card-body text-center">
+                <i class="bi bi-wallet2 fs-1 mb-3"></i>
+                <h3 class="mb-2" id="portfolioValue">Loading...</h3>
+                <p class="mb-0 opacity-75">Portfolio Value</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card stats-card h-100 shadow">
+            <div class="card-body text-center">
+                <i class="bi bi-graph-up fs-1 mb-3"></i>
+                <h3 class="mb-2" id="dailyPnL">Loading...</h3>
+                <p class="mb-0 opacity-75">Daily P&L</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card stats-card h-100 shadow">
+            <div class="card-body text-center">
+                <i class="bi bi-activity fs-1 mb-3"></i>
+                <h3 class="mb-2" id="successRate">Loading...</h3>
+                <p class="mb-0 opacity-75">Success Rate</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card stats-card h-100 shadow">
+            <div class="card-body text-center">
+                <i class="bi bi-lightning fs-1 mb-3"></i>
+                <h3 class="mb-2" id="activeTrades">Loading...</h3>
+                <p class="mb-0 opacity-75">Active Trades</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Dashboard Content -->
+<div class="row mb-4">
+    <!-- Live Token Discovery -->
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow">
+            <div class="card-header bg-white">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-search text-primary"></i> Live Token Discovery
+                    </h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary" onclick="refreshTokens()">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                        <button class="btn btn-sm btn-outline-info ms-2" onclick="showDiscoverySettings()">
+                            <i class="bi bi-gear"></i> Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="tokensList">
+                    <div class="text-center text-muted">
+                        <div class="spinner-border spinner-border-sm me-2"></div>
+                        Loading tokens...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Stats Sidebar -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-graph-up text-success"></i> Quick Stats
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <span>API Status:</span>
+                    <span class="badge bg-success" id="apiStatus">Operational</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span>Tokens Scanned:</span>
+                    <span id="tokensScanned">0</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span>Networks:</span>
+                    <span>4 Active</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3">
+                    <span>Success Rate:</span>
+                    <span class="text-success" id="quickSuccessRate">89.4%</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Uptime:</span>
+                    <span class="text-success" id="uptime">99.8%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Risk Assessment Widget -->
+        <div class="card shadow mt-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-robot text-info"></i> AI Risk Assessment
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <div class="badge bg-warning fs-6 px-3 py-2 mb-3">
+                        Phase 3B Complete
+                    </div>
+                    <p class="small text-muted">
+                        AI-powered honeypot detection and risk scoring ready for implementation.
+                    </p>
+                    <button class="btn btn-outline-info btn-sm" onclick="showAIFeatures()">
+                        <i class="bi bi-arrow-right"></i> Learn More
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Information -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">
+                    <i class="bi bi-info-circle text-info"></i> System Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <strong>Phase:</strong> 3B Week 7-8 Complete
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Status:</strong> <span class="text-success">Operational</span>
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Version:</strong> 3.1.0
+                    </div>
+                    <div class="col-md-3">
+                        <strong>Next:</strong> Phase 3C Mobile
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Global variables
+    let dashboardData = {};
+    let tokensData = [];
+    
+    // Initialize dashboard when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Dashboard Loading...');
+        initializeDashboard();
+    });
+    
+    function initializeDashboard() {
+        console.log('📊 Initializing dashboard...');
+        
+        loadDashboardStats();
+        loadTokens();
+        
+        setInterval(loadDashboardStats, 30000);
+        setInterval(loadTokens, 15000);
+        
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+        
+        console.log('✅ Dashboard initialization complete');
+    }
+    
+    async function loadDashboardStats() {
+        try {
+            console.log('📊 Loading dashboard stats...');
+            
+            const response = await fetch('/api/v1/dashboard/stats');
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
+            const data = await response.json();
+            console.log('✅ Dashboard stats loaded:', data);
+            
+            updateDashboardStats(data);
+            updateConnectionStatus(true);
+            
+        } catch (error) {
+            console.error('❌ Failed to load dashboard stats:', error);
+            updateConnectionStatus(false);
+        }
+    }
+    
+    function updateDashboardStats(data) {
+        try {
+            function safeFormat(value, type) {
+                if (value === null || value === undefined) return '0';
+                
+                if (type === 'currency') {
+                    if (typeof value === 'string' && value.includes('$')) return value;
+                    return formatCurrency(parseFloat(value) || 0);
+                }
+                
+                if (type === 'percentage') {
+                    if (typeof value === 'string' && value.includes('%')) return value;
+                    return (parseFloat(value) || 0).toFixed(1) + '%';
+                }
+                
+                return value.toString();
+            }
+            
+            // Update elements safely
+            updateElement('portfolioValue', safeFormat(data.portfolio_value, 'currency'));
+            updateElement('successRate', safeFormat(data.success_rate, 'percentage'));
+            updateElement('quickSuccessRate', safeFormat(data.success_rate, 'percentage'));
+            updateElement('activeTrades', data.active_trades || 0);
+            
+            if (data.daily_pnl !== undefined) {
+                const pnlElement = document.getElementById('dailyPnL');
+                if (pnlElement) {
+                    const pnlValue = parseFloat(data.daily_pnl) || 0;
+                    const isPositive = pnlValue >= 0;
+                    pnlElement.textContent = (isPositive ? '+' : '') + safeFormat(data.daily_pnl, 'currency');
+                    pnlElement.className = 'mb-2 ' + (isPositive ? 'text-success' : 'text-danger');
+                }
+            }
+            
+            console.log('✅ Dashboard stats updated successfully');
+            
+        } catch (error) {
+            console.error('❌ Error updating dashboard stats:', error);
+        }
+    }
+    
+    function updateElement(id, value) {
+        const element = document.getElementById(id);
+        if (element && value !== undefined) {
+            element.textContent = value;
+        }
+    }
+    
+    async function loadTokens() {
+        try {
+            console.log('🔍 Loading tokens...');
+            
+            const response = await fetch('/api/v1/tokens/discover?limit=10');
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
+            const data = await response.json();
+            console.log('✅ Tokens API response:', data);
+            
+            let tokens = [];
+            if (data.discovered_tokens && Array.isArray(data.discovered_tokens)) {
+                tokens = data.discovered_tokens;
+            } else if (data.tokens && Array.isArray(data.tokens)) {
+                tokens = data.tokens;
+            }
+            
+            console.log(`📋 Found ${tokens.length} tokens`);
+            
+            if (tokens.length > 0) {
+                tokensData = tokens;
+                displayTokens(tokens);
+                updateElement('tokensScanned', tokens.length);
+            } else {
+                displayNoTokens();
+            }
+            
+        } catch (error) {
+            console.error('❌ Failed to load tokens:', error);
+            displayTokensError();
+        }
+    }
+    
+        function formatPrice(value, decimals) {
+        decimals = decimals || 6;
+        if (value === null || value === undefined) return '0.00';
+        const num = parseFloat(value);
+        if (isNaN(num)) return '0.00';
+        return num.toFixed(decimals);
+    }
+    
+    function displayTokens(tokens) {
+        const container = document.getElementById('tokensList');
+        if (!container) return;
+        
+        let html = '';
+        tokens.forEach(function(token) {
+            const symbol = token.symbol || 'UNKNOWN';
+            const price = token.price_usd || token.price || 0;
+            const liquidity = token.liquidity_usd || 0;
+            const priceChange = token.price_change_24h || 0;
+            const riskScore = token.risk_score || 2.5;
+            const age = token.age || 'Unknown';
+            
+            const isPositive = priceChange >= 0;
+            const badgeClass = isPositive ? 'bg-success' : 'bg-danger';
+            
+            html += '<div class="token-item border-bottom py-2">';
+            html += '  <div class="d-flex justify-content-between align-items-center">';
+            html += '    <div>';
+            html += '      <div class="d-flex align-items-center">';
+            html += '        <span class="badge bg-primary me-2">' + symbol + '</span>';
+            html += '        <small class="text-muted">$' + formatPrice(price) + '</small>';
+            html += '      </div>';
+            html += '      <div class="small text-muted mt-1">';
+            html += '        <i class="bi bi-droplet"></i> ' + formatLiquidity(liquidity);
+            html += '        <span class="ms-2"><i class="bi bi-clock"></i> ' + age + '</span>';
+            html += '      </div>';
+            html += '    </div>';
+            html += '    <div class="text-end">';
+            html += '      <span class="badge ' + badgeClass + '">';
+            html += '        ' + (isPositive ? '+' : '') + formatPrice(priceChange, 2) + '%';
+            html += '      </span>';
+            html += '      <div class="small text-muted mt-1">';
+            html += '        Risk: <span class="badge bg-secondary">' + formatPrice(riskScore, 1) + '</span>';
+            html += '      </div>';
+            html += '    </div>';
+            html += '  </div>';
+            html += '</div>';
+        });
+        
+        container.innerHTML = html;
+        console.log('✅ Displayed ' + tokens.length + ' tokens');
+    }
+    
+    function displayNoTokens() {
+        const container = document.getElementById('tokensList');
+        if (container) {
+            container.innerHTML = '<div class="text-center text-muted py-4"><i class="bi bi-search fs-2 mb-3"></i><p>No tokens discovered yet</p></div>';
+        }
+    }
+    
+    function displayTokensError() {
+        const container = document.getElementById('tokensList');
+        if (container) {
+            container.innerHTML = '<div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> Unable to load tokens. <button class="btn btn-sm btn-outline-primary ms-2" onclick="loadTokens()">Retry</button></div>';
+        }
+    }
+    
+    function updateConnectionStatus(connected) {
+        const statusElement = document.getElementById('apiStatus');
+        if (statusElement) {
+            statusElement.textContent = connected ? 'Operational' : 'Reconnecting';
+            statusElement.className = connected ? 'badge bg-success' : 'badge bg-warning';
+        }
+    }
+    
+    function updateTimestamp() {
+        const timestampElement = document.getElementById('lastUpdateTime');
+        if (timestampElement) {
+            timestampElement.textContent = new Date().toLocaleTimeString();
+        }
+    }
+    
+    function formatCurrency(amount) {
+        if (typeof amount !== 'number') return '$0.00';
+
+        if (amount >= 1000000) {
+            return '$' + (amount / 1000000).toFixed(1) + 'M';
+        } else if (amount >= 1000) {
+            return '$' + (amount / 1000).toFixed(1) + 'K';
+        } else {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(amount);
+        }
+    }
+
+    function formatLiquidity(amount) {
+        if (typeof amount !== 'number') return '$0';
+
+        if (amount >= 1000000) {
+            return '$' + (amount / 1000000).toFixed(1) + 'M';
+        } else if (amount >= 1000) {
+            return '$' + (amount / 1000).toFixed(0) + 'K';
+        } else {
+            return '$' + (amount || 0).toFixed(0);
+        }
+    }
+
+    function refreshTokens() {
+        console.log('🔄 Manual refresh...');
+        loadTokens();
+    }
+
+    function showDiscoverySettings() {
+        alert('Discovery settings coming soon!');
+    }
+
+    function showAIFeatures() {
+        alert('AI features ready for implementation!');
+    }
+
+    console.log('✅ Clean dashboard script loaded');
+</script>
+{% endblock %}
