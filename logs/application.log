@@ -1484,3 +1484,49 @@
 17:03:00 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
 17:03:04 - INFO - app.main - SHUTDOWN: Shutting down DEX Sniper Pro
 17:03:04 - INFO - app.main - SHUTDOWN: Shutdown complete
+17:31:26 - WARNING - app.main - SNIPE: Snipe trading controller not available
+17:31:27 - WARNING - app.main - AI: AI risk assessment engine not available
+17:31:27 - WARNING - app.main - WALLET: Enhanced wallet manager not available
+17:31:27 - INFO - app.main - TEMPLATE: Templates configured
+17:31:27 - INFO - app.main - STATIC: Static files mounted
+17:31:27 - INFO - app.main - ROUTER: Dashboard router included
+17:31:27 - INFO - app.main - ROUTER: Tokens router included
+17:31:27 - INFO - app.main - ROUTER: Trading router included
+17:31:27 - INFO - app.main - STARTUP: Starting DEX Sniper Pro - Phase 4D Enhanced
+17:31:27 - INFO - app.main - ============================================================
+17:31:27 - INFO - app.main - STARTUP: Application initialization complete!
+17:31:27 - INFO - app.main - INFO: Running in compatibility mode - Phase 4D features will be added as components become available
+17:31:27 - INFO - app.api.v1.endpoints.dashboard - [OK] Fetching dashboard statistics
+17:31:27 - INFO - app.api.v1.endpoints.dashboard - [OK] Dashboard statistics retrieved successfully
+17:31:29 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Polygon', 'Ethereum', 'Avalanche', 'Arbitrum', 'BSC'], limit=10
+17:31:29 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+17:31:33 - INFO - app.api.v1.endpoints.dashboard - [OK] Fetching dashboard statistics
+17:31:33 - INFO - app.api.v1.endpoints.dashboard - [OK] Dashboard statistics retrieved successfully
+17:31:33 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Avalanche', 'Fantom', 'Optimism'], limit=10
+17:31:33 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+17:31:43 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['BSC', 'Fantom', 'Optimism', 'Solana'], limit=10
+17:31:43 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+17:31:59 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Fantom', 'Avalanche', 'Solana', 'Ethereum'], limit=10
+17:31:59 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+17:32:10 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['BSC', 'Arbitrum', 'Polygon', 'Ethereum'], limit=10
+17:32:10 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+17:32:10 - INFO - app.api.v1.endpoints.dashboard - [OK] Fetching dashboard statistics
+17:32:10 - INFO - app.api.v1.endpoints.dashboard - [OK] Dashboard statistics retrieved successfully
+17:32:14 - INFO - app.main - SHUTDOWN: Shutting down DEX Sniper Pro
+17:32:14 - INFO - app.main - SHUTDOWN: Shutdown complete
+17:32:15 - WARNING - app.main - SNIPE: Snipe trading controller not available
+17:32:16 - WARNING - app.main - AI: AI risk assessment engine not available
+17:32:16 - WARNING - app.main - WALLET: Enhanced wallet manager not available
+17:32:16 - INFO - app.main - TEMPLATE: Templates configured
+17:32:16 - INFO - app.main - STATIC: Static files mounted
+17:32:16 - INFO - app.main - ROUTER: Dashboard router included
+17:32:16 - INFO - app.main - ROUTER: Tokens router included
+17:32:16 - INFO - app.main - ROUTER: Trading router included
+17:32:16 - INFO - app.main - STARTUP: Starting DEX Sniper Pro - Phase 4D Enhanced
+17:32:16 - INFO - app.main - ============================================================
+17:32:16 - INFO - app.main - STARTUP: Application initialization complete!
+17:32:16 - INFO - app.main - INFO: Running in compatibility mode - Phase 4D features will be added as components become available
+17:32:20 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Fantom', 'Optimism', 'BSC', 'Arbitrum'], limit=10
+17:32:20 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+17:32:23 - INFO - app.main - SHUTDOWN: Shutting down DEX Sniper Pro
+17:32:23 - INFO - app.main - SHUTDOWN: Shutdown complete

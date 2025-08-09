@@ -1,122 +1,242 @@
 """
-Enhanced Logger Setup - All Levels Supported
+Logger Utility Module
 File: app/utils/logger.py
 
-Logger that supports any level name and avoids Unicode issues.
+Professional logging system for the DEX Sniper Pro trading bot with
+structured logging, performance monitoring, and configurable output formats.
 """
 
 import logging
 import sys
-from typing import Optional
+from typing import Optional, Dict, Any
+from datetime import datetime
+from pathlib import Path
 
-def setup_logger(
-    name: str, 
-    level: int = logging.INFO,
-    format_string: Optional[str] = None
-) -> logging.Logger:
+
+class ColoredFormatter(logging.Formatter):
+    """Custom formatter with colors for console output."""
+    
+    # Color codes
+    COLORS = {
+        'DEBUG': '\033[36m',    # Cyan
+        'INFO': '\033[32m',     # Green
+        'WARNING': '\033[33m',  # Yellow
+        'ERROR': '\033[31m',    # Red
+        'CRITICAL': '\033[35m', # Magenta
+        'RESET': '\033[0m'      # Reset
+    }
+    
+    def format(self, record):
+        # Add color to level name
+        level_color = self.COLORS.get(record.levelname, self.COLORS['RESET'])
+        record.levelname = f"{level_color}{record.levelname}{self.COLORS['RESET']}"
+        
+        # Format the message
+        return super().format(record)
+
+
+class TradingLogger:
+    """Professional trading logger with structured logging capabilities."""
+    
+    def __init__(self, name: str, level: str = "INFO"):
+        """
+        Initialize trading logger.
+        
+        Args:
+            name: Logger name (usually __name__)
+            level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+        """
+        self.logger = logging.getLogger(name)
+        
+        # Handle custom log levels
+        if level.upper() == "APPLICATION":
+            level = "INFO"  # Map APPLICATION to INFO
+        
+        # Validate logging level
+        valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+        if level.upper() not in valid_levels:
+            level = "INFO"  # Default to INFO for invalid levels
+            
+        self.logger.setLevel(getattr(logging, level.upper()))
+        
+        # Prevent duplicate handlers
+        if not self.logger.handlers:
+            self._setup_handlers()
+    
+    def _setup_handlers(self):
+        """Setup console and file handlers."""
+        # Console handler with colors
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler.setLevel(logging.INFO)
+        
+        console_formatter = ColoredFormatter(
+            fmt='%(asctime)s - %(levelname)s - %(name)s - [LOG] %(message)s',
+            datefmt='%H:%M:%S'
+        )
+        console_handler.setFormatter(console_formatter)
+        
+        # File handler (if logs directory exists)
+        logs_dir = Path("logs")
+        if logs_dir.exists() or self._create_logs_dir():
+            file_handler = logging.FileHandler(
+                logs_dir / "dex_sniper.log",
+                encoding='utf-8'
+            )
+            file_handler.setLevel(logging.DEBUG)
+            
+            file_formatter = logging.Formatter(
+                fmt='%(asctime)s - %(levelname)s - %(name)s - %(funcName)s:%(lineno)d - %(message)s',
+                datefmt='%Y-%m-%d %H:%M:%S'
+            )
+            file_handler.setFormatter(file_formatter)
+            self.logger.addHandler(file_handler)
+        
+        self.logger.addHandler(console_handler)
+    
+    def _create_logs_dir(self) -> bool:
+        """Create logs directory if it doesn't exist."""
+        try:
+            logs_dir = Path("logs")
+            logs_dir.mkdir(exist_ok=True)
+            return True
+        except Exception:
+            return False
+    
+    def debug(self, message: str, extra: Optional[Dict[str, Any]] = None):
+        """Log debug message."""
+        self.logger.debug(message, extra=extra or {})
+    
+    def info(self, message: str, extra: Optional[Dict[str, Any]] = None):
+        """Log info message."""
+        self.logger.info(message, extra=extra or {})
+    
+    def warning(self, message: str, extra: Optional[Dict[str, Any]] = None):
+        """Log warning message."""
+        self.logger.warning(message, extra=extra or {})
+    
+    def error(self, message: str, extra: Optional[Dict[str, Any]] = None):
+        """Log error message."""
+        self.logger.error(message, extra=extra or {})
+    
+    def critical(self, message: str, extra: Optional[Dict[str, Any]] = None):
+        """Log critical message."""
+        self.logger.critical(message, extra=extra or {})
+    
+    def trade_execution(self, action: str, token: str, amount: float, price: float, success: bool):
+        """Log trade execution with structured data."""
+        status = "SUCCESS" if success else "FAILED"
+        message = f"TRADE {status}: {action} {amount} {token} @ {price}"
+        
+        extra = {
+            'action': action,
+            'token': token,
+            'amount': amount,
+            'price': price,
+            'success': success,
+            'timestamp': datetime.utcnow().isoformat()
+        }
+        
+        if success:
+            self.info(message, extra=extra)
+        else:
+            self.error(message, extra=extra)
+    
+    def performance_metric(self, metric_name: str, value: float, unit: str = ""):
+        """Log performance metrics."""
+        message = f"PERFORMANCE: {metric_name} = {value} {unit}".strip()
+        
+        extra = {
+            'metric_name': metric_name,
+            'value': value,
+            'unit': unit,
+            'timestamp': datetime.utcnow().isoformat()
+        }
+        
+        self.info(message, extra=extra)
+    
+    def exception(self, message: str, exc_info: bool = True):
+        """Log exception with traceback."""
+        self.logger.error(message, exc_info=exc_info)
+
+
+def setup_logger(name: str, level: str = "INFO") -> TradingLogger:
     """
-    Setup logger with flexible level support.
+    Setup and return a trading logger instance.
     
     Args:
-        name: Logger name (can be any string)
-        level: Logging level
-        format_string: Custom format string
+        name: Logger name (usually __name__)
+        level: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
         
     Returns:
-        logging.Logger: Configured logger
+        TradingLogger: Configured logger instance
     """
-    if format_string is None:
-        format_string = '%(asctime)s - %(levelname)s - %(name)s - %(message)s'
+    # Handle custom log levels
+    if level.upper() == "APPLICATION":
+        level = "INFO"  # Map APPLICATION to INFO
     
-    # Convert level to standard logging level if it's a string
-    if isinstance(level, str):
-        level = getattr(logging, level.upper(), logging.INFO)
+    return TradingLogger(name, level)
+
+
+# Global logger configuration
+def configure_global_logging(level: str = "INFO", format_style: str = "detailed"):
+    """
+    Configure global logging settings for the entire application.
     
-    logger = logging.getLogger(name)
-    logger.setLevel(level)
+    Args:
+        level: Global logging level
+        format_style: Format style ('simple', 'detailed', 'json')
+    """
+    # Configure root logger
+    root_logger = logging.getLogger()
+    root_logger.setLevel(getattr(logging, level.upper()))
     
-    # Remove existing handlers to avoid duplicates
-    for handler in logger.handlers[:]:
-        logger.removeHandler(handler)
+    # Remove existing handlers
+    for handler in root_logger.handlers[:]:
+        root_logger.removeHandler(handler)
     
-    # Create console handler with UTF-8 encoding
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setLevel(level)
+    # Setup new handlers based on format style
+    if format_style == "simple":
+        formatter = logging.Formatter('%(levelname)s: %(message)s')
+    elif format_style == "json":
+        formatter = logging.Formatter(
+            '{"timestamp": "%(asctime)s", "level": "%(levelname)s", '
+            '"logger": "%(name)s", "message": "%(message)s"}'
+        )
+    else:  # detailed
+        formatter = logging.Formatter(
+            '%(asctime)s - %(levelname)s - %(name)s - %(funcName)s:%(lineno)d - %(message)s'
+        )
     
-    # Set UTF-8 encoding for the handler if possible
-    if hasattr(handler.stream, 'reconfigure'):
-        try:
-            handler.stream.reconfigure(encoding='utf-8')
-        except Exception:
-            pass
-    
-    # Create formatter
-    formatter = logging.Formatter(format_string, datefmt='%H:%M:%S')
-    handler.setFormatter(formatter)
-    
-    logger.addHandler(handler)
-    logger.propagate = False
-    
-    return logger
+    # Console handler
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setFormatter(formatter)
+    root_logger.addHandler(console_handler)
 
-# Alias for backward compatibility
-def get_logger(name: str) -> logging.Logger:
-    """Get logger with default configuration."""
+
+# Convenience functions for quick logging
+def get_logger(name: str) -> TradingLogger:
+    """Get a logger instance (alias for setup_logger)."""
     return setup_logger(name)
 
 
-# Additional logger functions for backward compatibility
-def get_trading_logger(name: str = "trading") -> logging.Logger:
-    """Get trading-specific logger."""
-    return setup_logger(name)
-
-def get_application_logger(name: str = "application") -> logging.Logger:
-    """Get application-specific logger."""
-    return setup_logger(name)
-
-def get_websocket_logger(name: str = "websocket") -> logging.Logger:
-    """Get websocket-specific logger."""
-    return setup_logger(name)
-
-def get_ai_logger(name: str = "ai") -> logging.Logger:
-    """Get AI-specific logger."""
-    return setup_logger(name)
-
-def get_blockchain_logger(name: str = "blockchain") -> logging.Logger:
-    """Get blockchain-specific logger."""
-    return setup_logger(name)
+def log_trade(action: str, token: str, amount: float, price: float, success: bool, logger_name: str = "trading"):
+    """Quick trade logging function."""
+    logger = setup_logger(logger_name)
+    logger.trade_execution(action, token, amount, price, success)
 
 
-# Additional logger functions for backward compatibility
-def get_trading_logger(name: str = "trading") -> logging.Logger:
-    """Get trading-specific logger."""
-    return setup_logger(name)
-
-def get_application_logger(name: str = "application") -> logging.Logger:
-    """Get application-specific logger."""
-    return setup_logger(name)
-
-def get_websocket_logger(name: str = "websocket") -> logging.Logger:
-    """Get websocket-specific logger."""
-    return setup_logger(name)
-
-def get_ai_logger(name: str = "ai") -> logging.Logger:
-    """Get AI-specific logger."""
-    return setup_logger(name)
-
-def get_blockchain_logger(name: str = "blockchain") -> logging.Logger:
-    """Get blockchain-specific logger."""
-    return setup_logger(name)
+def log_performance(metric_name: str, value: float, unit: str = "", logger_name: str = "performance"):
+    """Quick performance logging function."""
+    logger = setup_logger(logger_name)
+    logger.performance_metric(metric_name, value, unit)
 
 
-def get_performance_logger(name: str = "performance"):
-    """Get performance logger."""
-    return setup_logger(name)
-
-def get_strategy_logger(name: str = "strategy"):
-    """Get strategy logger."""
-    return setup_logger(name)
-
-def get_multichain_logger(name: str = "multichain"):
-    """Get multichain logger.""" 
-    return setup_logger(name)
+# Export main functions
+__all__ = [
+    "setup_logger",
+    "TradingLogger", 
+    "configure_global_logging",
+    "get_logger",
+    "log_trade",
+    "log_performance"
+]
