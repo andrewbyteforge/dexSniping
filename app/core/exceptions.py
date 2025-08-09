@@ -1,677 +1,180 @@
 """
-Core Trading Bot Exceptions
+DEX Sniper Pro Exception System
 File: app/core/exceptions.py
 
-Clean exception hierarchy for the DEX Sniper Pro trading bot.
+Comprehensive exception handling for the trading bot.
 """
 
 
-class TradingBotError(Exception):
-    """Base exception for all trading bot errors."""
+class DEXSniperError(Exception):
+    """Base exception class for DEX Sniper Pro."""
+    
+    def __init__(self, message: str, error_code: str = None, details: dict = None):
+        """Initialize exception with message, code, and details."""
+        super().__init__(message)
+        self.message = message
+        self.error_code = error_code or "UNKNOWN_ERROR"
+        self.details = details or {}
+        
+    def __str__(self):
+        return f"{self.error_code}: {self.message}"
+
+
+# ==================== SECURITY EXCEPTIONS ====================
+
+class SecurityError(DEXSniperError):
+    """Exception for security-related issues."""
     pass
 
 
-class DatabaseError(TradingBotError):
-    """Database operation errors."""
+class AuthenticationError(DEXSniperError):
+    """Exception for authentication failures."""
     pass
 
 
-class NetworkError(TradingBotError):
-    """Network connection errors."""
+class AuthorizationError(DEXSniperError):
+    """Exception for authorization failures."""
     pass
 
 
-class TradingError(TradingBotError):
-    """Trading operation errors."""
+class ValidationError(DEXSniperError):
+    """Exception for data validation failures."""
     pass
 
 
-class InsufficientFundsError(TradingError):
-    """Insufficient funds for trading operations."""
+class AccessDeniedError(SecurityError):
+    """Exception for access denied scenarios."""
     pass
 
 
-class ConfigurationError(TradingBotError):
-    """Configuration errors."""
+class CredentialError(AuthenticationError):
+    """Exception for credential-related issues."""
     pass
 
 
-class ValidationError(TradingBotError):
-    """Data validation errors."""
-    pass
+# ==================== WALLET EXCEPTIONS ====================
 
-
-class AuthenticationError(TradingBotError):
-    """Authentication errors."""
-    pass
-
-
-class RateLimitError(TradingBotError):
-    """API rate limit errors."""
-    pass
-
-
-class AIAnalysisError(TradingBotError):
-    """AI analysis errors."""
-    pass
-
-
-class HoneypotDetectionError(AIAnalysisError):
-    """Honeypot detection errors."""
-    pass
-
-
-class RiskAssessmentError(AIAnalysisError):
-    """Risk assessment errors."""
-    pass
-
-
-class ModelLoadError(AIAnalysisError):
-    """Model loading errors."""
-    pass
-
-
-class ModelError(AIAnalysisError):
-    """Model errors."""
-    pass
-
-
-class SentimentAnalysisError(AIAnalysisError):
-    """Sentiment analysis errors."""
-    pass
-
-
-class PredictionError(AIAnalysisError):
-    """Prediction errors."""
-    pass
-
-
-class DataPreparationError(AIAnalysisError):
-    """Data preparation errors."""
-    pass
-
-
-class TokenAnalysisError(AIAnalysisError):
-    """Token analysis errors."""
-    pass
-
-
-
-
-class TokenMetadataError(TokenAnalysisError):
-    """Failed to retrieve token metadata."""
-    pass
-
-class InvalidTokenError(TokenAnalysisError):
-    """Invalid or malformed token address."""
-    pass
-
-class BlockchainError(TradingBotError):
-    """Blockchain errors."""
-    pass
-
-
-class ContractError(BlockchainError):
-    """Contract errors."""
-    pass
-
-
-class ContractAnalysisError(ContractError):
-    """Contract analysis errors."""
-    pass
-
-
-class TransactionError(BlockchainError):
-    """Transaction errors."""
-    pass
-
-
-
-class TransactionFailedError(TransactionError):
-    """Transaction execution failed on blockchain."""
-    pass
-
-class GasEstimationError(TransactionError):
-    """Gas estimation errors."""
-    pass
-
-
-
-
-class InsufficientGasError(GasEstimationError):
-    """Insufficient gas for transaction execution."""
-    pass
-
-class GasEstimationFailedError(GasEstimationError):
-    """Gas estimation failed for transaction."""
-    pass
-
-class SlippageError(TradingError):
-    """Slippage errors."""
-    pass
-
-
-
-
-class MaxSlippageError(SlippageError):
-    """Maximum slippage limit exceeded."""
-    pass
-
-class SlippageExceededError(SlippageError):
-    """Slippage tolerance exceeded during trade execution."""
-    pass
-
-class LiquidityError(TradingError):
-    """Liquidity errors."""
-    pass
-
-
-
-
-class LiquidityPoolError(LiquidityError):
-    """Liquidity pool interaction failed."""
-    pass
-
-class InsufficientLiquidityError(LiquidityError):
-    """Insufficient liquidity for trade execution."""
-    pass
-
-class WalletError(TradingBotError):
-    """Wallet errors."""
+class WalletError(DEXSniperError):
+    """Base class for wallet-related errors."""
     pass
 
 
 class WalletConnectionError(WalletError):
-    """Wallet connection errors."""
+    """Exception for wallet connection failures."""
     pass
 
 
-class WalletSigningError(WalletError):
-    """Wallet signing errors."""
+class InsufficientFundsError(WalletError):
+    """Exception for insufficient wallet funds."""
     pass
 
 
-class SecurityError(TradingBotError):
-    """Security errors."""
+class InvalidAddressError(WalletError):
+    """Exception for invalid wallet addresses."""
     pass
 
 
-class WebSocketError(TradingBotError):
-    """WebSocket errors."""
+# ==================== TRADING EXCEPTIONS ====================
+
+class TradingError(DEXSniperError):
+    """Base class for trading-related errors."""
     pass
 
 
-class StreamingError(TradingBotError):
-    """Streaming errors."""
+class OrderExecutionError(TradingError):
+    """Exception for order execution failures."""
     pass
 
 
-class ConnectionTimeoutError(NetworkError):
-    """Connection timeout errors."""
+class RiskLimitExceededError(TradingError):
+    """Exception for risk limit violations."""
     pass
 
 
-class StrategyError(TradingBotError):
-    """Strategy errors."""
+# ==================== NETWORK EXCEPTIONS ====================
+
+class NetworkError(DEXSniperError):
+    """Base class for network-related errors."""
     pass
 
 
-class ExecutionError(TradingError):
-    """Execution errors."""
-    pass
-
-
-
-class SwapExecutionError(ExecutionError):
-    """Swap execution failed."""
-    pass
-
-class OrderError(TradingError):
-    """Order errors."""
-    pass
-
-
-class PositionError(TradingError):
-    """Position errors."""
-    pass
-
-
-class DataError(TradingBotError):
-    """Data errors."""
-    pass
-
-
-
-class PriceFeedError(DataError):
-    """Price feed data retrieval failed."""
-    pass
-
-class DataAnalysisError(DataError):
-    """Data analysis errors."""
-    pass
-
-
-class APIError(TradingBotError):
-    """API errors."""
-    pass
-
-
-class CacheError(TradingBotError):
-    """Cache errors."""
-    pass
-
-
-class ParsingError(DataError):
-    """Parsing errors."""
-    pass
-
-
-class SystemError(TradingBotError):
-    """System errors."""
-    pass
-
-
-class PerformanceError(SystemError):
-    """Performance errors."""
-    pass
-
-
-class CircuitBreakerError(SystemError):
-    """Circuit breaker errors."""
-    pass
-
-
-class ResourceError(SystemError):
-    """Resource errors."""
-    pass
-
-
-class MarketAnalysisError(DataAnalysisError):
-    """Market analysis errors."""
-    pass
-
-
-class PriceAnalysisError(DataAnalysisError):
-    """Price analysis errors."""
-    pass
-
-
-class VolumeAnalysisError(DataAnalysisError):
-    """Volume analysis errors."""
-    pass
-
-
-class LiquidityAnalysisError(DataAnalysisError):
-    """Liquidity analysis errors."""
-    pass
-
-
-class TechnicalAnalysisError(DataAnalysisError):
-    """Technical analysis errors."""
-    pass
-
-
-class FundamentalAnalysisError(DataAnalysisError):
-    """Fundamental analysis errors."""
-    pass
-
-
-class PortfolioError(TradingError):
-    """Portfolio errors."""
-    pass
-
-
-class BacktestingError(StrategyError):
-    """Backtesting errors."""
-    pass
-
-
-class OptimizationError(StrategyError):
-    """Optimization errors."""
-    pass
-
-
-class IndicatorError(StrategyError):
-    """Indicator errors."""
-    pass
-
-
-class SignalError(StrategyError):
-    """Signal errors."""
-    pass
-
-
-class DataProcessingError(DataError):
-    """Data processing errors."""
-    pass
-
-
-class DataValidationError(ValidationError):
-    """Data validation errors."""
-    pass
-
-
-class DataCleaningError(DataError):
-    """Data cleaning errors."""
-    pass
-
-
-class DataTransformationError(DataError):
-    """Data transformation errors."""
-    pass
-
-
-class SerializationError(DataError):
-    """Serialization errors."""
-    pass
-
-
-class DeserializationError(DataError):
-    """Deserialization errors."""
-    pass
-
-
-class JSONError(DataError):
-    """JSON errors."""
-    pass
-
-
-class EncryptionError(SecurityError):
-    """Encryption errors."""
-    pass
-
-
-class DecryptionError(SecurityError):
-    """Decryption errors."""
-    pass
-
-
-class HashError(SecurityError):
-    """Hash errors."""
-    pass
-
-
-class AuthTokenError(AuthenticationError):
-    """Auth token errors."""
-    pass
-
-
-class SessionError(SecurityError):
-    """Session errors."""
-    pass
-
-
-class AccessError(SecurityError):
-    """Access errors."""
-    pass
-
-
-class RoleError(SecurityError):
-    """Role errors."""
-    pass
-
-
-class InitializationError(SystemError):
-    """Initialization errors."""
-    pass
-
-
-class ComponentError(SystemError):
-    """Component errors."""
-    pass
-
-
-class ServiceError(SystemError):
-    """Service errors."""
-    pass
-
-
-class ModuleError(SystemError):
-    """Module errors."""
-    pass
-
-
-class DeploymentError(SystemError):
-    """Deployment errors."""
-    pass
-
-
-class UpdateError(SystemError):
-    """Update errors."""
-    pass
-
-
-class MigrationError(DatabaseError):
-    """Migration errors."""
-    pass
-
-
-class BackupError(DatabaseError):
-    """Backup errors."""
-    pass
-
-
-class RestoreError(DatabaseError):
-    """Restore errors."""
-    pass
-
-
-class DEXError(BlockchainError):
-    """DEX errors."""
-    pass
-
-
-class UniswapIntegrationError(DEXError):
-    """Uniswap integration errors."""
-    pass
-
-
-class OrderExecutionError(ExecutionError):
-    """Order execution errors."""
-    pass
-
-
-class InvalidOrderError(OrderError):
-    """Invalid order errors."""
-    pass
-
-
-class TokenNotFoundError(TokenAnalysisError):
-    """Token not found errors."""
-    pass
-
-
-class TokenDiscoveryError(TokenAnalysisError):
-    """Token discovery errors."""
-    pass
-
-
-class RiskManagementError(RiskAssessmentError):
-    """Risk management errors."""
+class ConnectionError(NetworkError):
+    """Exception for network connection issues."""
     pass
 
 
 class RPCError(NetworkError):
-    """RPC errors."""
+    """Exception for RPC communication errors."""
     pass
 
 
-class InvalidAddressError(ValidationError):
-    """Invalid address errors."""
+# ==================== SERVICE EXCEPTIONS ====================
+
+class ServiceError(DEXSniperError):
+    """Base class for service-level errors."""
     pass
 
 
-class TokenScannerError(TokenAnalysisError):
-    """Token scanner errors."""
+class ServiceUnavailableError(ServiceError):
+    """Exception for unavailable services."""
     pass
 
 
-class MempoolScannerError(NetworkError):
-    """Mempool scanner errors."""
+class ConfigurationError(ServiceError):
+    """Exception for configuration issues."""
     pass
 
 
-class MempoolManagerError(SystemError):
-    """Mempool manager errors."""
+class InitializationError(ServiceError):
+    """Exception for initialization failures."""
     pass
 
 
-class BlockZeroSniperError(TradingError):
-    """Block zero sniper errors."""
+# ==================== DATA EXCEPTIONS ====================
+
+class DataError(DEXSniperError):
+    """Base class for data-related errors."""
     pass
 
 
-class WebSocketManagerError(WebSocketError):
-    """WebSocket manager errors."""
+class ParseError(DataError):
+    """Exception for data parsing failures."""
     pass
 
 
-class MonitoringError(SystemError):
-    """Monitoring errors."""
-    pass
-
-
-class AlertError(SystemError):
-    """Alert errors."""
-    pass
-
-
-class NotificationError(SystemError):
-    """Notification errors."""
-    pass
-
-
-class ReportError(SystemError):
-    """Report errors."""
-    pass
-
-
-class ConfigError(ConfigurationError):
-    """Config errors."""
-    pass
-
-
-class SettingsError(ConfigurationError):
-    """Settings errors."""
-    pass
-
-
-class EnvironmentError(ConfigurationError):
-    """Environment errors."""
+class FormatError(DataError):
+    """Exception for data format issues."""
     pass
 
 
 # Export all exceptions
+
+
+# ==================== ADDITIONAL EXCEPTIONS ====================
+
+class RateLimitError(DEXSniperError):
+    """Exception for rate limiting violations."""
+    pass
+
+
+class TimeoutError(DEXSniperError):
+    """Exception for operation timeouts."""
+    pass
+
+
+class APIError(DEXSniperError):
+    """Exception for API-related errors."""
+    pass
+
+
 __all__ = [
-    'TradingBotError',
-    'DatabaseError',
-    'NetworkError',
-    'TradingError',
-    'InsufficientFundsError',
-    'ConfigurationError',
-    'ValidationError',
-    'AuthenticationError',
-    'RateLimitError',
-    'AIAnalysisError',
-    'HoneypotDetectionError',
-    'RiskAssessmentError',
-    'ModelLoadError',
-    'ModelError',
-    'SentimentAnalysisError',
-    'PredictionError',
-    'DataPreparationError',
-    'TokenAnalysisError',
-    'BlockchainError',
-    'ContractError',
-    'ContractAnalysisError',
-    'TransactionError',
-    'GasEstimationError',
-    'SlippageError',
-    'LiquidityError',
-    'WalletError',
-    'WalletConnectionError',
-    'WalletSigningError',
-    'SecurityError',
-    'WebSocketError',
-    'StreamingError',
-    'ConnectionTimeoutError',
-    'StrategyError',
-    'ExecutionError',
-    'OrderError',
-    'PositionError',
-    'DataError',
-    'DataAnalysisError',
-    'APIError',
-    'CacheError',
-    'ParsingError',
-    'SystemError',
-    'PerformanceError',
-    'CircuitBreakerError',
-    'ResourceError',
-    'MarketAnalysisError',
-    'PriceAnalysisError',
-    'VolumeAnalysisError',
-    'LiquidityAnalysisError',
-    'TechnicalAnalysisError',
-    'FundamentalAnalysisError',
-    'PortfolioError',
-    'BacktestingError',
-    'OptimizationError',
-    'IndicatorError',
-    'SignalError',
-    'DataProcessingError',
-    'DataValidationError',
-    'DataCleaningError',
-    'DataTransformationError',
-    'SerializationError',
-    'DeserializationError',
-    'JSONError',
-    'EncryptionError',
-    'DecryptionError',
-    'HashError',
-    'AuthTokenError',
-    'SessionError',
-    'AccessError',
-    'RoleError',
-    'InitializationError',
-    'ComponentError',
-    'ServiceError',
-    'ModuleError',
-    'DeploymentError',
-    'UpdateError',
-    'MigrationError',
-    'BackupError',
-    'RestoreError',
-    'DEXError',
-    'UniswapIntegrationError',
-    'OrderExecutionError',
-    'InvalidOrderError',
-    'TokenNotFoundError',
-    'TokenDiscoveryError',
-    'RiskManagementError',
-    'RPCError',
-    'InvalidAddressError',
-    'TokenScannerError',
-    'MempoolScannerError',
-    'MempoolManagerError',
-    'BlockZeroSniperError',
-    'WebSocketManagerError',
-    'MonitoringError',
-    'AlertError',
-    'NotificationError',
-    'ReportError',
-    'ConfigError',
-    'SettingsError',
-    'EnvironmentError',
-    'InsufficientLiquidityError',
-    'SlippageExceededError',
-    'MaxSlippageError',
-    'GasEstimationFailedError',
-    'InsufficientGasError',
-    'TransactionFailedError',
-    'InvalidTokenError',
-    'TokenMetadataError',
-    'PriceFeedError',
-    'LiquidityPoolError',
-    'SwapExecutionError',
+    'DEXSniperError',
+    'SecurityError', 'AuthenticationError', 'AuthorizationError', 
+    'ValidationError', 'AccessDeniedError', 'CredentialError',
+    'WalletError', 'WalletConnectionError', 'InsufficientFundsError', 'InvalidAddressError',
+    'TradingError', 'OrderExecutionError', 'RiskLimitExceededError',
+    'NetworkError', 'ConnectionError', 'RPCError',
+    'ServiceError', 'ServiceUnavailableError', 'ConfigurationError', 'InitializationError',
+    'DataError', 'ParseError', 'FormatError',
+    'RateLimitError', 'TimeoutError', 'APIError'
 ]

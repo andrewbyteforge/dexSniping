@@ -1,0 +1,23 @@
+Requirement already satisfied: pycryptodome in d:\dex_sniping\dex_sniping_project\venv\lib\site-packages (3.23.0)
+Collecting passlib
+  Using cached passlib-1.7.4-py2.py3-none-any.whl.metadata (1.7 kB)
+Collecting python-jose
+  Downloading python_jose-3.5.0-py2.py3-none-any.whl.metadata (5.5 kB)
+Collecting bcrypt
+  Using cached bcrypt-4.3.0-cp39-abi3-win_amd64.whl.metadata (10 kB)
+Collecting ecdsa!=0.15 (from python-jose)
+  Using cached ecdsa-0.19.1-py2.py3-none-any.whl.metadata (29 kB)
+Collecting rsa!=4.1.1,!=4.4,<5.0,>=4.0 (from python-jose)
+  Using cached rsa-4.9.1-py3-none-any.whl.metadata (5.6 kB)
+Collecting pyasn1>=0.5.0 (from python-jose)
+  Using cached pyasn1-0.6.1-py3-none-any.whl.metadata (8.4 kB)
+Requirement already satisfied: six>=1.9.0 in d:\dex_sniping\dex_sniping_project\venv\lib\site-packages (from ecdsa!=0.15->python-jose) (1.17.0)
+Using cached passlib-1.7.4-py2.py3-none-any.whl (525 kB)
+Downloading python_jose-3.5.0-py2.py3-none-any.whl (34 kB)
+Using cached rsa-4.9.1-py3-none-any.whl (34 kB)
+Using cached bcrypt-4.3.0-cp39-abi3-win_amd64.whl (152 kB)
+Using cached ecdsa-0.19.1-py2.py3-none-any.whl (150 kB)
+Using cached pyasn1-0.6.1-py3-none-any.whl (83 kB)
+Installing collected packages: passlib, pyasn1, ecdsa, bcrypt, rsa, python-jose
+
+Successfully installed bcrypt-4.3.0 ecdsa-0.19.1 passlib-1.7.4 pyasn1-0.6.1 python-jose-3.5.0 rsa-4.9.1

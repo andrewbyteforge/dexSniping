@@ -260,3 +260,52 @@
 2025-08-09 09:34:30 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
 2025-08-09 09:34:30 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
 2025-08-09 09:34:30 - app.core.config.settings_manager - INFO - settings_manager.py:394 - [OK] Configuration validation passed
+2025-08-09 10:25:32 - app.core.security.security_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.security.security_manager (component: application)
+2025-08-09 10:27:05 - app.core.security.security_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.security.security_manager (component: application)
+2025-08-09 10:27:05 - app.core.security.security_manager - INFO - security_manager.py:129 - Wallet security initialized
+2025-08-09 10:27:05 - app.core.security.security_manager - INFO - security_manager.py:214 - API authentication initialized
+2025-08-09 10:27:05 - app.core.security.security_manager - INFO - security_manager.py:72 - Input validator initialized
+2025-08-09 10:27:05 - app.core.security.security_manager - INFO - security_manager.py:276 - Error sanitizer initialized
+2025-08-09 10:27:05 - app.core.security.security_manager - INFO - security_manager.py:72 - Input validator initialized
+2025-08-09 10:27:05 - app.core.security.security_manager - INFO - security_manager.py:129 - Wallet security initialized
+2025-08-09 10:27:05 - app.core.security.security_manager - INFO - security_manager.py:214 - API authentication initialized
+2025-08-09 10:27:05 - app.core.security.security_manager - INFO - security_manager.py:276 - Error sanitizer initialized
+2025-08-09 10:27:05 - app.core.security.security_manager - INFO - security_manager.py:310 - Security manager initialized
+2025-08-09 10:31:17 - app.core.security.security_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.security.security_manager (component: application)
+2025-08-09 10:31:17 - app.core.security.security_manager - INFO - security_manager.py:130 - Wallet security initialized
+2025-08-09 10:31:17 - app.core.security.security_manager - INFO - security_manager.py:232 - API authentication initialized
+2025-08-09 10:31:17 - app.core.security.security_manager - INFO - security_manager.py:61 - Input validator initialized
+2025-08-09 10:31:17 - app.core.security.security_manager - INFO - security_manager.py:303 - Error sanitizer initialized
+2025-08-09 10:31:17 - app.core.security.security_manager - INFO - security_manager.py:61 - Input validator initialized
+2025-08-09 10:31:17 - app.core.security.security_manager - INFO - security_manager.py:130 - Wallet security initialized
+2025-08-09 10:31:17 - app.core.security.security_manager - INFO - security_manager.py:232 - API authentication initialized
+2025-08-09 10:31:17 - app.core.security.security_manager - INFO - security_manager.py:303 - Error sanitizer initialized
+2025-08-09 10:31:17 - app.core.security.security_manager - INFO - security_manager.py:342 - Security manager initialized
+2025-08-09 10:31:17 - app.middleware.security_middleware - INFO - logger.py:204 - [LOG] Logger initialized for app.middleware.security_middleware (component: application)
+2025-08-09 10:39:28 - app.core.security.security_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.security.security_manager (component: application)
+2025-08-09 10:39:28 - test - INFO - logger.py:204 - [LOG] Logger initialized for test (component: application)
+2025-08-09 10:39:28 - test - INFO - run_all_tests.py:105 - Test log message
+2025-08-09 10:39:31 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 10:39:31 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
+2025-08-09 10:39:31 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
+2025-08-09 10:39:31 - app.core.config.settings_manager - INFO - settings_manager.py:394 - [OK] Configuration validation passed
+2025-08-09 10:39:31 - app.core.security.security_manager - INFO - security_manager.py:61 - Input validator initialized
+2025-08-09 10:39:31 - app.core.security.security_manager - INFO - security_manager.py:130 - Wallet security initialized
+2025-08-09 10:39:31 - app.core.security.security_manager - INFO - security_manager.py:232 - API authentication initialized
+2025-08-09 10:39:31 - app.core.security.security_manager - INFO - security_manager.py:303 - Error sanitizer initialized
+2025-08-09 10:39:31 - app.core.security.security_manager - INFO - security_manager.py:342 - Security manager initialized
+2025-08-09 10:44:58 - app.core.security.security_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.security.security_manager (component: application)
+2025-08-09 10:44:58 - test - INFO - logger.py:204 - [LOG] Logger initialized for test (component: application)
+2025-08-09 10:44:58 - test - INFO - run_all_tests.py:105 - Test log message
+2025-08-09 10:44:58 - app.core.portfolio.portfolio_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.portfolio.portfolio_manager (component: application)
+2025-08-09 10:44:59 - app.main - INFO - logger.py:204 - [LOG] Logger initialized for app.main (component: application)
+2025-08-09 10:44:59 - app.utils.websocket_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.utils.websocket_manager (component: application)
+2025-08-09 10:44:59 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 10:44:59 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
+2025-08-09 10:44:59 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
+2025-08-09 10:44:59 - app.core.config.settings_manager - INFO - settings_manager.py:394 - [OK] Configuration validation passed
+2025-08-09 10:44:59 - app.core.security.security_manager - INFO - security_manager.py:61 - Input validator initialized
+2025-08-09 10:44:59 - app.core.security.security_manager - INFO - security_manager.py:130 - Wallet security initialized
+2025-08-09 10:44:59 - app.core.security.security_manager - INFO - security_manager.py:232 - API authentication initialized
+2025-08-09 10:44:59 - app.core.security.security_manager - INFO - security_manager.py:303 - Error sanitizer initialized
+2025-08-09 10:44:59 - app.core.security.security_manager - INFO - security_manager.py:342 - Security manager initialized
