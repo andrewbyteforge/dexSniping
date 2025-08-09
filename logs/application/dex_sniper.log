@@ -562,3 +562,5 @@
 2025-08-09 11:34:10 - app.api.v1.endpoints.trading - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.trading (component: trading)
 2025-08-09 11:44:58 - app.api.v1.endpoints.trading - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.trading (component: trading)
 2025-08-09 11:49:47 - app.api.v1.endpoints.trading - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.trading (component: trading)
+2025-08-09 11:53:02 - app.api.v1.endpoints.trading - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.trading (component: trading)
+2025-08-09 11:53:13 - app.api.v1.endpoints.trading - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.trading (component: trading)
