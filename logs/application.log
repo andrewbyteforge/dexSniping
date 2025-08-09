@@ -171,3 +171,18 @@
 11:33:42 - INFO - app.main - [OK] Dashboard router included
 11:33:42 - INFO - app.main - [OK] Tokens router included
 11:33:42 - INFO - app.main - [OK] Trading router included
+11:34:10 - INFO - app.main - [OK] Templates configured
+11:34:10 - INFO - app.main - [OK] Static files mounted
+11:34:10 - INFO - app.main - [OK] Dashboard router included
+11:34:10 - INFO - app.main - [OK] Tokens router included
+11:34:10 - INFO - app.main - [OK] Trading router included
+11:34:14 - INFO - app.api.v1.endpoints.dashboard - [OK] Fetching dashboard statistics
+11:34:14 - INFO - app.api.v1.endpoints.dashboard - [OK] Dashboard statistics retrieved successfully
+11:34:18 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Optimism', 'Ethereum', 'Arbitrum', 'Polygon'], limit=10
+11:34:18 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+11:34:20 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Solana', 'Avalanche', 'Optimism', 'Arbitrum'], limit=10
+11:34:20 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+11:34:45 - INFO - app.api.v1.endpoints.dashboard - [OK] Fetching dashboard statistics
+11:34:45 - INFO - app.api.v1.endpoints.dashboard - [OK] Dashboard statistics retrieved successfully
+11:35:15 - INFO - app.api.v1.endpoints.dashboard - [OK] Fetching dashboard statistics
+11:35:15 - INFO - app.api.v1.endpoints.dashboard - [OK] Dashboard statistics retrieved successfully
