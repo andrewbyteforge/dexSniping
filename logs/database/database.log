@@ -43,3 +43,18 @@
 2025-08-09 09:26:05 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
 2025-08-09 09:26:05 - app.core.database.persistence_manager - INFO - persistence_manager.py:179 - [DATA] Initializing persistence manager: test_db.sqlite
 2025-08-09 09:26:05 - app.core.database.persistence_manager - INFO - persistence_manager.py:179 - [DATA] Initializing persistence manager: data\trading_bot.db
+2025-08-09 09:28:45 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 09:28:45 - app.core.database.persistence_manager - INFO - persistence_manager.py:179 - [DATA] Initializing persistence manager: test_db.sqlite
+2025-08-09 09:28:45 - app.core.database.persistence_manager - INFO - persistence_manager.py:179 - [DATA] Initializing persistence manager: data\trading_bot.db
+2025-08-09 09:31:22 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 09:31:22 - app.core.database.persistence_manager - INFO - persistence_manager.py:179 - [DATA] Initializing persistence manager: test_db.sqlite
+2025-08-09 09:31:22 - app.core.database.persistence_manager - INFO - persistence_manager.py:179 - [DATA] Initializing persistence manager: data\trading_bot.db
+2025-08-09 09:32:23 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 09:32:23 - app.core.database.persistence_manager - INFO - persistence_manager.py:179 - [DATA] Initializing persistence manager: test_db.sqlite
+2025-08-09 09:32:23 - app.core.database.persistence_manager - INFO - persistence_manager.py:179 - [DATA] Initializing persistence manager: data\trading_bot.db
+2025-08-09 09:33:22 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 09:33:22 - app.core.database.persistence_manager - INFO - persistence_manager.py:179 - [DATA] Initializing persistence manager: test_db.sqlite
+2025-08-09 09:33:22 - app.core.database.persistence_manager - INFO - persistence_manager.py:179 - [DATA] Initializing persistence manager: data\trading_bot.db
+2025-08-09 09:34:30 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 09:34:30 - app.core.database.persistence_manager - INFO - persistence_manager.py:179 - [DATA] Initializing persistence manager: test_db.sqlite
+2025-08-09 09:34:30 - app.core.database.persistence_manager - INFO - persistence_manager.py:179 - [DATA] Initializing persistence manager: data\trading_bot.db
