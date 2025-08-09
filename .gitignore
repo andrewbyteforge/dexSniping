@@ -5,3 +5,5 @@ venv/
 *.backup 
 *_backup* 
 *.logging_backup 
+.log
+*.log

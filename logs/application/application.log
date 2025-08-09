@@ -354,3 +354,23 @@
 2025-08-09 11:02:56 - app.main - INFO - logger.py:204 - [LOG] Logger initialized for app.main (component: application)
 2025-08-09 11:02:56 - app.main - INFO - main.py:44 - [OK] Dashboard router included
 2025-08-09 11:02:56 - app.main - INFO - main.py:51 - [OK] Trading router included
+2025-08-09 12:46:35 - app.core.blockchain.network_manager_fixed - INFO - logger.py:204 - [LOG] Logger initialized for app.core.blockchain.network_manager_fixed (component: application)
+2025-08-09 12:46:36 - app.core.blockchain.network_manager_fixed - INFO - network_manager_fixed.py:95 - [LINK] Initializing NetworkManagerFixed with enhanced validation...
+2025-08-09 12:46:36 - app.core.blockchain.network_manager_fixed - INFO - network_manager_fixed.py:220 - [OK] Network configurations setup complete: 4 networks
+2025-08-09 12:46:36 - app.core.blockchain.network_manager_fixed - INFO - network_manager_fixed.py:236 - [OK] Network status tracking initialized
+2025-08-09 12:46:36 - app.core.blockchain.network_manager_fixed - INFO - network_manager_fixed.py:108 - [OK] NetworkManagerFixed initialized successfully
+2025-08-09 12:47:20 - app.core.blockchain.network_manager_fixed - INFO - logger.py:204 - [LOG] Logger initialized for app.core.blockchain.network_manager_fixed (component: application)
+2025-08-09 12:47:20 - app.core.blockchain.network_manager_fixed - INFO - network_manager_fixed.py:95 - [LINK] Initializing NetworkManagerFixed with enhanced validation...
+2025-08-09 12:47:20 - app.core.blockchain.network_manager_fixed - INFO - network_manager_fixed.py:220 - [OK] Network configurations setup complete: 4 networks
+2025-08-09 12:47:20 - app.core.blockchain.network_manager_fixed - INFO - network_manager_fixed.py:236 - [OK] Network status tracking initialized
+2025-08-09 12:47:20 - app.core.blockchain.network_manager_fixed - INFO - network_manager_fixed.py:108 - [OK] NetworkManagerFixed initialized successfully
+2025-08-09 12:51:53 - app.core.blockchain.network_manager_fixed - INFO - logger.py:204 - [LOG] Logger initialized for app.core.blockchain.network_manager_fixed (component: application)
+2025-08-09 12:51:53 - app.core.blockchain.network_manager_fixed - INFO - network_manager_fixed.py:95 - [LINK] Initializing NetworkManagerFixed with enhanced validation...
+2025-08-09 12:51:53 - app.core.blockchain.network_manager_fixed - INFO - network_manager_fixed.py:220 - [OK] Network configurations setup complete: 4 networks
+2025-08-09 12:51:53 - app.core.blockchain.network_manager_fixed - INFO - network_manager_fixed.py:236 - [OK] Network status tracking initialized
+2025-08-09 12:51:53 - app.core.blockchain.network_manager_fixed - INFO - network_manager_fixed.py:108 - [OK] NetworkManagerFixed initialized successfully
+2025-08-09 12:51:59 - app.core.blockchain.network_manager_fixed - INFO - logger.py:204 - [LOG] Logger initialized for app.core.blockchain.network_manager_fixed (component: application)
+2025-08-09 12:51:59 - app.core.blockchain.network_manager_fixed - INFO - network_manager_fixed.py:95 - [LINK] Initializing NetworkManagerFixed with enhanced validation...
+2025-08-09 12:51:59 - app.core.blockchain.network_manager_fixed - INFO - network_manager_fixed.py:220 - [OK] Network configurations setup complete: 4 networks
+2025-08-09 12:51:59 - app.core.blockchain.network_manager_fixed - INFO - network_manager_fixed.py:236 - [OK] Network status tracking initialized
+2025-08-09 12:51:59 - app.core.blockchain.network_manager_fixed - INFO - network_manager_fixed.py:108 - [OK] NetworkManagerFixed initialized successfully
