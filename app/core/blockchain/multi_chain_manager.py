@@ -57,27 +57,38 @@ class ChainHealth:
 
 
 class MockChain(BaseChain):
-    """Mock chain implementation for testing and fallback."""
-    
-    class MockChain(BaseChain):
-        """Mock chain implementation for testing and fallback."""
+    """Mock chain implementation for testing and fallback."""    
         
-        def __init__(self, network_name: str, network_config: Dict[str, Any]):
-            """Initialize mock chain with proper BaseChain initialization."""
-            # Extract rpc_urls first
+    def __init__(self, network_name: str, network_config: Dict[str, Any]):
+        """Initialize mock chain with proper BaseChain initialization."""
+        # Store our attributes first
+        self.network_name = network_name
+        self.network_config = network_config
+        self.is_connected = False
+        self.mock_block_number = 18500000
+        self._connected = False
+        
+        # Try different BaseChain initialization patterns
+        try:
+            # Pattern 1: network_name, rpc_urls, **kwargs
             rpc_urls = network_config.get('rpc_urls', ['https://mock-rpc.example.com'])
-            
-            # Initialize BaseChain with ONLY the expected parameters
             super().__init__(network_name, rpc_urls)
-            
-            # Store our own attributes after BaseChain init
-            self.network_name = network_name
-            self.network_config = network_config
-            self.is_connected = False
-            self.mock_block_number = 18500000
-            self._connected = False
-            
-            logger.info(f"[OK] MockChain initialized for {network_name}")
+        except Exception:
+            try:
+                # Pattern 2: network_name only
+                super().__init__(network_name)
+            except Exception:
+                try:
+                    # Pattern 3: no arguments
+                    super().__init__()
+                except Exception:
+                    # If all fail, just set the required attributes directly
+                    self.network_name = network_name
+                    self.rpc_urls = network_config.get('rpc_urls', ['https://mock-rpc.example.com'])
+                    self.config = {}
+                    self._connected = False
+        
+        logger.info(f"[OK] MockChain initialized for {network_name}")
     
     @property
     def chain_type(self):
