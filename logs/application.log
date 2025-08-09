@@ -961,3 +961,32 @@
 12:51:53 - INFO - app.main - STARTUP: Application initialization complete!
 12:51:55 - INFO - app.main - SHUTDOWN: Shutting down DEX Sniper Pro
 12:51:55 - INFO - app.main - SHUTDOWN: Shutdown complete
+12:51:57 - WARNING - app.main - SNIPE: Snipe trading controller not available
+12:51:58 - WARNING - app.main - AI: AI risk assessment engine not available
+12:51:59 - INFO - app.main - WALLET: Enhanced wallet manager available
+12:51:59 - INFO - app.main - TEMPLATE: Templates configured
+12:51:59 - INFO - app.main - STATIC: Static files mounted
+12:51:59 - INFO - app.main - ROUTER: Dashboard router included
+12:51:59 - INFO - app.main - ROUTER: Tokens router included
+12:51:59 - INFO - app.main - ROUTER: Trading router included
+12:51:59 - INFO - app.main - STARTUP: Starting DEX Sniper Pro - Phase 4D Enhanced
+12:51:59 - INFO - app.main - ============================================================
+12:51:59 - INFO - app.main - WALLET: Initializing Enhanced Wallet Manager...
+12:51:59 - INFO - app.main - WALLET: Enhanced Wallet Manager initialized
+12:51:59 - INFO - app.main - STARTUP: Application initialization complete!
+12:52:01 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['BSC', 'Fantom', 'Arbitrum', 'Ethereum', 'Optimism', 'Solana'], limit=10
+12:52:01 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+12:52:06 - INFO - app.api.v1.endpoints.dashboard - [OK] Fetching dashboard statistics
+12:52:06 - INFO - app.api.v1.endpoints.dashboard - [OK] Dashboard statistics retrieved successfully
+12:52:06 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Fantom', 'Avalanche', 'Optimism', 'Arbitrum'], limit=10
+12:52:06 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+12:52:16 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Optimism', 'Solana', 'Ethereum', 'BSC', 'Avalanche'], limit=10
+12:52:16 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+12:52:26 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Ethereum', 'Arbitrum', 'Optimism', 'BSC'], limit=10
+12:52:26 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+12:52:37 - INFO - app.api.v1.endpoints.dashboard - [OK] Fetching dashboard statistics
+12:52:37 - INFO - app.api.v1.endpoints.dashboard - [OK] Dashboard statistics retrieved successfully
+12:52:37 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Fantom', 'BSC', 'Arbitrum', 'Optimism', 'Solana', 'Polygon'], limit=10
+12:52:37 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+12:52:47 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Ethereum', 'Arbitrum', 'Optimism', 'Fantom'], limit=10
+12:52:47 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
