@@ -12,6 +12,7 @@ import sys
 import logging
 from pathlib import Path
 from typing import Dict, Any
+from datetime import datetime
 
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse
@@ -19,7 +20,12 @@ from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.utils.logger import setup_logger
+from app.utils.logger import (
+    setup_logger, 
+    log_application_startup, 
+    log_application_shutdown,
+    get_performance_logger
+)
 
 # Configure detailed logging
 logging.basicConfig(
@@ -180,7 +186,13 @@ def setup_professional_dashboard_routes(app: FastAPI) -> None:
         Serve the PROFESSIONAL trading dashboard with sidebar.
         NO FALLBACK - If this fails, we want to see the error.
         """
-        logger.info("🎯 Serving PROFESSIONAL dashboard with sidebar")
+                        logger.info("🎯 Serving PROFESSIONAL dashboard with sidebar")
+        logger.debug(f"📄 Template: pages/dashboard.html")
+        logger.debug(f"🔗 Request URL: {request.url}")
+        logger.debug(f"🕐 Request time: {datetime.now().isoformat()}")
+        logger.debug(f"📄 Template: pages/dashboard.html")
+        logger.debug(f"🔗 Request URL: {request.url}")
+        logger.debug(f"🕐 Request time: {datetime.now().isoformat()}")
         logger.info(f"📄 Template: pages/dashboard.html")
         logger.info(f"🔗 Request URL: {request.url}")
         
@@ -264,7 +276,13 @@ def create_application() -> FastAPI:
         RuntimeError: If application creation fails
     """
     logger.info("🚀 Creating DEX Sniper Pro application - PROFESSIONAL DASHBOARD ONLY")
-    logger.info(f"📖 Version: {__version__}")
+            # Log application startup
+        log_application_startup()
+        logger.info("🎯 Creating professional dashboard application")
+                # Log application startup
+        log_application_startup()
+        logger.info("🎯 Creating professional dashboard application")
+        logger.info(f"📖 Version: {__version__}")
     logger.info(f"🎯 Phase: {__phase__}")
     
     try:
@@ -338,8 +356,10 @@ def main():
             log_level="info",
             access_log=True
         )
-    except KeyboardInterrupt:
+            except KeyboardInterrupt:
         logger.info("🛑 Server stopped by user")
+        log_application_shutdown()
+        log_application_shutdown()
     except Exception as error:
         logger.error(f"❌ Server startup failed: {error}")
         sys.exit(1)
