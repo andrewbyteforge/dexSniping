@@ -548,42 +548,6 @@ def _setup_essential_routes(app: FastAPI) -> None:
     logger.info("Essential routes configured successfully")
 
 
-
-    # Dashboard route with proper template
-    @app.get("/dashboard", response_class=HTMLResponse)
-    async def serve_dashboard(request: Request) -> HTMLResponse:
-        """Serve the professional dashboard with sidebar."""
-        from fastapi.templating import Jinja2Templates
-        from fastapi.responses import HTMLResponse
-        from fastapi import Request
-        
-        templates = Jinja2Templates(directory="frontend/templates")
-        try:
-            # Serve the dashboard that extends from layout.html (has sidebar)
-            return templates.TemplateResponse(
-                "pages/dashboard.html",
-                {"request": request}
-            )
-        except Exception as e:
-            logger.error(f"Dashboard template error: {e}")
-            # Return simple error page
-            return HTMLResponse(f"""
-            <html>
-            <head><title>Dashboard Error</title></head>
-            <body style="padding: 50px;">
-                <h1>Dashboard Template Error</h1>
-                <p>Error: {e}</p>
-                <p>Please ensure frontend/templates/pages/dashboard.html exists</p>
-            </body>
-            </html>
-            """)
-    
-    # Root redirect to dashboard
-    @app.get("/", response_class=HTMLResponse)
-    async def root_to_dashboard(request: Request) -> HTMLResponse:
-        """Redirect root to dashboard."""
-        return await serve_dashboard(request)
-
 def _create_basic_app() -> FastAPI:
     """
     Create a basic FastAPI application as fallback.

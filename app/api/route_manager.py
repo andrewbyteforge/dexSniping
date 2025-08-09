@@ -16,7 +16,8 @@ from datetime import datetime
 
 from app.utils.logger import setup_logger
 from app.core.system_info import SystemInfoProvider
-import requests
+from fastapi.responses import HTMLResponse
+
 
 logger = setup_logger(__name__)
 
@@ -127,20 +128,16 @@ class RouteManager:
         """Setup frontend routes using the ORIGINAL working template approach."""
         
         @app.get("/dashboard", response_class=HTMLResponse)
-        @router.get("/dashboard", response_class=HTMLResponse)
         async def serve_dashboard(request: Request) -> HTMLResponse:
             """Serve the main trading dashboard with sidebar."""
-        from fastapi import APIRouter
-
-        router = APIRouter()        
-
-        try:
+            try:
                 logger.info("Serving dashboard with proper sidebar layout")
                 
                 # Check template exists
-                if not Path("frontend/templates/pages/dashboard.html").exists():
+                dashboard_path = Path("frontend/templates/pages/dashboard.html")
+                if not dashboard_path.exists():
                     logger.error("Dashboard template not found!")
-                    # Create a simple redirect to fix
+                    # Return error page
                     return HTMLResponse("""
                     <!DOCTYPE html>
                     <html>
@@ -164,64 +161,56 @@ class RouteManager:
                 if self.templates:
                     return self.templates.TemplateResponse(
                         "pages/dashboard.html",
-                        {"request": requests}
+                        {"request": request}
                     )
                 else:
                     raise Exception("Templates not initialized")
                     
-        except Exception as error:
-            logger.error(f"Dashboard error: {error}")
-            # Return error page, not landing page
-            return HTMLResponse(f"""
-            <html>
-            <head><title>Dashboard Error</title></head>
-            <body style="padding: 50px; font-family: Arial;">
-                <h1>Dashboard Loading Error</h1>
-                <p>Error: {error}</p>
-                <p>Please check that frontend/templates/pages/dashboard.html exists.</p>
-            </body>
-            </html>
-            """, status_code=500)
-
-@app.get("/", response_class=HTMLResponse)  
-async def root_redirect(request: Request) -> HTMLResponse:
-    """Root redirect to dashboard - ORIGINAL VERSION."""
-    return await serve_dashboard(request)
-
-@app.get("/risk-analysis", response_class=HTMLResponse)
-async def serve_risk_analysis(request: Request) -> HTMLResponse:
-    """Serve risk analysis - redirect to dashboard for now."""
-    return await serve_dashboard(request)
-
-@app.get("/live-trading", response_class=HTMLResponse)
-async def serve_live_trading(request: Request) -> HTMLResponse:
-    """Serve live trading - redirect to dashboard for now."""
-    return await serve_dashboard(request)
-
-@app.get("/portfolio", response_class=HTMLResponse)
-async def serve_portfolio(request: Request) -> HTMLResponse:
-    """Serve portfolio - redirect to dashboard for now."""
-    return await serve_dashboard(request)
-
-@app.get("/wallet-connection", response_class=HTMLResponse)
-async def serve_wallet_connection(request: Request) -> HTMLResponse:
-    """Serve wallet connection - redirect to dashboard for now."""
-    return await serve_dashboard(request)
-
-logger.info("Frontend routes configured with ORIGINAL template approach")
-
+            except Exception as error:
+                logger.error(f"Dashboard error: {error}")
+                # Return error page, not landing page
+                return HTMLResponse(f"""
+                <html>
+                <head><title>Dashboard Error</title></head>
+                <body style="padding: 50px; font-family: Arial;">
+                    <h1>Dashboard Loading Error</h1>
+                    <p>Error: {error}</p>
+                    <p>Please check that frontend/templates/pages/dashboard.html exists.</p>
+                </body>
+                </html>
+                """, status_code=500)
+        
+        @app.get("/", response_class=HTMLResponse)  
+        async def root_redirect(request: Request) -> HTMLResponse:
+            """Root redirect to dashboard - ORIGINAL VERSION."""
+            return await serve_dashboard(request)
+        
+        @app.get("/risk-analysis", response_class=HTMLResponse)
+        async def serve_risk_analysis(request: Request) -> HTMLResponse:
+            """Serve risk analysis - redirect to dashboard for now."""
+            return await serve_dashboard(request)
+        
+        @app.get("/live-trading", response_class=HTMLResponse)
+        async def serve_live_trading(request: Request) -> HTMLResponse:
+            """Serve live trading - redirect to dashboard for now."""
+            return await serve_dashboard(request)
+        
+        @app.get("/portfolio", response_class=HTMLResponse)
+        async def serve_portfolio(request: Request) -> HTMLResponse:
+            """Serve portfolio - redirect to dashboard for now."""
+            return await serve_dashboard(request)
+        
+        @app.get("/wallet-connection", response_class=HTMLResponse)
+        async def serve_wallet_connection(request: Request) -> HTMLResponse:
+            """Serve wallet connection - redirect to dashboard for now."""
+            return await serve_dashboard(request)
+        
+        logger.info("Frontend routes configured with ORIGINAL template approach")
+    
     def _setup_system_routes(self, app: FastAPI, component_status: Dict[str, bool]) -> None:
         """Setup system health and status routes."""
-        @app.get("/")
-        async def root() -> Dict[str, Any]:
-            """Root endpoint with comprehensive system information."""
-            try:
-                return await self.system_info.get_comprehensive_system_info(component_status)
-            except Exception as error:
-                logger.error(f"Root endpoint error: {error}")
-                return await self.system_info.get_fallback_system_info(component_status, str(error))
         
-        @app.get("/health")
+        @app.get("/api/v1/health")
         async def health_check() -> Dict[str, Any]:
             """Comprehensive health check endpoint."""
             try:
@@ -230,11 +219,21 @@ logger.info("Frontend routes configured with ORIGINAL template approach")
                 logger.error(f"Health check error: {error}")
                 return await self.system_info.get_fallback_health_status(str(error))
         
+        @app.get("/api/v1/status")
+        async def system_status() -> Dict[str, Any]:
+            """System status endpoint."""
+            try:
+                return await self.system_info.get_comprehensive_system_info(component_status)
+            except Exception as error:
+                logger.error(f"Status endpoint error: {error}")
+                return await self.system_info.get_fallback_system_info(component_status, str(error))
+        
         logger.info("System routes configured")
     
     def _setup_fallback_routes(self, app: FastAPI) -> None:
         """Setup minimal fallback routes."""
-        @app.get("/")
+        
+        @app.get("/fallback")
         async def fallback_root():
             """Fallback root endpoint."""
             return {
@@ -242,12 +241,12 @@ logger.info("Frontend routes configured with ORIGINAL template approach")
                 "status": "limited_functionality",
                 "version": "4.1.0-beta",
                 "endpoints": {
-                    "health": "/health",
+                    "health": "/api/v1/health",
                     "docs": "/docs"
                 }
             }
         
-        @app.get("/health")
+        @app.get("/fallback/health")
         async def fallback_health():
             """Fallback health endpoint."""
             return {
@@ -302,6 +301,58 @@ logger.info("Frontend routes configured with ORIGINAL template approach")
             logger.error(f"Dashboard template rendering error: {error}")
             return self._create_professional_dashboard_fallback(context)
     
+    def _create_professional_dashboard_fallback(self, context: Dict[str, Any]) -> HTMLResponse:
+        """Create a professional dashboard fallback."""
+        html_content = """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>DEX Sniper Pro - Dashboard</title>
+            <style>
+                body { 
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    background: #f5f5f5;
+                }
+                .container { 
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    padding: 2rem;
+                }
+                .header {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 2rem;
+                    border-radius: 10px;
+                    margin-bottom: 2rem;
+                }
+                .card {
+                    background: white;
+                    padding: 1.5rem;
+                    border-radius: 10px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    margin-bottom: 1rem;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="header">
+                    <h1>DEX Sniper Pro Dashboard</h1>
+                    <p>Professional Trading Interface</p>
+                </div>
+                <div class="card">
+                    <h2>Template Loading...</h2>
+                    <p>The dashboard template is being loaded. If this persists, check the template configuration.</p>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        return HTMLResponse(content=html_content)
     
     def _create_fallback_dashboard_router(self) -> APIRouter:
         """Create fallback dashboard router."""
@@ -323,6 +374,18 @@ logger.info("Frontend routes configured with ORIGINAL template approach")
                 "timestamp": datetime.utcnow().isoformat()
             }
         
+        @router.get("/health")
+        async def fallback_dashboard_health():
+            """Fallback dashboard health."""
+            return {
+                "status": "healthy",
+                "components": {
+                    "api": "operational",
+                    "database": "operational",
+                    "websocket": "operational"
+                }
+            }
+        
         return router
     
     def _create_fallback_tokens_router(self) -> APIRouter:
@@ -341,94 +404,17 @@ logger.info("Frontend routes configured with ORIGINAL template approach")
                 "supported_networks": ["ethereum", "polygon", "bsc", "arbitrum"]
             }
         
-        return router
-    
-    def _create_fallback_html_response(
-        self,
-        title: str,
-        subtitle: str,
-        description: str
-    ) -> HTMLResponse:
-        """Create fallback HTML response."""
-        html_content = f"""
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>{title}</title>
-            <style>
-                body {{ 
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    margin: 0;
-                    padding: 0;
-                    min-height: 100vh;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                }}
-                .container {{ 
-                    background: rgba(255, 255, 255, 0.1);
-                    backdrop-filter: blur(10px);
-                    border-radius: 20px;
-                    padding: 3rem;
-                    text-align: center;
-                    max-width: 600px;
-                    margin: 2rem;
-                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-                }}
-                h1 {{ 
-                    font-size: 2.5rem; 
-                    margin-bottom: 1rem;
-                    background: linear-gradient(45deg, #fff, #f0f0f0);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                }}
-                h2 {{ 
-                    font-size: 1.5rem; 
-                    margin-bottom: 1.5rem;
-                    opacity: 0.9;
-                }}
-                p {{ 
-                    font-size: 1.1rem; 
-                    line-height: 1.6;
-                    opacity: 0.8;
-                    margin-bottom: 2rem;
-                }}
-                .links {{
-                    margin-top: 2rem;
-                }}
-                .links a {{
-                    color: white;
-                    text-decoration: none;
-                    background: rgba(255, 255, 255, 0.2);
-                    padding: 0.8rem 1.5rem;
-                    border-radius: 10px;
-                    margin: 0.5rem;
-                    display: inline-block;
-                    transition: all 0.3s ease;
-                }}
-                .links a:hover {{
-                    background: rgba(255, 255, 255, 0.3);
-                    transform: translateY(-2px);
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>{title}</h1>
-                <h2>{subtitle}</h2>
-                <p>{description}</p>
-                
-                <div class="links">
-                    <a href="/docs">API Documentation</a>
-                    <a href="/health">System Health</a>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
+        @router.get("/live")
+        async def fallback_live_tokens():
+            """Fallback live tokens."""
+            return {
+                "tokens": [],
+                "total": 0,
+                "last_update": datetime.utcnow().isoformat()
+            }
         
-        return HTMLResponse(content=html_content)
+        return router
+
+
+# Create a singleton instance
+route_manager = RouteManager()

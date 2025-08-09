@@ -12,6 +12,8 @@ from pathlib import Path
 from app.utils.logger import setup_logger
 from app.factory import create_app
 from app.core.lifecycle_manager import LifecycleManager
+from fastapi.responses import HTMLResponse
+
 
 logger = setup_logger(__name__)
 
