@@ -1,4 +1,3 @@
-Add this
 """
 Gas Optimization Engine
 File: app/core/performance/gas_optimizer.py
@@ -429,7 +428,7 @@ __all__ = [
 ]
 
 
-to this
+
 """
 Enhanced Gas Optimization Engine
 File: app/core/performance/gas_optimizer.py
