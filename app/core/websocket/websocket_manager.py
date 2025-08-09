@@ -20,6 +20,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 import time
 import uuid
+from app.core.exceptions import WebSocketManagerError
+
 
 try:
     from fastapi import WebSocket
