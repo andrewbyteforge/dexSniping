@@ -25,6 +25,73 @@
     </div>
 </div>
 
+<!-- Wallet Connection Section -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">
+                            <i class="bi bi-wallet2 text-primary"></i>
+                            Wallet Connection
+                        </h6>
+                        <small class="text-muted">Connect your wallet to start trading</small>
+                    </div>
+                    
+                    <!-- Wallet Status Display (when connected) -->
+                    <div id="walletConnected" class="d-none">
+                        <div class="d-flex align-items-center">
+                            <div class="wallet-info me-3 text-end">
+                                <div class="wallet-address fw-bold" id="connectedWalletAddress">0x1234...5678</div>
+                                <small class="text-muted">
+                                    <span id="connectedNetwork">Ethereum</span> • 
+                                    <span id="connectedBalance">1.234 ETH</span>
+                                </small>
+                            </div>
+                            <div class="wallet-avatar me-2">
+                                <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 40px; height: 40px;">
+                                    <i class="bi bi-wallet2 text-white"></i>
+                                </div>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" 
+                                        type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-gear"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#" onclick="walletManager.viewDetails()">
+                                        <i class="bi bi-info-circle me-2"></i>View Details
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="walletManager.switchNetwork()">
+                                        <i class="bi bi-arrow-repeat me-2"></i>Switch Network
+                                    </a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-danger" href="#" onclick="walletManager.disconnect()">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Disconnect
+                                    </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Connect Wallet Button (when not connected) -->
+                    <div id="walletDisconnected">
+                        <button class="btn btn-primary" 
+                                onclick="walletManager.showConnectionModal()" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#walletConnectionModal">
+                            <i class="bi bi-wallet2 me-2"></i>
+                            Connect Wallet
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Stats Cards Row -->
 <div class="row mb-4">
     <div class="col-lg-3 col-md-6 mb-3">
@@ -194,8 +261,145 @@
     </div>
 </div>
 
-<!-- Add simple chart styling -->
+<!-- Wallet Connection Modal -->
+<div class="modal fade" id="walletConnectionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">
+                    <i class="bi bi-wallet2 text-primary me-2"></i>
+                    Connect Your Wallet
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-4">
+                    Choose your preferred wallet to connect and start trading on DEX Sniper Pro.
+                </p>
+                
+                <!-- Loading State -->
+                <div id="walletConnecting" class="text-center py-4 d-none">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Connecting...</span>
+                    </div>
+                    <p class="text-muted">Connecting to your wallet...</p>
+                    <small class="text-muted">Please check your wallet for connection approval</small>
+                </div>
+                
+                <!-- Wallet Options -->
+                <div id="walletOptions">
+                    <!-- MetaMask Option -->
+                    <div class="wallet-option mb-3" onclick="walletManager.connectMetaMask()">
+                        <div class="card h-100" style="cursor: pointer; transition: all 0.3s ease;">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="wallet-icon me-3">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                                             style="width: 50px; height: 50px; background: linear-gradient(135deg, #f6911d, #ff6b35);">
+                                            <span style="font-size: 24px;">🦊</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">MetaMask</h6>
+                                        <p class="text-muted mb-1 small">Browser extension wallet</p>
+                                        <div class="d-flex gap-1">
+                                            <span class="badge bg-success">Most Popular</span>
+                                            <span class="badge bg-info">Easy Setup</span>
+                                        </div>
+                                    </div>
+                                    <div class="wallet-action">
+                                        <i class="bi bi-chevron-right fs-5 text-muted"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- WalletConnect Option -->
+                    <div class="wallet-option mb-3" onclick="walletManager.connectWalletConnect()">
+                        <div class="card h-100" style="cursor: pointer; transition: all 0.3s ease;">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="wallet-icon me-3">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                                             style="width: 50px; height: 50px; background: linear-gradient(135deg, #3b99fc, #1e88e5);">
+                                            <span style="font-size: 24px;">📱</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">WalletConnect</h6>
+                                        <p class="text-muted mb-1 small">Scan QR code with your mobile wallet</p>
+                                        <div class="d-flex gap-1">
+                                            <span class="badge bg-warning">Mobile</span>
+                                            <span class="badge bg-secondary">Secure</span>
+                                        </div>
+                                    </div>
+                                    <div class="wallet-action">
+                                        <i class="bi bi-chevron-right fs-5 text-muted"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Coinbase Wallet Option -->
+                    <div class="wallet-option mb-3" onclick="walletManager.connectCoinbaseWallet()">
+                        <div class="card h-100" style="cursor: pointer; transition: all 0.3s ease;">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="wallet-icon me-3">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center" 
+                                             style="width: 50px; height: 50px; background: linear-gradient(135deg, #0052ff, #0040cc);">
+                                            <span style="font-size: 24px;">💼</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">Coinbase Wallet</h6>
+                                        <p class="text-muted mb-1 small">Official Coinbase wallet extension</p>
+                                        <div class="d-flex gap-1">
+                                            <span class="badge bg-primary">Exchange</span>
+                                        </div>
+                                    </div>
+                                    <div class="wallet-action">
+                                        <i class="bi bi-chevron-right fs-5 text-muted"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Connection Help -->
+                <div class="mt-4 p-3 bg-light rounded">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle me-1"></i>
+                        <strong>New to wallets?</strong> 
+                        We recommend MetaMask for beginners. It's free and easy to set up.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add styling for wallet components and simple chart -->
 <style>
+/* Wallet Connection Styling */
+.wallet-option .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #007bff;
+}
+
+.wallet-icon {
+    transition: transform 0.3s ease;
+}
+
+.wallet-option:hover .wallet-icon {
+    transform: scale(1.05);
+}
+
+/* Simple Chart Styling */
 .simple-chart {
     padding: 1rem;
     text-align: center;
@@ -245,11 +449,288 @@
 .alert-sm:last-child {
     margin-bottom: 0;
 }
+
+/* Stats card styling (if not already defined) */
+.stats-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+}
+
+.stats-card .card-body {
+    padding: 1.5rem;
+}
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+    // ==================== WALLET MANAGER CLASS ====================
+    
+    class WalletManager {
+        constructor() {
+            this.isConnected = false;
+            this.walletAddress = null;
+            this.walletType = null;
+            this.connectionId = null;
+            this.supportedNetworks = ['ethereum', 'polygon', 'bsc', 'arbitrum'];
+            this.connectedNetworks = [];
+            this.balances = {};
+            
+            console.log('🔗 Wallet Manager initialized');
+            this.checkExistingConnection();
+        }
+        
+        async checkExistingConnection() {
+            try {
+                // Check if user has a wallet connected in localStorage
+                const savedConnection = localStorage.getItem('walletConnection');
+                if (savedConnection) {
+                    const connectionData = JSON.parse(savedConnection);
+                    if (connectionData.walletAddress && connectionData.connectionId) {
+                        console.log('🔄 Checking existing connection...');
+                        // Verify connection is still valid
+                        await this.verifyConnection(connectionData);
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Error checking existing connection:', error);
+                this.clearStoredConnection();
+            }
+        }
+        
+        async verifyConnection(connectionData) {
+            try {
+                const response = await fetch(`/api/v1/live-trading/wallet/connections`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data[connectionData.connectionId]) {
+                        this.setConnectedState(connectionData);
+                        return true;
+                    }
+                }
+                this.clearStoredConnection();
+                return false;
+            } catch (error) {
+                console.error('❌ Connection verification failed:', error);
+                return false;
+            }
+        }
+        
+        showConnectionModal() {
+            console.log('🔗 Opening wallet connection modal');
+            // Reset modal state
+            document.getElementById('walletOptions').style.display = 'block';
+            document.getElementById('walletConnecting').classList.add('d-none');
+        }
+        
+        async connectMetaMask() {
+            console.log('🦊 Attempting MetaMask connection...');
+            
+            if (typeof window.ethereum === 'undefined') {
+                alert('MetaMask is not installed. Please install MetaMask to continue.');
+                window.open('https://metamask.io/download/', '_blank');
+                return;
+            }
+            
+            try {
+                this.showConnectingState();
+                
+                // Request account access
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+                
+                if (accounts.length === 0) {
+                    throw new Error('No accounts returned from MetaMask');
+                }
+                
+                const walletAddress = accounts[0];
+                console.log('✅ MetaMask accounts retrieved:', walletAddress);
+                
+                // Connect via backend API
+                const connectionData = await this.connectWalletAPI({
+                    wallet_type: 'metamask',
+                    wallet_address: walletAddress,
+                    requested_networks: ['ethereum', 'polygon']
+                });
+                
+                this.setConnectedState({
+                    walletAddress: connectionData.wallet_address,
+                    walletType: 'metamask',
+                    connectionId: connectionData.connection_id,
+                    connectedNetworks: connectionData.connected_networks,
+                    balances: connectionData.balances
+                });
+                
+                this.hideConnectionModal();
+                console.log('✅ MetaMask connected successfully');
+                
+            } catch (error) {
+                console.error('❌ MetaMask connection failed:', error);
+                this.showConnectionError('MetaMask connection failed: ' + error.message);
+            }
+        }
+        
+        async connectWalletConnect() {
+            console.log('📱 Attempting WalletConnect connection...');
+            
+            try {
+                this.showConnectingState();
+                
+                // For now, show coming soon message
+                alert('WalletConnect integration coming soon! Please use MetaMask for now.');
+                this.hideConnectingState();
+                
+            } catch (error) {
+                console.error('❌ WalletConnect connection failed:', error);
+                this.showConnectionError('WalletConnect connection failed: ' + error.message);
+            }
+        }
+        
+        async connectCoinbaseWallet() {
+            console.log('💼 Attempting Coinbase Wallet connection...');
+            
+            try {
+                this.showConnectingState();
+                
+                // For now, show coming soon message
+                alert('Coinbase Wallet integration coming soon! Please use MetaMask for now.');
+                this.hideConnectingState();
+                
+            } catch (error) {
+                console.error('❌ Coinbase Wallet connection failed:', error);
+                this.showConnectionError('Coinbase Wallet connection failed: ' + error.message);
+            }
+        }
+        
+        async connectWalletAPI(requestData) {
+            const response = await fetch('/api/v1/live-trading/wallet/connect', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'API connection failed');
+            }
+            
+            return await response.json();
+        }
+        
+        setConnectedState(connectionData) {
+            this.isConnected = true;
+            this.walletAddress = connectionData.walletAddress;
+            this.walletType = connectionData.walletType;
+            this.connectionId = connectionData.connectionId;
+            this.connectedNetworks = connectionData.connectedNetworks || [];
+            this.balances = connectionData.balances || {};
+            
+            // Store connection data
+            localStorage.setItem('walletConnection', JSON.stringify(connectionData));
+            
+            // Update UI
+            this.updateWalletUI();
+        }
+        
+        updateWalletUI() {
+            // Show connected state
+            document.getElementById('walletConnected').classList.remove('d-none');
+            document.getElementById('walletDisconnected').classList.add('d-none');
+            
+            // Update wallet info
+            const addressElement = document.getElementById('connectedWalletAddress');
+            if (addressElement && this.walletAddress) {
+                addressElement.textContent = 
+                    this.walletAddress.substring(0, 6) + '...' + 
+                    this.walletAddress.substring(this.walletAddress.length - 4);
+            }
+            
+            // Update network info
+            const networkElement = document.getElementById('connectedNetwork');
+            if (networkElement && this.connectedNetworks.length > 0) {
+                networkElement.textContent = this.connectedNetworks[0].charAt(0).toUpperCase() + 
+                                           this.connectedNetworks[0].slice(1);
+            }
+            
+            // Update balance info
+            const balanceElement = document.getElementById('connectedBalance');
+            if (balanceElement && this.balances) {
+                const firstNetwork = this.connectedNetworks[0];
+                if (firstNetwork && this.balances[firstNetwork]) {
+                    const balance = parseFloat(this.balances[firstNetwork].native_balance);
+                    const symbol = this.balances[firstNetwork].native_symbol || 'ETH';
+                    balanceElement.textContent = `${balance.toFixed(3)} ${symbol}`;
+                }
+            }
+        }
+        
+        disconnect() {
+            if (confirm('Are you sure you want to disconnect your wallet?')) {
+                this.isConnected = false;
+                this.walletAddress = null;
+                this.walletType = null;
+                this.connectionId = null;
+                this.connectedNetworks = [];
+                this.balances = {};
+                
+                // Clear stored data
+                this.clearStoredConnection();
+                
+                // Update UI
+                document.getElementById('walletConnected').classList.add('d-none');
+                document.getElementById('walletDisconnected').classList.remove('d-none');
+                
+                console.log('🔌 Wallet disconnected');
+            }
+        }
+        
+        viewDetails() {
+            if (this.isConnected) {
+                alert(`Wallet Details:\n\nAddress: ${this.walletAddress}\nType: ${this.walletType}\nNetworks: ${this.connectedNetworks.join(', ')}`);
+            }
+        }
+        
+        switchNetwork() {
+            if (this.isConnected) {
+                alert('Network switching coming soon! You can switch networks in your wallet for now.');
+            }
+        }
+        
+        showConnectingState() {
+            document.getElementById('walletOptions').style.display = 'none';
+            document.getElementById('walletConnecting').classList.remove('d-none');
+        }
+        
+        hideConnectingState() {
+            document.getElementById('walletOptions').style.display = 'block';
+            document.getElementById('walletConnecting').classList.add('d-none');
+        }
+        
+        hideConnectionModal() {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('walletConnectionModal'));
+            if (modal) {
+                modal.hide();
+            }
+            this.hideConnectingState();
+        }
+        
+        showConnectionError(message) {
+            alert('Connection Error: ' + message);
+            this.hideConnectingState();
+        }
+        
+        clearStoredConnection() {
+            localStorage.removeItem('walletConnection');
+        }
+    }
+    
+    // Initialize wallet manager
+    let walletManager;
+    
     // ==================== ENHANCED LOGGING UTILITIES ====================
     
     function debugLog(level, message, data = null) {
@@ -281,6 +762,11 @@
     
     document.addEventListener('DOMContentLoaded', function() {
         debugLog('info', '🚀 DEX Sniper Pro Dashboard starting...');
+        
+        // Initialize wallet manager first
+        walletManager = new WalletManager();
+        
+        // Then initialize dashboard
         initializeDashboard();
     });
     
@@ -647,6 +1133,15 @@
     function snipeToken(symbol, address) {
         debugLog('info', `⚡ Snipe action triggered for ${symbol} (${address})`);
         
+        // Check if wallet is connected first
+        if (!walletManager.isConnected) {
+            alert('Please connect your wallet first to execute trades.');
+            walletManager.showConnectionModal();
+            const modal = new bootstrap.Modal(document.getElementById('walletConnectionModal'));
+            modal.show();
+            return;
+        }
+        
         if (confirm(`Execute snipe trade for ${symbol}?\n\nThis will attempt to buy this token using your configured trading parameters.`)) {
             alert(`Snipe order submitted for ${symbol}!\n\nNote: This is a demonstration. In production, this would connect to your trading engine.`);
         }
@@ -731,7 +1226,8 @@
         loadLiveTokens,
         refreshOpportunities,
         debugLog,
-        dashboardData: () => dashboardData
+        dashboardData: () => dashboardData,
+        walletManager: () => walletManager
     };
     
     // Legacy compatibility
