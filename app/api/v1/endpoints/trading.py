@@ -12,7 +12,7 @@ from typing import Dict, Any, Optional, List
 from decimal import Decimal
 from datetime import datetime
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_performance_logger, get_performance_logger
 from app.core.trading.order_executor import (
     order_executor, OrderSide, OrderType, OrderStatus
 )
@@ -20,7 +20,7 @@ from app.core.portfolio.portfolio_manager import (
     get_portfolio_manager, TransactionType
 )
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "api")
 
 router = APIRouter(prefix="/trading", tags=["trading"])
 

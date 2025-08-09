@@ -15,13 +15,13 @@ from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel, Field
 from sse_starlette.sse import EventSourceResponse
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_performance_logger, get_performance_logger
 from app.core.discovery.token_scanner import TokenScanner
 from app.core.ai.risk_assessor import AIRiskAssessor
 from app.core.trading.auto_trader import AutoTrader, AutoTraderConfig
 from app.core.database import get_db_session
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "api")
 
 router = APIRouter(prefix="/live", tags=["Live Feed"])
 

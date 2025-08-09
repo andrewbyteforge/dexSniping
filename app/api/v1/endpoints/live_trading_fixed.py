@@ -15,7 +15,7 @@ from typing import Dict, Any, Optional, List
 from fastapi import APIRouter, HTTPException, Depends, Query, BackgroundTasks
 from fastapi.responses import JSONResponse
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_performance_logger, get_performance_logger
 from app.schemas.trading_schemas import (
     TradingSessionResponse,
     TradingSessionStatus,
@@ -33,7 +33,7 @@ from app.schemas.trading_schemas import (
     OrderType
 )
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "api")
 
 # Initialize router
 router = APIRouter(prefix="/live-trading", tags=["Live Trading"])

@@ -13,7 +13,7 @@ from decimal import Decimal
 from datetime import datetime, timedelta
 import uuid
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_performance_logger, get_performance_logger
 from app.core.dependencies import get_database_session, get_current_user
 from app.core.trading.risk_manager import (
     get_risk_manager, RiskLevel, PositionSizeMethod,
@@ -25,7 +25,7 @@ from app.models.dex.trading_models import (
     create_order, get_user_positions, calculate_portfolio_metrics
 )
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "api")
 
 router = APIRouter(prefix="/trading", tags=["enhanced_trading"])
 

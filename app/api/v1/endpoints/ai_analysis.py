@@ -13,7 +13,7 @@ from fastapi import APIRouter, HTTPException, Depends, Query, Body
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_performance_logger, get_performance_logger
 from app.core.ai.risk_assessor import AIRiskAssessor, ComprehensiveRiskAssessment
 from app.core.ai.honeypot_detector import HoneypotDetector, HoneypotDetectionResult
 from app.core.ai.sentiment_analyzer import SentimentAnalyzer, SentimentAnalysisResult
@@ -26,7 +26,7 @@ from app.core.exceptions import (
     PredictionError
 )
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "api")
 
 router = APIRouter(prefix="/ai", tags=["AI Analysis"])
 

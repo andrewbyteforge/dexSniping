@@ -13,7 +13,7 @@ from decimal import Decimal
 from fastapi import APIRouter, HTTPException, Depends, Query
 from pydantic import BaseModel, Field, validator
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_performance_logger, get_performance_logger
 from app.core.trading.trading_engine import (
     TradingEngine, 
     TradingConfiguration, 
@@ -24,7 +24,7 @@ from app.core.trading.trading_engine import (
 from app.core.wallet.wallet_manager import WalletType, NetworkType
 from app.core.dex.dex_integration import DEXProtocol
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "api")
 
 # Initialize router
 router = APIRouter(prefix="/live-trading", tags=["Live Trading"])

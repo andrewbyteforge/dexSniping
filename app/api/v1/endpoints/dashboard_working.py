@@ -12,9 +12,9 @@ from datetime import datetime, timedelta
 from fastapi import APIRouter, HTTPException, Query
 import random
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_performance_logger, get_performance_logger
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "api")
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 
 

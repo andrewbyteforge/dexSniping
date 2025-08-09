@@ -12,7 +12,7 @@ from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, Field
 from datetime import datetime
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_performance_logger, get_performance_logger
 from app.core.wallet.enhanced_wallet_manager import (
     get_enhanced_wallet_manager,
     EnhancedWalletManager,
@@ -22,7 +22,7 @@ from app.core.wallet.enhanced_wallet_manager import (
 from app.core.blockchain.network_manager_fixed import NetworkType
 from app.core.exceptions import WalletError, NetworkError
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "api")
 
 # Create router
 router = APIRouter(prefix="/wallet", tags=["wallet"])

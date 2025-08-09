@@ -14,9 +14,9 @@ from typing import Dict, Any
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException, Depends
 from fastapi.responses import HTMLResponse
 from app.core.websocket.websocket_manager import websocket_manager, WebSocketManagerError
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_performance_logger, get_performance_logger
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "api")
 
 router = APIRouter()
 

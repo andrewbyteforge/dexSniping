@@ -10,10 +10,10 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime, timedelta
 import random
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_performance_logger, get_performance_logger
 from pydantic import BaseModel
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "api")
 
 # Create router without prefix since it's added in main.py
 router = APIRouter(prefix="/tokens", tags=["tokens"])

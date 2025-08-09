@@ -39,10 +39,10 @@ from app.core.dex.live_dex_integration import (
     SwapQuote,
     get_live_dex_integration
 )
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_performance_logger, get_performance_logger
 from app.core.exceptions import TradingError, WalletError, DEXError
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "api")
 
 # Initialize router
 router = APIRouter(prefix="/live-trading", tags=["Live Trading"])

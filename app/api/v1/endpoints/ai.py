@@ -14,7 +14,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 import json
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_performance_logger, get_performance_logger
 from app.core.ai.risk_assessor import AIRiskAssessor
 from app.core.ai.honeypot_detector import HoneypotDetector
 from app.core.ai.contract_analyzer import ContractAnalyzer
@@ -22,7 +22,7 @@ from app.core.trading.auto_trader import AutoTrader
 from app.core.discovery.token_discovery import TokenDiscovery
 from app.core.database import get_db_session
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "api")
 
 router = APIRouter(prefix="/ai", tags=["AI Trading"])
 

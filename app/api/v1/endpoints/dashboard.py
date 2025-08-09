@@ -14,9 +14,9 @@ from decimal import Decimal
 from fastapi import APIRouter, HTTPException, Query, Depends
 from pydantic import BaseModel, Field
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_performance_logger, get_performance_logger
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "api")
 
 # Create routers
 dashboard_router = APIRouter(prefix="/dashboard", tags=["dashboard"])
