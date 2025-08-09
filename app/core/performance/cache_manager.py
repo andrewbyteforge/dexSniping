@@ -1,7 +1,8 @@
 """
+Fixed Cache Manager Import Alias
 File: app/core/performance/cache_manager.py
 
-Simplified cache manager with in-memory storage and optional Redis support.
+Add CacheManager alias to fix import issues while maintaining backward compatibility.
 """
 
 import asyncio
@@ -11,12 +12,12 @@ from typing import Any, Optional, Dict, List
 from dataclasses import dataclass
 
 from app.utils.logger import setup_logger
-from app.utils.exceptions import DexSnipingException
+from app.core.exceptions import ServiceError
 
-logger = setup_logger(__name__, "application")
+logger = setup_logger(__name__)
 
 
-class CacheError(DexSnipingException):
+class CacheError(ServiceError):
     """Exception raised when cache operations fail."""
     pass
 
@@ -31,15 +32,16 @@ class CacheEntry:
     last_accessed: Optional[float] = None
 
 
-class SimpleCacheManager:
+class CacheManager:
     """
-    Simplified cache manager with in-memory storage.
+    Enhanced cache manager with in-memory storage and optional Redis support.
     
     Features:
     - In-memory caching with TTL support
     - Optional Redis support (when available)
     - Key namespacing
     - Cache statistics
+    - Async operations
     """
     
     def __init__(self, redis_url: Optional[str] = None):
@@ -61,61 +63,53 @@ class SimpleCacheManager:
             "deletes": 0,
             "errors": 0
         }
+        
+        logger.info("[OK] Cache Manager initialized")
     
     async def connect(self) -> None:
         """Initialize cache connections."""
-        logger.info("Initializing cache manager...")
-        
-        # Try to connect to Redis if URL provided
-        if self.redis_url:
-            try:
-                # Only try Redis if aioredis is available
+        try:
+            if self.redis_url:
                 try:
-                    import aioredis
-                    self.redis_client = aioredis.from_url(
-                        self.redis_url,
-                        encoding="utf-8",
-                        decode_responses=True,
-                        retry_on_timeout=True,
-                        socket_timeout=5
-                    )
-                    # Test connection
+                    import redis.asyncio as redis
+                    self.redis_client = redis.from_url(self.redis_url)
                     await self.redis_client.ping()
                     self.use_redis = True
-                    logger.info("Connected to Redis cache")
+                    logger.info("✅ Connected to Redis cache")
                 except ImportError:
-                    logger.info("aioredis not available, using in-memory cache")
-                    self.use_redis = False
+                    logger.warning("⚠️ Redis not available, using in-memory cache")
                 except Exception as e:
-                    logger.warning(f"Redis connection failed, using in-memory cache: {e}")
-                    self.use_redis = False
-            except Exception as e:
-                logger.warning(f"Redis initialization failed: {e}")
-                self.use_redis = False
-        else:
-            logger.info("No Redis URL provided, using in-memory cache")
-        
-        if not self.use_redis:
-            logger.info("Using in-memory cache")
+                    logger.warning(f"⚠️ Failed to connect to Redis: {e}, using in-memory cache")
+            
+            logger.info("✅ Cache manager ready")
+            
+        except Exception as e:
+            logger.error(f"❌ Cache manager initialization failed: {e}")
+            # Continue with in-memory cache only
     
     async def set(
         self,
         key: str,
         value: Any,
-        ttl: Optional[int] = 3600,
+        ttl: Optional[int] = None,
         namespace: str = "default"
-    ) -> None:
+    ) -> bool:
         """
         Set a value in the cache.
         
         Args:
             key: Cache key
             value: Value to cache
-            ttl: Time to live in seconds (default: 1 hour)
-            namespace: Key namespace for organization
+            ttl: Time to live in seconds
+            namespace: Key namespace
+            
+        Returns:
+            True if value was set successfully
         """
         try:
             namespaced_key = f"{namespace}:{key}"
+            current_time = time.time()
+            expires_at = current_time + ttl if ttl else None
             
             if self.use_redis and self.redis_client:
                 serialized_value = self._serialize(value)
@@ -126,25 +120,24 @@ class SimpleCacheManager:
             else:
                 # Use in-memory cache
                 async with self._lock:
-                    current_time = time.time()
-                    expires_at = current_time + ttl if ttl else None
-                    
-                    self._cache[namespaced_key] = CacheEntry(
+                    entry = CacheEntry(
                         value=value,
                         created_at=current_time,
                         expires_at=expires_at
                     )
+                    self._cache[namespaced_key] = entry
                     
-                    # Clean up expired entries periodically
-                    await self._cleanup_expired()
+                    # Cleanup expired entries occasionally
+                    if len(self._cache) % 100 == 0:
+                        await self._cleanup_expired()
             
             self._stats["sets"] += 1
-            logger.debug(f"Cached value for key: {namespaced_key}")
+            return True
             
         except Exception as e:
             self._stats["errors"] += 1
             logger.error(f"Cache set failed for key {key}: {e}")
-            # Don't raise exception for cache failures
+            return False
     
     async def get(
         self,
@@ -265,6 +258,39 @@ class SimpleCacheManager:
             logger.error(f"Cache exists check failed for key {key}: {e}")
             return False
     
+    async def clear(self, namespace: str = "default") -> bool:
+        """
+        Clear all keys in a namespace.
+        
+        Args:
+            namespace: Namespace to clear
+            
+        Returns:
+            True if cleared successfully
+        """
+        try:
+            if self.use_redis and self.redis_client:
+                # Get all keys in namespace
+                pattern = f"{namespace}:*"
+                keys = await self.redis_client.keys(pattern)
+                if keys:
+                    await self.redis_client.delete(*keys)
+            else:
+                # Clear in-memory cache
+                async with self._lock:
+                    keys_to_delete = [
+                        key for key in self._cache.keys() 
+                        if key.startswith(f"{namespace}:")
+                    ]
+                    for key in keys_to_delete:
+                        del self._cache[key]
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Cache clear failed for namespace {namespace}: {e}")
+            return False
+    
     async def get_stats(self) -> Dict[str, Any]:
         """
         Get cache statistics.
@@ -347,5 +373,18 @@ class SimpleCacheManager:
             return value
 
 
+# Create aliases for backward compatibility
+SimpleCacheManager = CacheManager
+
 # Global cache manager instance
-cache_manager = SimpleCacheManager()
+cache_manager = CacheManager()
+
+
+# ==================== MODULE METADATA ====================
+
+__version__ = "2.0.0"
+__phase__ = "4C - Cache Manager Fix"
+__description__ = "Fixed cache manager with proper CacheManager class name and imports"
+
+# Export both names for compatibility
+__all__ = ["CacheManager", "SimpleCacheManager", "cache_manager", "CacheError", "CacheEntry"]
