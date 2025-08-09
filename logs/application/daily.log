@@ -107,3 +107,16 @@
 2025-08-09 09:00:46 - test_logger - INFO - logger.py:204 - [LOG] Logger initialized for test_logger (component: application)
 2025-08-09 09:00:46 - test_logger - INFO - test_all_features.py:171 - Test log message
 2025-08-09 09:00:46 - app.core.database.persistence_manager - INFO - persistence_manager.py:179 - [DATA] Initializing persistence manager: data\trading_bot.db
+2025-08-09 09:00:47 - app.core.database.persistence_manager - INFO - persistence_manager.py:354 - [OK] Database tables created successfully
+2025-08-09 09:00:47 - app.core.database.persistence_manager - ERROR - persistence_manager.py:210 - [ERROR] Database initialization failed: 'PersistenceManager' object has no attribute '_verify_tables'
+2025-08-09 09:00:47 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
+2025-08-09 09:00:47 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
+2025-08-09 09:00:47 - app.core.config.settings_manager - INFO - settings_manager.py:394 - [OK] Configuration validation passed
+2025-08-09 09:00:47 - app.core.performance.circuit_breaker - INFO - circuit_breaker.py:133 - [OK] Circuit breaker manager initialized
+2025-08-09 09:00:47 - app.core.ai.risk_assessor - INFO - risk_assessor.py:211 - [OK] AI Risk Assessor initialized
+2025-08-09 09:00:47 - app.core.performance.circuit_breaker - INFO - circuit_breaker.py:133 - [OK] Circuit breaker manager initialized
+2025-08-09 09:00:47 - app.core.performance.circuit_breaker - INFO - circuit_breaker.py:133 - [OK] Circuit breaker manager initialized
+2025-08-09 09:00:47 - app.core.ai.predictive_analytics - INFO - predictive_analytics.py:240 - [GROWTH] Predictive Analytics Engine initialized
+2025-08-09 09:00:47 - app.core.websocket.websocket_manager - INFO - websocket_manager.py:95 - [OK] WebSocket Manager initialized
+2025-08-09 09:00:47 - app.core.trading.transaction_executor - INFO - transaction_executor.py:223 - [ZAP] Transaction executor initialized
+2025-08-09 09:00:47 - app.core.trading.trading_engine - INFO - trading_engine.py:255 - Trading Engine initialized for ethereum
