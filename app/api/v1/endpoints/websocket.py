@@ -42,7 +42,7 @@ async def websocket_dashboard_endpoint(websocket: WebSocket, client_id: str):
             'data': {'subscription': 'dashboard'}
         })
         
-        logger.info(f"📊 Dashboard WebSocket connected: {client_id}")
+        logger.info(f"[STATS] Dashboard WebSocket connected: {client_id}")
         
         # Listen for messages from client
         while True:
@@ -55,7 +55,7 @@ async def websocket_dashboard_endpoint(websocket: WebSocket, client_id: str):
                 await websocket_manager.handle_message(client_id, message)
                 
             except WebSocketDisconnect:
-                logger.info(f"📊 Dashboard WebSocket disconnected: {client_id}")
+                logger.info(f"[STATS] Dashboard WebSocket disconnected: {client_id}")
                 break
             except json.JSONDecodeError as e:
                 logger.error(f"Invalid JSON from {client_id}: {e}")
@@ -106,7 +106,7 @@ async def websocket_trading_endpoint(websocket: WebSocket, client_id: str):
             'data': {'subscription': 'trading'}
         })
         
-        logger.info(f"🔄 Trading WebSocket connected: {client_id}")
+        logger.info(f"[REFRESH] Trading WebSocket connected: {client_id}")
         
         while True:
             try:
@@ -115,7 +115,7 @@ async def websocket_trading_endpoint(websocket: WebSocket, client_id: str):
                 await websocket_manager.handle_message(client_id, message)
                 
             except WebSocketDisconnect:
-                logger.info(f"🔄 Trading WebSocket disconnected: {client_id}")
+                logger.info(f"[REFRESH] Trading WebSocket disconnected: {client_id}")
                 break
             except Exception as e:
                 logger.error(f"Error in trading WebSocket {client_id}: {e}")
@@ -148,7 +148,7 @@ async def websocket_alerts_endpoint(websocket: WebSocket, client_id: str):
             'data': {'subscription': 'alerts'}
         })
         
-        logger.info(f"🚨 Alerts WebSocket connected: {client_id}")
+        logger.info(f"[EMOJI] Alerts WebSocket connected: {client_id}")
         
         while True:
             try:
@@ -157,7 +157,7 @@ async def websocket_alerts_endpoint(websocket: WebSocket, client_id: str):
                 await websocket_manager.handle_message(client_id, message)
                 
             except WebSocketDisconnect:
-                logger.info(f"🚨 Alerts WebSocket disconnected: {client_id}")
+                logger.info(f"[EMOJI] Alerts WebSocket disconnected: {client_id}")
                 break
             except Exception as e:
                 logger.error(f"Error in alerts WebSocket {client_id}: {e}")
@@ -190,7 +190,7 @@ async def websocket_portfolio_endpoint(websocket: WebSocket, client_id: str):
             'data': {'subscription': 'portfolio'}
         })
         
-        logger.info(f"💰 Portfolio WebSocket connected: {client_id}")
+        logger.info(f"[PROFIT] Portfolio WebSocket connected: {client_id}")
         
         while True:
             try:
@@ -199,7 +199,7 @@ async def websocket_portfolio_endpoint(websocket: WebSocket, client_id: str):
                 await websocket_manager.handle_message(client_id, message)
                 
             except WebSocketDisconnect:
-                logger.info(f"💰 Portfolio WebSocket disconnected: {client_id}")
+                logger.info(f"[PROFIT] Portfolio WebSocket disconnected: {client_id}")
                 break
             except Exception as e:
                 logger.error(f"Error in portfolio WebSocket {client_id}: {e}")
@@ -288,7 +288,7 @@ async def websocket_test_page():
     </head>
     <body>
         <div class="container">
-            <h1>🤖 DEX Sniper Pro - WebSocket Test</h1>
+            <h1>[BOT] DEX Sniper Pro - WebSocket Test</h1>
             <p>Test real-time WebSocket connections for live dashboard updates.</p>
             
             <div class="controls">
@@ -338,7 +338,7 @@ async def websocket_test_page():
                 
                 ws.onopen = function(event) {
                     updateStatus(true);
-                    addMessage('✅ Connected to WebSocket');
+                    addMessage('[OK] Connected to WebSocket');
                     document.getElementById('connectBtn').disabled = true;
                     document.getElementById('disconnectBtn').disabled = false;
                 };
@@ -346,21 +346,21 @@ async def websocket_test_page():
                 ws.onmessage = function(event) {
                     try {
                         const data = JSON.parse(event.data);
-                        addMessage(`📨 Received: ${JSON.stringify(data, null, 2)}`);
+                        addMessage(`[EMOJI] Received: ${JSON.stringify(data, null, 2)}`);
                     } catch (e) {
-                        addMessage(`📨 Received (raw): ${event.data}`);
+                        addMessage(`[EMOJI] Received (raw): ${event.data}`);
                     }
                 };
                 
                 ws.onclose = function(event) {
                     updateStatus(false);
-                    addMessage(`🔌 Connection closed: ${event.code} - ${event.reason}`);
+                    addMessage(`[WS] Connection closed: ${event.code} - ${event.reason}`);
                     document.getElementById('connectBtn').disabled = false;
                     document.getElementById('disconnectBtn').disabled = true;
                 };
                 
                 ws.onerror = function(error) {
-                    addMessage(`❌ WebSocket error: ${error}`);
+                    addMessage(`[ERROR] WebSocket error: ${error}`);
                 };
             }
             
@@ -394,9 +394,9 @@ async def websocket_test_page():
             function sendMessage(message) {
                 if (ws && ws.readyState === WebSocket.OPEN) {
                     ws.send(JSON.stringify(message));
-                    addMessage(`📤 Sent: ${JSON.stringify(message)}`);
+                    addMessage(`[EMOJI] Sent: ${JSON.stringify(message)}`);
                 } else {
-                    addMessage('❌ WebSocket not connected');
+                    addMessage('[ERROR] WebSocket not connected');
                 }
             }
             
@@ -437,12 +437,12 @@ async def websocket_test_page():
             
             function simulateTradeUpdate() {
                 // This would normally come from the server
-                addMessage('🔄 Simulating trade update from server...');
+                addMessage('[REFRESH] Simulating trade update from server...');
             }
             
             function simulateAlert() {
                 // This would normally come from the server
-                addMessage('🚨 Simulating alert from server...');
+                addMessage('[EMOJI] Simulating alert from server...');
             }
             
             function clearMessages() {
@@ -451,7 +451,7 @@ async def websocket_test_page():
             
             // Auto-connect on page load for testing
             window.addEventListener('load', function() {
-                addMessage('🚀 WebSocket test page loaded. Click Connect to start.');
+                addMessage('[START] WebSocket test page loaded. Click Connect to start.');
             });
         </script>
     </body>
@@ -519,15 +519,15 @@ async def startup_websocket_manager():
     """Start the WebSocket manager on application startup."""
     try:
         await websocket_manager.start()
-        logger.info("✅ WebSocket manager started successfully")
+        logger.info("[OK] WebSocket manager started successfully")
     except Exception as e:
-        logger.error(f"❌ Failed to start WebSocket manager: {e}")
+        logger.error(f"[ERROR] Failed to start WebSocket manager: {e}")
 
 
 async def shutdown_websocket_manager():
     """Stop the WebSocket manager on application shutdown."""
     try:
         await websocket_manager.stop()
-        logger.info("🛑 WebSocket manager stopped successfully")
+        logger.info("[EMOJI] WebSocket manager stopped successfully")
     except Exception as e:
-        logger.error(f"❌ Error stopping WebSocket manager: {e}")
+        logger.error(f"[ERROR] Error stopping WebSocket manager: {e}")

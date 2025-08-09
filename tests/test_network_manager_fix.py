@@ -28,11 +28,11 @@ try:
     )
     logger = setup_logger(__name__)
 except ImportError as e:
-    print(f"❌ Import error: {e}")
-    print("💡 Make sure you're running from the project root directory")
-    print("💡 Command: python tests/test_phase_4b_integration.py")
-    print(f"💡 Current working directory: {Path.cwd()}")
-    print(f"💡 Script location: {Path(__file__).parent.parent}")
+    print(f"[ERROR] Import error: {e}")
+    print("[TIP] Make sure you're running from the project root directory")
+    print("[TIP] Command: python tests/test_phase_4b_integration.py")
+    print(f"[TIP] Current working directory: {Path.cwd()}")
+    print(f"[TIP] Script location: {Path(__file__).parent.parent}")
     sys.exit(1)
 
 
@@ -51,7 +51,7 @@ class NetworkManagerFixTester:
         Returns:
             Dict containing test results and summary
         """
-        logger.info("🧪 Starting Network Manager Fix Verification Tests")
+        logger.info("[TEST] Starting Network Manager Fix Verification Tests")
         logger.info("=" * 60)
         
         test_methods = [
@@ -71,22 +71,22 @@ class NetworkManagerFixTester:
         
         for test_method in test_methods:
             try:
-                logger.info(f"🔍 Running {test_method.__name__}...")
+                logger.info(f"[SEARCH] Running {test_method.__name__}...")
                 
                 result = await test_method()
                 
                 if result.get("passed", False):
-                    logger.info(f"✅ {test_method.__name__} - PASSED")
+                    logger.info(f"[OK] {test_method.__name__} - PASSED")
                     passed_tests += 1
                 else:
-                    logger.error(f"❌ {test_method.__name__} - FAILED")
+                    logger.error(f"[ERROR] {test_method.__name__} - FAILED")
                     logger.error(f"   Reason: {result.get('error', 'Unknown error')}")
                     failed_tests += 1
                 
                 self.test_results.append(result)
                 
             except Exception as e:
-                logger.error(f"💥 {test_method.__name__} - EXCEPTION: {e}")
+                logger.error(f"[EMOJI] {test_method.__name__} - EXCEPTION: {e}")
                 logger.error(f"   Traceback: {traceback.format_exc()}")
                 failed_tests += 1
                 
@@ -109,12 +109,12 @@ class NetworkManagerFixTester:
         }
         
         logger.info("=" * 60)
-        logger.info(f"📊 Test Summary: {passed_tests}/{total_tests} passed ({success_rate:.1f}%)")
+        logger.info(f"[STATS] Test Summary: {passed_tests}/{total_tests} passed ({success_rate:.1f}%)")
         
         if failed_tests == 0:
-            logger.info("🎉 All network manager fix tests passed!")
+            logger.info("[SUCCESS] All network manager fix tests passed!")
         else:
-            logger.warning(f"⚠️ {failed_tests} tests failed - review implementation")
+            logger.warning(f"[WARN] {failed_tests} tests failed - review implementation")
         
         return summary
     
@@ -232,12 +232,12 @@ class NetworkManagerFixTester:
                 if network_type is None:
                     validation_results.append(f"Valid string '{valid_string}' not recognized")
                 elif isinstance(network_type, NetworkType):
-                    validation_results.append(f"✅ '{valid_string}' -> {network_type.value}")
+                    validation_results.append(f"[OK] '{valid_string}' -> {network_type.value}")
                 else:
                     validation_results.append(f"Invalid type returned for '{valid_string}': {type(network_type)}")
             
             # Check if all validations were successful
-            successful_validations = [r for r in validation_results if r.startswith("✅")]
+            successful_validations = [r for r in validation_results if r.startswith("[OK]")]
             
             if len(successful_validations) == len(valid_strings):
                 return {
@@ -275,11 +275,11 @@ class NetworkManagerFixTester:
                 network_type = self.network_manager._validate_network_type(enum_input)
                 
                 if network_type == enum_input:
-                    validation_results.append(f"✅ {enum_input.value} enum validated correctly")
+                    validation_results.append(f"[OK] {enum_input.value} enum validated correctly")
                 else:
-                    validation_results.append(f"❌ {enum_input.value} enum validation failed")
+                    validation_results.append(f"[ERROR] {enum_input.value} enum validation failed")
             
-            successful_validations = [r for r in validation_results if r.startswith("✅")]
+            successful_validations = [r for r in validation_results if r.startswith("[OK]")]
             
             if len(successful_validations) == len(enum_inputs):
                 return {
@@ -506,24 +506,24 @@ async def run_network_manager_fix_tests() -> bool:
         return results["failed_tests"] == 0
         
     except Exception as e:
-        logger.error(f"❌ Test suite execution failed: {e}")
+        logger.error(f"[ERROR] Test suite execution failed: {e}")
         return False
 
 
 if __name__ == "__main__":
     """Run the network manager fix tests."""
     async def main():
-        logger.info("🧪 Network Manager Fix Verification Test Suite")
+        logger.info("[TEST] Network Manager Fix Verification Test Suite")
         logger.info("=" * 60)
         
         success = await run_network_manager_fix_tests()
         
         if success:
-            logger.info("🎉 All network manager fix tests passed!")
-            logger.info("✅ The integer input error has been resolved")
+            logger.info("[SUCCESS] All network manager fix tests passed!")
+            logger.info("[OK] The integer input error has been resolved")
             sys.exit(0)
         else:
-            logger.error("❌ Some tests failed - check implementation")
+            logger.error("[ERROR] Some tests failed - check implementation")
             sys.exit(1)
     
     # Run the async main function

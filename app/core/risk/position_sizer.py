@@ -124,7 +124,7 @@ class PositionSizer:
         self.volatility_cache = {}
         self.correlation_matrix = {}
         
-        logger.info("✅ PositionSizer initialized with professional risk management")
+        logger.info("[OK] PositionSizer initialized with professional risk management")
 
     async def calculate_position_size(
         self,
@@ -161,7 +161,7 @@ class PositionSizer:
                 token_address, current_price, stop_loss_price
             )
             
-            logger.info(f"🎯 Calculating position size for {token_address} using {method.value}")
+            logger.info(f"[TARGET] Calculating position size for {token_address} using {method.value}")
             
             # Calculate using specified method
             if method == PositionSizeMethod.FIXED_AMOUNT:
@@ -195,7 +195,7 @@ class PositionSizer:
             # Cache result
             await self._cache_sizing_result(token_address, result)
             
-            logger.info(f"✅ Position size calculated: ${result.recommended_size} "
+            logger.info(f"[OK] Position size calculated: ${result.recommended_size} "
                        f"(Risk: {result.risk_percentage:.2f}%)")
             
             return result
@@ -268,7 +268,7 @@ class PositionSizer:
             adjustment_pct = ((position_size - original_size) / original_size * 100) if original_size > 0 else 0
             
             if applied_constraints:
-                logger.info(f"🛡️ Risk limits applied to {token_address}: "
+                logger.info(f"[SEC] Risk limits applied to {token_address}: "
                            f"{adjustment_pct:.1f}% adjustment")
             
             return position_size, applied_constraints
@@ -879,7 +879,7 @@ class PositionSizer:
     def update_portfolio_value(self, new_value: Decimal) -> None:
         """Update portfolio value for position sizing calculations."""
         self.portfolio_value = Decimal(str(new_value))
-        logger.info(f"📊 Portfolio value updated: ${self.portfolio_value:,.2f}")
+        logger.info(f"[STATS] Portfolio value updated: ${self.portfolio_value:,.2f}")
 
     def update_daily_pnl(self, pnl: Decimal) -> None:
         """Update daily P&L for risk monitoring."""
@@ -888,18 +888,18 @@ class PositionSizer:
         # Check if daily loss limit reached
         loss_limit = self.portfolio_value * self.risk_params.max_daily_loss
         if self.daily_pnl < -loss_limit:
-            logger.warning(f"⚠️ Daily loss limit reached: {self.daily_pnl} < -{loss_limit}")
+            logger.warning(f"[WARN] Daily loss limit reached: {self.daily_pnl} < -{loss_limit}")
 
     def add_position(self, token_address: str, position_data: Dict) -> None:
         """Add or update a position in the portfolio."""
         self.current_positions[token_address] = position_data
-        logger.info(f"📈 Position updated for {token_address}")
+        logger.info(f"[PERF] Position updated for {token_address}")
 
     def remove_position(self, token_address: str) -> None:
         """Remove a position from the portfolio."""
         if token_address in self.current_positions:
             del self.current_positions[token_address]
-            logger.info(f"📉 Position removed for {token_address}")
+            logger.info(f"[EMOJI] Position removed for {token_address}")
 
     async def get_risk_summary(self) -> Dict[str, Any]:
         """Get comprehensive risk summary for the portfolio."""
@@ -948,7 +948,7 @@ if __name__ == "__main__":
                 method=PositionSizeMethod.COMBINED
             )
             
-            print(f"✅ Position sizing result:")
+            print(f"[OK] Position sizing result:")
             print(f"   Recommended size: ${result.recommended_size:,.2f}")
             print(f"   Risk amount: ${result.risk_amount:,.2f}")
             print(f"   Risk percentage: {result.risk_percentage:.2f}%")
@@ -959,7 +959,7 @@ if __name__ == "__main__":
                 print(f"   Warnings: {', '.join(result.warnings)}")
                 
         except Exception as e:
-            print(f"❌ Test failed: {e}")
+            print(f"[ERROR] Test failed: {e}")
     
     # Run test
     asyncio.run(test_position_sizer())

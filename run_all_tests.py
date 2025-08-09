@@ -28,11 +28,11 @@ def run_test_category(category_name: str, test_functions: List) -> Dict[str, Any
     
     for test_func in test_functions:
         try:
-            print(f"🧪 Running {test_func.__name__}...")
+            print(f"[TEST] Running {test_func.__name__}...")
             result = test_func()
             
             if result:
-                print(f"  ✅ {test_func.__name__}: PASSED")
+                print(f"  [OK] {test_func.__name__}: PASSED")
                 passed += 1
                 test_results.append({
                     "test_name": test_func.__name__,
@@ -40,7 +40,7 @@ def run_test_category(category_name: str, test_functions: List) -> Dict[str, Any
                     "category": category_name
                 })
             else:
-                print(f"  ❌ {test_func.__name__}: FAILED")
+                print(f"  [ERROR] {test_func.__name__}: FAILED")
                 failed += 1
                 test_results.append({
                     "test_name": test_func.__name__,
@@ -50,7 +50,7 @@ def run_test_category(category_name: str, test_functions: List) -> Dict[str, Any
                 })
                 
         except Exception as e:
-            print(f"  ❌ {test_func.__name__}: ERROR - {e}")
+            print(f"  [ERROR] {test_func.__name__}: ERROR - {e}")
             failed += 1
             test_results.append({
                 "test_name": test_func.__name__,
@@ -368,79 +368,128 @@ def test_error_sanitization():
 # ==================== INTEGRATION TESTING (Phase 5B) ====================
 
 def test_end_to_end_workflow():
-    """Test end-to-end workflow (Phase 5B)."""
-    # This would require full system integration
-    return False  # Not implemented yet
-
+    """Test end-to-end workflow integration."""
+    try:
+        import subprocess
+        import sys
+        
+        # Run the integration test
+        result = subprocess.run([
+            sys.executable, 
+            "tests/integration/test_e2e_workflow.py"
+        ], capture_output=True, text=True, timeout=30)
+        
+        if result.returncode == 0:
+            return True
+        else:
+            print(f"[ERROR] E2E test failed: {result.stderr}")
+            return False
+            
+    except Exception as e:
+        print(f"[ERROR] E2E workflow test error: {e}")
+        return False
 def test_cross_component_communication():
-    """Test cross-component communication (Phase 5B)."""
-    # This would test service-to-service communication
-    return False  # Not implemented yet
-
+    """Test cross-component communication."""
+    try:
+        import subprocess
+        import sys
+        
+        result = subprocess.run([
+            sys.executable,
+            "tests/integration/test_cross_component.py"
+        ], capture_output=True, text=True, timeout=30)
+        
+        return result.returncode == 0
+        
+    except Exception as e:
+        print(f"[ERROR] Cross-component test error: {e}")
+        return False
 def test_performance_benchmarks():
-    """Test performance benchmarks (Phase 5B)."""
-    # This would run performance testing
-    return False  # Not implemented yet
-
+    """Test performance benchmarks."""
+    try:
+        import subprocess
+        import sys
+        
+        result = subprocess.run([
+            sys.executable,
+            "tests/integration/test_performance.py"
+        ], capture_output=True, text=True, timeout=30)
+        
+        return result.returncode == 0
+        
+    except Exception as e:
+        print(f"[ERROR] Performance test error: {e}")
+        return False
 def test_scalability_metrics():
-    """Test scalability metrics (Phase 5B)."""
-    # This would test system scalability
-    return False  # Not implemented yet
-
+    """Test scalability metrics."""
+    try:
+        import subprocess
+        import sys
+        
+        result = subprocess.run([
+            sys.executable,
+            "tests/integration/test_scalability.py"
+        ], capture_output=True, text=True, timeout=30)
+        
+        return result.returncode == 0
+        
+    except Exception as e:
+        print(f"[ERROR] Scalability test error: {e}")
+        return False
 def main():
     """Run all comprehensive tests."""
-    print("🚀 DEX Sniper Pro - Comprehensive Test Suite")
+    print("[START] DEX Sniper Pro - Comprehensive Test Suite")
     print("=" * 60)
-    print("📊 Testing all 32 components across 6 categories")
+    print("[STATS] Testing all 32 components across 6 categories")
     print("=" * 60)
     
     start_time = time.time()
     
     # Define test categories
     test_categories = [
-        ("🏗️ Core Infrastructure", [
+        ("[BUILD] Core Infrastructure", [
             test_project_structure,
             test_core_imports,
             test_logger_system,
             test_exception_handling
         ]),
-        ("💾 Database Systems", [
+        ("[DB] Database Systems", [
             test_persistence_manager,
             test_database_operations,
             test_data_models,
             test_migration_system
         ]),
-        ("⚡ Trading Engine", [
+        ("[TRADE] Trading Engine", [
             test_trading_engine_init,
             test_order_execution,
             test_portfolio_tracking,
             test_risk_management
         ]),
-        ("🌐 API Endpoints", [
+        ("[API] API Endpoints", [
             test_fastapi_application,
             test_health_endpoints,
             test_trading_api,
             test_dashboard_api
         ]),
-        ("🎨 Frontend Interface", [
+        ("[UI] Frontend Interface", [
             test_template_system,
             test_dashboard_ui,
             test_static_assets,
             test_websocket_support
         ]),
-        ("⚙️ Configuration", [
+        ("[CONFIG] Configuration", [
             test_settings_manager,
             test_environment_config,
             test_runtime_updates,
             test_validation_system
         ]),
-        ("🛡️ Security & Compliance", [
+        ("[SEC] Security & Compliance", [
             test_wallet_security,
             test_api_authentication,
             test_input_validation,
             test_error_sanitization
         ]),
-        ("🧪 Integration Testing", [
+        ("[TEST] Integration Testing", [
             test_end_to_end_workflow,
             test_cross_component_communication,
             test_performance_benchmarks,
@@ -467,50 +516,50 @@ def main():
     
     # Print summary
     print("\n" + "=" * 60)
-    print("📊 COMPREHENSIVE TEST SUMMARY")
+    print("[STATS] COMPREHENSIVE TEST SUMMARY")
     print("=" * 60)
     
-    print(f"📋 Total Tests: {total_tests}")
-    print(f"✅ Passed: {total_passed}")
-    print(f"❌ Failed: {total_failed}")
-    print(f"📈 Success Rate: {success_rate:.1f}%")
-    print(f"⏱️ Duration: {end_time - start_time:.2f} seconds")
-    print(f"📅 Timestamp: {datetime.utcnow().isoformat()}")
+    print(f"[LOG] Total Tests: {total_tests}")
+    print(f"[OK] Passed: {total_passed}")
+    print(f"[ERROR] Failed: {total_failed}")
+    print(f"[PERF] Success Rate: {success_rate:.1f}%")
+    print(f"⏱[EMOJI] Duration: {end_time - start_time:.2f} seconds")
+    print(f"[TIME] Timestamp: {datetime.utcnow().isoformat()}")
     
     # Category breakdown
-    print(f"\n📋 CATEGORY BREAKDOWN:")
+    print(f"\n[LOG] CATEGORY BREAKDOWN:")
     for result in all_results:
-        status_emoji = "✅" if result['failed'] == 0 else "⚠️" if result['passed'] > result['failed'] else "❌"
+        status_emoji = "[OK]" if result['failed'] == 0 else "[WARN]" if result['passed'] > result['failed'] else "[ERROR]"
         print(f"{status_emoji} {result['category']}: {result['passed']}/{result['total']} passed")
     
     # Determine system status
     if success_rate >= 90:
         status = "EXCELLENT"
-        emoji = "🎉"
+        emoji = "[SUCCESS]"
     elif success_rate >= 75:
         status = "GOOD"
-        emoji = "✅"
+        emoji = "[OK]"
     elif success_rate >= 60:
         status = "MODERATE"
-        emoji = "⚠️"
+        emoji = "[WARN]"
     else:
         status = "NEEDS_WORK"
-        emoji = "❌"
+        emoji = "[ERROR]"
     
     print(f"\n{emoji} SYSTEM STATUS: {status}")
-    print(f"🎯 READINESS LEVEL: {'PRODUCTION_READY' if success_rate >= 90 else 'DEVELOPMENT_ACTIVE'}")
+    print(f"[TARGET] READINESS LEVEL: {'PRODUCTION_READY' if success_rate >= 90 else 'DEVELOPMENT_ACTIVE'}")
     
     # Phase completion status
     security_category = next(r for r in all_results if "Security" in r['category'])
     if security_category['failed'] == 0:
-        print("\n🛡️ PHASE 5A: COMPLETE - All security tests passed")
+        print("\n[SEC] PHASE 5A: COMPLETE - All security tests passed")
         integration_category = next(r for r in all_results if "Integration" in r['category'])
         if integration_category['failed'] == 0:
-            print("🧪 PHASE 5B: COMPLETE - All integration tests passed")
+            print("[TEST] PHASE 5B: COMPLETE - All integration tests passed")
         else:
-            print("🔄 PHASE 5B: IN PROGRESS - Integration testing needed")
+            print("[REFRESH] PHASE 5B: IN PROGRESS - Integration testing needed")
     else:
-        print("\n🔄 PHASE 5A: IN PROGRESS - Security implementation needed")
+        print("\n[REFRESH] PHASE 5A: IN PROGRESS - Security implementation needed")
     
     print("=" * 60)
     
@@ -521,8 +570,8 @@ if __name__ == "__main__":
         exit_code = main()
         sys.exit(exit_code)
     except KeyboardInterrupt:
-        print("\n⏹️ Tests interrupted by user")
+        print("\n⏹[EMOJI] Tests interrupted by user")
         sys.exit(1)
     except Exception as e:
-        print(f"\n💥 Test suite error: {e}")
+        print(f"\n[EMOJI] Test suite error: {e}")
         sys.exit(1)

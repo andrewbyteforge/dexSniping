@@ -136,7 +136,7 @@ async def start_trading_session(
         HTTPException: If session creation fails
     """
     try:
-        logger.info(f"🚀 Starting trading session with mode: {trading_mode.value}")
+        logger.info(f"[START] Starting trading session with mode: {trading_mode.value}")
         
         # Generate unique session ID
         session_id = f"session_{uuid.uuid4().hex[:8]}"
@@ -161,11 +161,11 @@ async def start_trading_session(
         # Create response
         response = TradingSessionResponse(**session_data)
         
-        logger.info(f"✅ Trading session started: {session_id}")
+        logger.info(f"[OK] Trading session started: {session_id}")
         return response
         
     except Exception as error:
-        logger.error(f"❌ Failed to start trading session: {error}")
+        logger.error(f"[ERROR] Failed to start trading session: {error}")
         raise HTTPException(
             status_code=500, 
             detail=f"Session creation failed: {str(error)}"
@@ -198,13 +198,13 @@ async def get_trading_session(session_id: str) -> TradingSessionResponse:
         
         response = TradingSessionResponse(**session_data)
         
-        logger.info(f"📊 Retrieved session info: {session_id}")
+        logger.info(f"[STATS] Retrieved session info: {session_id}")
         return response
         
     except HTTPException:
         raise
     except Exception as error:
-        logger.error(f"❌ Failed to get session: {error}")
+        logger.error(f"[ERROR] Failed to get session: {error}")
         raise HTTPException(
             status_code=500, 
             detail=f"Session retrieval failed: {str(error)}"
@@ -236,7 +236,7 @@ async def stop_trading_session(session_id: str) -> APIResponse:
         active_sessions[session_id]["status"] = TradingSessionStatus.INACTIVE
         active_sessions[session_id]["last_activity_at"] = datetime.utcnow()
         
-        logger.info(f"🛑 Trading session stopped: {session_id}")
+        logger.info(f"[EMOJI] Trading session stopped: {session_id}")
         
         return APIResponse(
             success=True,
@@ -247,7 +247,7 @@ async def stop_trading_session(session_id: str) -> APIResponse:
     except HTTPException:
         raise
     except Exception as error:
-        logger.error(f"❌ Failed to stop session: {error}")
+        logger.error(f"[ERROR] Failed to stop session: {error}")
         raise HTTPException(
             status_code=500, 
             detail=f"Session stop failed: {str(error)}"
@@ -289,7 +289,7 @@ async def execute_trade(
                 detail=f"Session not active: {session['status']}"
             )
         
-        logger.info(f"💼 Executing trade: {request.side.value} {request.quantity} of {request.token_address}")
+        logger.info(f"[EMOJI] Executing trade: {request.side.value} {request.quantity} of {request.token_address}")
         
         # Simulate trade execution
         order_id = f"order_{uuid.uuid4().hex[:8]}"
@@ -314,13 +314,13 @@ async def execute_trade(
         # Update session activity
         session["last_activity_at"] = datetime.utcnow()
         
-        logger.info(f"✅ Trade executed: {order_id}")
+        logger.info(f"[OK] Trade executed: {order_id}")
         return response
         
     except HTTPException:
         raise
     except Exception as error:
-        logger.error(f"❌ Trade execution failed: {error}")
+        logger.error(f"[ERROR] Trade execution failed: {error}")
         
         return TradeExecutionResponse(
             success=False,
@@ -379,13 +379,13 @@ async def get_portfolio_summary(session_id: str) -> PortfolioSummary:
         # Update session activity
         session["last_activity_at"] = datetime.utcnow()
         
-        logger.info(f"📈 Retrieved portfolio for session: {session_id}")
+        logger.info(f"[PERF] Retrieved portfolio for session: {session_id}")
         return portfolio
         
     except HTTPException:
         raise
     except Exception as error:
-        logger.error(f"❌ Failed to get portfolio: {error}")
+        logger.error(f"[ERROR] Failed to get portfolio: {error}")
         raise HTTPException(
             status_code=500, 
             detail=f"Portfolio retrieval failed: {str(error)}"
@@ -424,7 +424,7 @@ async def get_active_sessions() -> APIResponse:
         )
         
     except Exception as error:
-        logger.error(f"❌ Failed to get active sessions: {error}")
+        logger.error(f"[ERROR] Failed to get active sessions: {error}")
         raise HTTPException(
             status_code=500, 
             detail=f"Failed to retrieve active sessions: {str(error)}"
@@ -458,7 +458,7 @@ async def live_trading_health_check() -> APIResponse:
         )
         
     except Exception as error:
-        logger.error(f"❌ Health check failed: {error}")
+        logger.error(f"[ERROR] Health check failed: {error}")
         raise HTTPException(
             status_code=503, 
             detail=f"Service health check failed: {str(error)}"

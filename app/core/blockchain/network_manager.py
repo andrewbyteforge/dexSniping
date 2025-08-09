@@ -228,7 +228,7 @@ class NetworkManager:
             provider.value for provider, key in self.api_keys.items() 
             if key is not None
         ]
-        logger.info(f"🔗 Available API providers: {available_providers}")
+        logger.info(f"[EMOJI] Available API providers: {available_providers}")
     
     async def connect_to_network(
         self, 
@@ -249,7 +249,7 @@ class NetworkManager:
             ConnectionError: If unable to connect to any provider
         """
         try:
-            logger.info(f"🔗 Connecting to {network_type.value}")
+            logger.info(f"[EMOJI] Connecting to {network_type.value}")
             
             config = self.network_configs.get(network_type)
             if not config:
@@ -261,14 +261,14 @@ class NetworkManager:
             if connection:
                 self.connections[network_type] = connection
                 await self._update_network_status(network_type, True)
-                logger.info(f"✅ Connected to {network_type.value}")
+                logger.info(f"[OK] Connected to {network_type.value}")
                 return True
             else:
                 await self._update_network_status(network_type, False, "No providers available")
                 raise ConnectionError(f"Failed to connect to {network_type.value}")
                 
         except Exception as e:
-            logger.error(f"❌ Failed to connect to {network_type.value}: {e}")
+            logger.error(f"[ERROR] Failed to connect to {network_type.value}: {e}")
             await self._update_network_status(network_type, False, str(e))
             raise ConnectionError(f"Network connection failed: {e}")
     
@@ -304,7 +304,7 @@ class NetworkManager:
         # Try each URL until one works
         for rpc_url in rpc_urls:
             try:
-                logger.info(f"🔄 Trying RPC: {rpc_url[:50]}...")
+                logger.info(f"[REFRESH] Trying RPC: {rpc_url[:50]}...")
                 
                 # Create Web3 instance
                 provider = HTTPProvider(rpc_url, request_kwargs={'timeout': 10})
@@ -317,11 +317,11 @@ class NetworkManager:
                 # Test connection
                 latest_block = await web3.eth.block_number
                 if latest_block > 0:
-                    logger.info(f"✅ Connected via {rpc_url[:50]}... (block: {latest_block})")
+                    logger.info(f"[OK] Connected via {rpc_url[:50]}... (block: {latest_block})")
                     return web3
                     
             except Exception as e:
-                logger.warning(f"⚠️ RPC failed {rpc_url[:50]}...: {e}")
+                logger.warning(f"[WARN] RPC failed {rpc_url[:50]}...: {e}")
                 continue
         
         return None
@@ -365,7 +365,7 @@ class NetworkManager:
             )
             
         except Exception as e:
-            logger.error(f"❌ Failed to update network status for {network_type}: {e}")
+            logger.error(f"[ERROR] Failed to update network status for {network_type}: {e}")
     
     async def get_network_config(self, network_type: NetworkType) -> NetworkConfig:
         """Get network configuration."""
@@ -395,13 +395,13 @@ class NetworkManager:
             latest_block = await web3.eth.block_number
             
             if latest_block > 0:
-                logger.info(f"🔄 Switched to {network_type.value} (block: {latest_block})")
+                logger.info(f"[REFRESH] Switched to {network_type.value} (block: {latest_block})")
                 return True
             else:
                 return False
                 
         except Exception as e:
-            logger.error(f"❌ Failed to switch to {network_type}: {e}")
+            logger.error(f"[ERROR] Failed to switch to {network_type}: {e}")
             return False
     
     async def get_web3_instance(self, network_type: NetworkType) -> AsyncWeb3:
@@ -426,7 +426,7 @@ class NetworkManager:
             return Decimal(str(balance_eth))
             
         except Exception as e:
-            logger.error(f"❌ Failed to get balance for {address}: {e}")
+            logger.error(f"[ERROR] Failed to get balance for {address}: {e}")
             raise TradingError(f"Balance check failed: {e}")
     
     async def get_token_balance(
@@ -460,7 +460,7 @@ class NetworkManager:
             return Decimal(str(balance))
             
         except Exception as e:
-            logger.error(f"❌ Failed to get token balance: {e}")
+            logger.error(f"[ERROR] Failed to get token balance: {e}")
             raise TradingError(f"Token balance check failed: {e}")
     
     async def estimate_gas_price(self, network_type: NetworkType) -> Dict[str, int]:
@@ -478,7 +478,7 @@ class NetworkManager:
             }
             
         except Exception as e:
-            logger.error(f"❌ Failed to estimate gas price: {e}")
+            logger.error(f"[ERROR] Failed to estimate gas price: {e}")
             return {"fast": 20, "standard": 15, "safe": 10}
     
     async def start_health_monitoring(self) -> None:
@@ -487,7 +487,7 @@ class NetworkManager:
             return  # Already running
         
         self._health_check_task = asyncio.create_task(self._health_check_loop())
-        logger.info("🏥 Started network health monitoring")
+        logger.info("[EMOJI] Started network health monitoring")
     
     async def stop_health_monitoring(self) -> None:
         """Stop health check monitoring."""
@@ -497,7 +497,7 @@ class NetworkManager:
                 await self._health_check_task
             except asyncio.CancelledError:
                 pass
-        logger.info("🛑 Stopped network health monitoring")
+        logger.info("[EMOJI] Stopped network health monitoring")
     
     async def _health_check_loop(self) -> None:
         """Periodic health check loop."""
@@ -511,7 +511,7 @@ class NetworkManager:
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                logger.error(f"❌ Health check error: {e}")
+                logger.error(f"[ERROR] Health check error: {e}")
                 await asyncio.sleep(5)  # Wait before retrying
     
     async def get_all_network_status(self) -> Dict[str, NetworkStatus]:
@@ -529,13 +529,13 @@ class NetworkManager:
             try:
                 # Close any active connections if needed
                 del self.connections[network_type]
-                logger.info(f"🔌 Disconnected from {network_type.value}")
+                logger.info(f"[WS] Disconnected from {network_type.value}")
             except Exception as e:
-                logger.error(f"❌ Error disconnecting from {network_type}: {e}")
+                logger.error(f"[ERROR] Error disconnecting from {network_type}: {e}")
         
         self.connections.clear()
         self.network_status.clear()
-        logger.info("🔌 Disconnected from all networks")
+        logger.info("[WS] Disconnected from all networks")
 
 
 # Global network manager instance

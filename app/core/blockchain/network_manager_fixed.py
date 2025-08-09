@@ -376,7 +376,7 @@ class NetworkManagerFixed:
                         all_endpoints.append(private_url.format(api_key=api_key))
                         logger.info(f"[OK] Added private RPC endpoint with API key")
                     else:
-                        logger.info(f"ℹ️ Skipping private endpoint - no API key available")
+                        logger.info(f"ℹ[EMOJI] Skipping private endpoint - no API key available")
                 else:
                     all_endpoints.append(private_url)
             
@@ -493,7 +493,7 @@ class NetworkManagerFixed:
                 logger.info(f"[OK] Disconnected from {network_type.value}")
                 return True
             else:
-                logger.info(f"ℹ️ Not connected to {network_type.value}")
+                logger.info(f"ℹ[EMOJI] Not connected to {network_type.value}")
                 return True
                 
         except Exception as e:

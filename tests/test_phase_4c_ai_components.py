@@ -37,7 +37,7 @@ class TestPhase4CAIComponents:
     async def setup(self):
         """Setup test components."""
         try:
-            logger.info("🚀 Setting up AI test components...")
+            logger.info("[START] Setting up AI test components...")
             
             # Initialize components
             self.honeypot_detector = HoneypotDetector()
@@ -45,18 +45,18 @@ class TestPhase4CAIComponents:
             
             self.contract_analyzer = ContractAnalyzer()
             
-            logger.info("✅ AI components initialized for testing")
+            logger.info("[OK] AI components initialized for testing")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Setup failed: {e}")
+            logger.error(f"[ERROR] Setup failed: {e}")
             return False
     
     async def test_honeypot_detection(self):
         """Test honeypot detection functionality."""
         test_name = "Honeypot Detection"
         try:
-            logger.info(f"🧪 Testing {test_name}...")
+            logger.info(f"[TEST] Testing {test_name}...")
             
             # Test with mock contract
             test_address = "0x1234567890123456789012345678901234567890"
@@ -88,7 +88,7 @@ class TestPhase4CAIComponents:
             assert 0.0 <= result.confidence <= 1.0
             
             logger.info(
-                f"✅ {test_name} passed - "
+                f"[OK] {test_name} passed - "
                 f"Risk: {result.risk_level.value}, "
                 f"Score: {result.risk_score:.2f}"
             )
@@ -96,7 +96,7 @@ class TestPhase4CAIComponents:
             return True
             
         except Exception as e:
-            logger.error(f"❌ {test_name} failed: {e}")
+            logger.error(f"[ERROR] {test_name} failed: {e}")
             self.test_results["failed"] += 1
             self.test_results["errors"].append(f"{test_name}: {str(e)}")
             return False
@@ -105,7 +105,7 @@ class TestPhase4CAIComponents:
         """Test comprehensive honeypot analysis."""
         test_name = "Comprehensive Honeypot Analysis"
         try:
-            logger.info(f"🧪 Testing {test_name}...")
+            logger.info(f"[TEST] Testing {test_name}...")
             
             # Test with suspicious contract patterns
             test_address = "0xBAD0000000000000000000000000000000000BAD"
@@ -145,14 +145,14 @@ class TestPhase4CAIComponents:
             assert len(summary) > 0
             
             logger.info(
-                f"✅ {test_name} passed - "
+                f"[OK] {test_name} passed - "
                 f"Found {len(result.indicators)} risk indicators"
             )
             self.test_results["passed"] += 1
             return True
             
         except Exception as e:
-            logger.error(f"❌ {test_name} failed: {e}")
+            logger.error(f"[ERROR] {test_name} failed: {e}")
             self.test_results["failed"] += 1
             self.test_results["errors"].append(f"{test_name}: {str(e)}")
             return False
@@ -161,7 +161,7 @@ class TestPhase4CAIComponents:
         """Test contract analysis functionality."""
         test_name = "Contract Analysis"
         try:
-            logger.info(f"🧪 Testing {test_name}...")
+            logger.info(f"[TEST] Testing {test_name}...")
             
             # Test contract analysis
             test_address = "0x5678901234567890123456789012345678901234"
@@ -194,7 +194,7 @@ class TestPhase4CAIComponents:
             assert 0.0 <= result.security_audit.risk_score <= 10.0
             
             logger.info(
-                f"✅ {test_name} passed - "
+                f"[OK] {test_name} passed - "
                 f"Type: {result.contract_features.contract_type.value}, "
                 f"Score: {result.overall_score:.2f}"
             )
@@ -202,7 +202,7 @@ class TestPhase4CAIComponents:
             return True
             
         except Exception as e:
-            logger.error(f"❌ {test_name} failed: {e}")
+            logger.error(f"[ERROR] {test_name} failed: {e}")
             self.test_results["failed"] += 1
             self.test_results["errors"].append(f"{test_name}: {str(e)}")
             return False
@@ -211,7 +211,7 @@ class TestPhase4CAIComponents:
         """Test security audit functionality."""
         test_name = "Security Audit"
         try:
-            logger.info(f"🧪 Testing {test_name}...")
+            logger.info(f"[TEST] Testing {test_name}...")
             
             # Test with risky contract
             test_address = "0xRISK000000000000000000000000000000000000"
@@ -249,7 +249,7 @@ class TestPhase4CAIComponents:
             assert "risks" in result.detailed_report
             
             logger.info(
-                f"✅ {test_name} passed - "
+                f"[OK] {test_name} passed - "
                 f"Security Level: {result.security_audit.security_level.value}, "
                 f"Warnings: {len(result.security_audit.warnings)}"
             )
@@ -257,7 +257,7 @@ class TestPhase4CAIComponents:
             return True
             
         except Exception as e:
-            logger.error(f"❌ {test_name} failed: {e}")
+            logger.error(f"[ERROR] {test_name} failed: {e}")
             self.test_results["failed"] += 1
             self.test_results["errors"].append(f"{test_name}: {str(e)}")
             return False
@@ -266,7 +266,7 @@ class TestPhase4CAIComponents:
         """Test transaction simulation for honeypot detection."""
         test_name = "Transaction Simulation"
         try:
-            logger.info(f"🧪 Testing {test_name}...")
+            logger.info(f"[TEST] Testing {test_name}...")
             
             # Simulate transaction
             test_address = "0xTEST00000000000000000000000000000000TEST"
@@ -289,7 +289,7 @@ class TestPhase4CAIComponents:
             assert 0.0 <= result["confidence"] <= 1.0
             
             logger.info(
-                f"✅ {test_name} passed - "
+                f"[OK] {test_name} passed - "
                 f"Can Buy: {result['can_buy']}, "
                 f"Can Sell: {result['can_sell']}, "
                 f"Honeypot: {result['is_honeypot']}"
@@ -298,7 +298,7 @@ class TestPhase4CAIComponents:
             return True
             
         except Exception as e:
-            logger.error(f"❌ {test_name} failed: {e}")
+            logger.error(f"[ERROR] {test_name} failed: {e}")
             self.test_results["failed"] += 1
             self.test_results["errors"].append(f"{test_name}: {str(e)}")
             return False
@@ -307,7 +307,7 @@ class TestPhase4CAIComponents:
         """Test caching mechanism for AI components."""
         test_name = "AI Caching Mechanism"
         try:
-            logger.info(f"🧪 Testing {test_name}...")
+            logger.info(f"[TEST] Testing {test_name}...")
             
             test_address = "0xCACHE0000000000000000000000000000000000"
             test_network = "ethereum"
@@ -338,12 +338,12 @@ class TestPhase4CAIComponents:
             # Should use cached result
             assert analysis1.overall_score == analysis2.overall_score
             
-            logger.info(f"✅ {test_name} passed - Caching working correctly")
+            logger.info(f"[OK] {test_name} passed - Caching working correctly")
             self.test_results["passed"] += 1
             return True
             
         except Exception as e:
-            logger.error(f"❌ {test_name} failed: {e}")
+            logger.error(f"[ERROR] {test_name} failed: {e}")
             self.test_results["failed"] += 1
             self.test_results["errors"].append(f"{test_name}: {str(e)}")
             return False
@@ -351,12 +351,12 @@ class TestPhase4CAIComponents:
     async def run_all_tests(self):
         """Run all AI component tests."""
         logger.info("=" * 60)
-        logger.info("🤖 PHASE 4C AI COMPONENTS TEST SUITE")
+        logger.info("[BOT] PHASE 4C AI COMPONENTS TEST SUITE")
         logger.info("=" * 60)
         
         # Setup
         if not await self.setup():
-            logger.error("❌ Failed to setup test environment")
+            logger.error("[ERROR] Failed to setup test environment")
             return False
         
         # Run tests
@@ -373,23 +373,23 @@ class TestPhase4CAIComponents:
             try:
                 await test()
             except Exception as e:
-                logger.error(f"❌ Test crashed: {e}")
+                logger.error(f"[ERROR] Test crashed: {e}")
                 self.test_results["failed"] += 1
         
         # Print results
         logger.info("=" * 60)
-        logger.info("📊 TEST RESULTS SUMMARY")
+        logger.info("[STATS] TEST RESULTS SUMMARY")
         logger.info("=" * 60)
-        logger.info(f"✅ Passed: {self.test_results['passed']}")
-        logger.info(f"❌ Failed: {self.test_results['failed']}")
-        logger.info(f"📊 Total: {self.test_results['passed'] + self.test_results['failed']}")
+        logger.info(f"[OK] Passed: {self.test_results['passed']}")
+        logger.info(f"[ERROR] Failed: {self.test_results['failed']}")
+        logger.info(f"[STATS] Total: {self.test_results['passed'] + self.test_results['failed']}")
         logger.info(
-            f"🎯 Success Rate: "
+            f"[TARGET] Success Rate: "
             f"{(self.test_results['passed'] / max(1, self.test_results['passed'] + self.test_results['failed']) * 100):.1f}%"
         )
         
         if self.test_results["errors"]:
-            logger.info("\n❌ ERRORS:")
+            logger.info("\n[ERROR] ERRORS:")
             for error in self.test_results["errors"]:
                 logger.error(f"  - {error}")
         
@@ -404,10 +404,10 @@ async def main():
     success = await tester.run_all_tests()
     
     if success:
-        logger.info("✅ All Phase 4C AI component tests passed!")
+        logger.info("[OK] All Phase 4C AI component tests passed!")
         return 0
     else:
-        logger.error("❌ Some tests failed. Please review the errors above.")
+        logger.error("[ERROR] Some tests failed. Please review the errors above.")
         return 1
 
 

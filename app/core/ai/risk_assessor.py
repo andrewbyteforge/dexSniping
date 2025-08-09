@@ -263,7 +263,7 @@ class AIRiskAssessor:
             # Check cache first
             cached_result = await self.cache_manager.get(cache_key)
             if cached_result:
-                logger.debug(f"📋 Using cached AI analysis for {token_address}")
+                logger.debug(f"[LOG] Using cached AI analysis for {token_address}")
                 return ComprehensiveRiskAssessment(**cached_result)
             
             logger.info(f"[BOT] Starting comprehensive AI analysis for {token_address} on {network}")
@@ -384,7 +384,7 @@ class AIRiskAssessor:
             if cached_result:
                 return HoneypotAnalysis(**cached_result)
             
-            logger.info(f"🍯 Detecting honeypot for {token_address}")
+            logger.info(f"[EMOJI] Detecting honeypot for {token_address}")
             
             if not contract_features:
                 # This would extract features - simplified for now
@@ -847,7 +847,7 @@ class AIRiskAssessor:
     ) -> str:
         """Generate honeypot recommendation."""
         if risk_level == HoneypotRisk.CRITICAL:
-            return "⛔ AVOID - Critical honeypot risk detected"
+            return "[EMOJI] AVOID - Critical honeypot risk detected"
         elif risk_level == HoneypotRisk.HIGH:
             return "[ALERT] HIGH RISK - Proceed with extreme caution"
         elif risk_level == HoneypotRisk.MEDIUM:

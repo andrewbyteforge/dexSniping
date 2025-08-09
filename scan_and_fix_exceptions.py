@@ -64,7 +64,7 @@ def scan_for_exception_imports() -> Set[str]:
                 exception_imports.add(match)
                 
         except Exception as e:
-            print(f"⚠️ Could not scan {py_file}: {e}")
+            print(f"[WARN] Could not scan {py_file}: {e}")
     
     return exception_imports
 
@@ -86,7 +86,7 @@ def get_existing_exceptions() -> Set[str]:
                 existing.add(match)
                 
         except Exception as e:
-            print(f"⚠️ Could not read exceptions.py: {e}")
+            print(f"[WARN] Could not read exceptions.py: {e}")
     
     return existing
 
@@ -211,7 +211,7 @@ def add_exceptions_to_file(exceptions: List[Tuple[str, str, str]]) -> bool:
     exceptions_file = Path("app/core/exceptions.py")
     
     if not exceptions_file.exists():
-        print("❌ exceptions.py not found")
+        print("[ERROR] exceptions.py not found")
         return False
     
     try:
@@ -248,13 +248,13 @@ class {exception_name}({parent_class}):
         return True
         
     except Exception as e:
-        print(f"❌ Error adding exceptions: {e}")
+        print(f"[ERROR] Error adding exceptions: {e}")
         return False
 
 
 def main():
     """Scan and fix all exception references."""
-    print("🔧 Scanning and Fixing All Exception References")
+    print("[FIX] Scanning and Fixing All Exception References")
     print("=" * 60)
     
     # Step 1: Scan for referenced exceptions
@@ -292,9 +292,9 @@ def main():
         success = add_exceptions_to_file(missing_exception_defs)
         
         if success:
-            print(f"✅ Added {len(missing_exception_defs)} missing exceptions")
+            print(f"[OK] Added {len(missing_exception_defs)} missing exceptions")
         else:
-            print("❌ Failed to add missing exceptions")
+            print("[ERROR] Failed to add missing exceptions")
     else:
         print("\n4. No missing exceptions to add")
         success = True
@@ -304,12 +304,12 @@ def main():
     print("=" * 60)
     
     if success:
-        print("✅ All exception references have been resolved!")
+        print("[OK] All exception references have been resolved!")
         print("\nNext steps:")
         print("1. Run: python test_all_features.py")
         print("2. Should now work without any exception import errors")
     else:
-        print("❌ Some exceptions could not be added")
+        print("[ERROR] Some exceptions could not be added")
     
     return success
 

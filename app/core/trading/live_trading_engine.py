@@ -119,7 +119,7 @@ class LiveTradingEngine(TradingEngine):
     async def initialize_live_connections(self) -> bool:
         """Initialize connections to live blockchain networks."""
         try:
-            logger.info("🚀 Initializing live blockchain connections...")
+            logger.info("[START] Initializing live blockchain connections...")
             
             # Validate configuration
             if not self.live_config.wallet_private_key:
@@ -130,7 +130,7 @@ class LiveTradingEngine(TradingEngine):
             
             # Connect to primary network
             primary_network = self.live_config.default_network
-            logger.info(f"🔗 Connecting to primary network: {primary_network.value}")
+            logger.info(f"[EMOJI] Connecting to primary network: {primary_network.value}")
             
             success = await self.network_manager.connect_to_network(primary_network)
             if not success:
@@ -161,40 +161,40 @@ class LiveTradingEngine(TradingEngine):
                         if success:
                             self.active_networks[network] = True
                             await self._update_market_conditions(network)
-                            logger.info(f"✅ Connected to {network.value}")
+                            logger.info(f"[OK] Connected to {network.value}")
                         else:
-                            logger.warning(f"⚠️ Failed to connect to {network.value}")
+                            logger.warning(f"[WARN] Failed to connect to {network.value}")
                     except Exception as e:
-                        logger.warning(f"⚠️ {network.value} connection failed: {e}")
+                        logger.warning(f"[WARN] {network.value} connection failed: {e}")
             
-            logger.info(f"🎯 Live trading engine initialized with {len(self.active_networks)} networks")
+            logger.info(f"[TARGET] Live trading engine initialized with {len(self.active_networks)} networks")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to initialize live connections: {e}")
+            logger.error(f"[ERROR] Failed to initialize live connections: {e}")
             raise TradingError(f"Live initialization failed: {e}")
     
     async def _verify_wallet_access(self, network_type: NetworkType) -> bool:
         """Verify wallet access and balances."""
         try:
-            logger.info(f"🔐 Verifying wallet access on {network_type.value}")
+            logger.info(f"[AUTH] Verifying wallet access on {network_type.value}")
             
             # Check native token balance
             native_balance = await self.network_manager.get_native_balance(
                 network_type, self.live_config.wallet_address
             )
             
-            logger.info(f"💰 Native balance: {native_balance} {network_type.value}")
+            logger.info(f"[PROFIT] Native balance: {native_balance} {network_type.value}")
             
             # Ensure minimum balance for gas
             min_native_balance = Decimal("0.001")  # Minimum for gas fees
             if native_balance < min_native_balance:
-                logger.warning(f"⚠️ Low native balance: {native_balance}")
+                logger.warning(f"[WARN] Low native balance: {native_balance}")
             
             return True
             
         except Exception as e:
-            logger.error(f"❌ Wallet verification failed: {e}")
+            logger.error(f"[ERROR] Wallet verification failed: {e}")
             return False
     
     async def _update_market_conditions(self, network_type: NetworkType) -> None:
@@ -227,10 +227,10 @@ class LiveTradingEngine(TradingEngine):
                 total_dex_liquidity_usd=Decimal("1000000")  # Placeholder
             )
             
-            logger.debug(f"📊 Updated market conditions for {network_type.value}: Gas {current_gas_gwei} Gwei")
+            logger.debug(f"[STATS] Updated market conditions for {network_type.value}: Gas {current_gas_gwei} Gwei")
             
         except Exception as e:
-            logger.error(f"❌ Failed to update market conditions: {e}")
+            logger.error(f"[ERROR] Failed to update market conditions: {e}")
     
     async def _start_blockchain_monitoring(self, network_type: NetworkType) -> None:
         """Start monitoring blockchain events."""
@@ -244,10 +244,10 @@ class LiveTradingEngine(TradingEngine):
             )
             self.blockchain_monitors[network_type] = monitor_task
             
-            logger.info(f"👀 Started blockchain monitoring for {network_type.value}")
+            logger.info(f"[EMOJI] Started blockchain monitoring for {network_type.value}")
             
         except Exception as e:
-            logger.error(f"❌ Failed to start blockchain monitoring: {e}")
+            logger.error(f"[ERROR] Failed to start blockchain monitoring: {e}")
     
     async def _blockchain_monitor_loop(self, network_type: NetworkType) -> None:
         """Blockchain monitoring loop."""
@@ -267,7 +267,7 @@ class LiveTradingEngine(TradingEngine):
             except asyncio.CancelledError:
                 break
             except Exception as e:
-                logger.error(f"❌ Blockchain monitoring error: {e}")
+                logger.error(f"[ERROR] Blockchain monitoring error: {e}")
                 await asyncio.sleep(10)  # Wait before retrying
     
     async def _check_pending_transactions(self) -> None:
@@ -279,7 +279,7 @@ class LiveTradingEngine(TradingEngine):
                 if updated_txn and updated_txn.status in ["confirmed", "failed"]:
                     # Transaction completed
                     if updated_txn.status == "confirmed":
-                        logger.info(f"✅ Transaction confirmed: {tx_hash[:10]}...")
+                        logger.info(f"[OK] Transaction confirmed: {tx_hash[:10]}...")
                         self.live_trades_executed += 1
                         
                         # Update profit tracking
@@ -288,13 +288,13 @@ class LiveTradingEngine(TradingEngine):
                         self.total_profit_usd += estimated_profit
                         
                     else:
-                        logger.warning(f"❌ Transaction failed: {tx_hash[:10]}...")
+                        logger.warning(f"[ERROR] Transaction failed: {tx_hash[:10]}...")
                     
                     # Remove from pending
                     del self.live_dex.pending_transactions[tx_hash]
                     
         except Exception as e:
-            logger.error(f"❌ Failed to check pending transactions: {e}")
+            logger.error(f"[ERROR] Failed to check pending transactions: {e}")
     
     async def _scan_arbitrage_opportunities(self, network_type: NetworkType) -> None:
         """Scan for arbitrage opportunities."""
@@ -338,7 +338,7 @@ class LiveTradingEngine(TradingEngine):
                             arbitrage_percent = (price_diff / avg_price) * 100
                             
                             if arbitrage_percent > 1:  # 1% minimum arbitrage
-                                logger.info(f"🎯 Arbitrage opportunity: {arbitrage_percent:.2f}% on {network_type.value}")
+                                logger.info(f"[TARGET] Arbitrage opportunity: {arbitrage_percent:.2f}% on {network_type.value}")
                                 
                                 # Generate arbitrage signal
                                 await self._generate_arbitrage_signal(
@@ -346,10 +346,10 @@ class LiveTradingEngine(TradingEngine):
                                 )
                 
                 except Exception as e:
-                    logger.debug(f"⚠️ Arbitrage scan error for pair: {e}")
+                    logger.debug(f"[WARN] Arbitrage scan error for pair: {e}")
                     
         except Exception as e:
-            logger.error(f"❌ Failed to scan arbitrage opportunities: {e}")
+            logger.error(f"[ERROR] Failed to scan arbitrage opportunities: {e}")
     
     async def _generate_arbitrage_signal(
         self,
@@ -387,10 +387,10 @@ class LiveTradingEngine(TradingEngine):
             # Add to active signals
             self.active_signals.append(signal)
             
-            logger.info(f"📈 Generated arbitrage signal: {profit_percent:.2f}% profit opportunity")
+            logger.info(f"[PERF] Generated arbitrage signal: {profit_percent:.2f}% profit opportunity")
             
         except Exception as e:
-            logger.error(f"❌ Failed to generate arbitrage signal: {e}")
+            logger.error(f"[ERROR] Failed to generate arbitrage signal: {e}")
     
     async def execute_live_trade(
         self,
@@ -399,7 +399,7 @@ class LiveTradingEngine(TradingEngine):
     ) -> ExecutionResult:
         """Execute a live trade on the blockchain."""
         try:
-            logger.info(f"🔄 Executing live trade: {signal.symbol} {signal.intent.value}")
+            logger.info(f"[REFRESH] Executing live trade: {signal.symbol} {signal.intent.value}")
             
             # Use default network if not specified
             if not network_type:
@@ -449,7 +449,7 @@ class LiveTradingEngine(TradingEngine):
                         best_dex = dex
                         
                 except Exception as e:
-                    logger.warning(f"⚠️ Failed to get quote from {dex.value}: {e}")
+                    logger.warning(f"[WARN] Failed to get quote from {dex.value}: {e}")
             
             if not best_quote:
                 raise TradingError("No valid quotes available")
@@ -458,7 +458,7 @@ class LiveTradingEngine(TradingEngine):
             if best_quote.total_fee_usd > signal.suggested_amount * Decimal("0.1"):  # Max 10% fees
                 raise TradingError("Fees too high for trade size")
             
-            logger.info(f"💱 Best quote: {best_quote.output_amount} from {best_dex.value}")
+            logger.info(f"[EMOJI] Best quote: {best_quote.output_amount} from {best_dex.value}")
             
             # Execute the swap
             swap_result = await self.live_dex.execute_live_swap(
@@ -484,11 +484,11 @@ class LiveTradingEngine(TradingEngine):
                 execution_time=0.0  # Placeholder
             )
             
-            logger.info(f"✅ Live trade executed: {swap_result.transaction_hash}")
+            logger.info(f"[OK] Live trade executed: {swap_result.transaction_hash}")
             return execution_result
             
         except Exception as e:
-            logger.error(f"❌ Live trade execution failed: {e}")
+            logger.error(f"[ERROR] Live trade execution failed: {e}")
             return ExecutionResult(
                 trade_id=str(uuid.uuid4()),
                 success=False,
@@ -561,7 +561,7 @@ class LiveTradingEngine(TradingEngine):
             }
             
         except Exception as e:
-            logger.error(f"❌ Failed to get live trading status: {e}")
+            logger.error(f"[ERROR] Failed to get live trading status: {e}")
             return {
                 "status": "error",
                 "error": str(e),
@@ -571,7 +571,7 @@ class LiveTradingEngine(TradingEngine):
     async def shutdown_live_trading(self) -> None:
         """Shutdown live trading and cleanup resources."""
         try:
-            logger.info("🛑 Shutting down live trading engine...")
+            logger.info("[EMOJI] Shutting down live trading engine...")
             
             # Cancel blockchain monitoring tasks
             for network_type, task in self.blockchain_monitors.items():
@@ -592,10 +592,10 @@ class LiveTradingEngine(TradingEngine):
             self.market_conditions.clear()
             self.blockchain_monitors.clear()
             
-            logger.info("✅ Live trading engine shutdown complete")
+            logger.info("[OK] Live trading engine shutdown complete")
             
         except Exception as e:
-            logger.error(f"❌ Shutdown error: {e}")
+            logger.error(f"[ERROR] Shutdown error: {e}")
 
 
 # Global instance
@@ -617,5 +617,5 @@ async def initialize_live_trading() -> bool:
         engine = get_live_trading_engine()
         return await engine.initialize_live_connections()
     except Exception as e:
-        logger.error(f"❌ Failed to initialize live trading: {e}")
+        logger.error(f"[ERROR] Failed to initialize live trading: {e}")
         return False

@@ -232,7 +232,7 @@ class HoneypotDetector:
         self.cache_ttl = 1800  # 30 minutes
         self.signature_cache_ttl = 86400  # 24 hours
         
-        logger.info("🍯 Advanced Honeypot Detector initialized")
+        logger.info("[EMOJI] Advanced Honeypot Detector initialized")
     
     async def initialize(self) -> bool:
         """
@@ -291,7 +291,7 @@ class HoneypotDetector:
             # Check cache first
             cached_result = await self.cache_manager.get(cache_key)
             if cached_result:
-                logger.debug(f"📋 Using cached honeypot analysis for {token_address}")
+                logger.debug(f"[LOG] Using cached honeypot analysis for {token_address}")
                 return HoneypotDetectionResult(**cached_result)
             
             logger.info(f"[SEARCH] Starting honeypot detection for {token_address} on {network}")
@@ -626,7 +626,7 @@ class HoneypotDetector:
                 compiler_version=f"0.8.{np.random.randint(10, 20)}"
             )
             
-            logger.debug(f"📋 Bytecode analysis complete for {token_address}")
+            logger.debug(f"[LOG] Bytecode analysis complete for {token_address}")
             return features
             
         except Exception as e:
@@ -696,7 +696,7 @@ class HoneypotDetector:
                 avg_liquidity_provision=total_liquidity / max(1, int(np.random.uniform(1, 20)))
             )
             
-            logger.debug(f"💧 Liquidity analysis complete for {token_address}")
+            logger.debug(f"[EMOJI] Liquidity analysis complete for {token_address}")
             return features
             
         except Exception as e:
@@ -725,7 +725,7 @@ class HoneypotDetector:
                 upgrade_capability=np.random.choice([True, False], p=[0.3, 0.7])
             )
             
-            logger.debug(f"👑 Ownership analysis complete for {token_address}")
+            logger.debug(f"[EMOJI] Ownership analysis complete for {token_address}")
             return features
             
         except Exception as e:
@@ -1136,7 +1136,7 @@ class HoneypotDetector:
             )
         ]
         
-        logger.info(f"📋 Loaded {len(self.honeypot_signatures)} honeypot signatures")
+        logger.info(f"[LOG] Loaded {len(self.honeypot_signatures)} honeypot signatures")
     
     async def _save_honeypot_signatures(self) -> None:
         """Save honeypot signatures to storage."""

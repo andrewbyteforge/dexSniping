@@ -19,7 +19,7 @@ def create_security_directory():
     if not init_file.exists():
         init_file.write_text('"""Security module."""\n')
     
-    print(f"✅ Security directory created: {security_dir}")
+    print(f"[OK] Security directory created: {security_dir}")
     return security_dir
 
 def create_simplified_security_manager():
@@ -92,7 +92,7 @@ class InputValidator:
             r'UNION\\s+SELECT',
         ]
         
-        logger.info("🔒 Input validator initialized")
+        logger.info("[EMOJI] Input validator initialized")
 
     def validate_ethereum_address(self, address: str) -> bool:
         """Validate Ethereum address format."""
@@ -101,7 +101,7 @@ class InputValidator:
                 return False
             return self.patterns['ethereum_address'].match(address) is not None
         except Exception as e:
-            logger.warning(f"⚠️ Address validation error: {e}")
+            logger.warning(f"[WARN] Address validation error: {e}")
             return False
 
     def validate_amount(self, amount: Union[str, float, int], 
@@ -121,7 +121,7 @@ class InputValidator:
             return True, parsed_amount
             
         except (ValueError, TypeError) as e:
-            logger.warning(f"⚠️ Amount validation error: {e}")
+            logger.warning(f"[WARN] Amount validation error: {e}")
             return False, None
 
     def sanitize_string(self, input_str: str, max_length: Optional[int] = None) -> str:
@@ -184,7 +184,7 @@ class InputValidator:
             return len(errors) == 0, errors
             
         except Exception as e:
-            logger.error(f"❌ Input validation error: {e}")
+            logger.error(f"[ERROR] Input validation error: {e}")
             return False, [f"Validation error: {str(e)}"]
 
 
@@ -198,7 +198,7 @@ class WalletSecurity:
         self.failed_attempts = {}
         self.locked_wallets = {}
         
-        logger.info("🔐 Wallet security initialized")
+        logger.info("[AUTH] Wallet security initialized")
 
     def encrypt_private_key(self, private_key: str, wallet_address: str) -> str:
         """Basic private key encoding (for testing)."""
@@ -214,11 +214,11 @@ class WalletSecurity:
             }
             
             encoded_data = base64.b64encode(json.dumps(payload).encode()).decode()
-            logger.info(f"🔐 Private key encoded for wallet {wallet_address[:8]}...")
+            logger.info(f"[AUTH] Private key encoded for wallet {wallet_address[:8]}...")
             return encoded_data
             
         except Exception as e:
-            logger.error(f"❌ Private key encoding failed: {e}")
+            logger.error(f"[ERROR] Private key encoding failed: {e}")
             raise SecurityError(f"Encoding failed: {e}")
 
     def decrypt_private_key(self, encrypted_key: str, wallet_address: str) -> str:
@@ -245,11 +245,11 @@ class WalletSecurity:
                 raise SecurityError("Private key integrity check failed")
             
             self.reset_failed_attempts(wallet_address)
-            logger.info(f"🔓 Private key decoded for wallet {wallet_address[:8]}...")
+            logger.info(f"[EMOJI] Private key decoded for wallet {wallet_address[:8]}...")
             return private_key
             
         except Exception as e:
-            logger.error(f"❌ Private key decoding failed: {e}")
+            logger.error(f"[ERROR] Private key decoding failed: {e}")
             self.record_failed_attempt(wallet_address)
             raise SecurityError(f"Decoding failed: {e}")
 
@@ -271,7 +271,7 @@ class WalletSecurity:
         
         if len(self.failed_attempts[address]) >= self.max_failed_attempts:
             self.locked_wallets[address] = current_time + self.lockout_duration
-            logger.warning(f"🔒 Wallet {address[:8]}... locked due to failed attempts")
+            logger.warning(f"[EMOJI] Wallet {address[:8]}... locked due to failed attempts")
 
     def is_wallet_locked(self, wallet_address: str) -> bool:
         """Check if wallet is currently locked."""
@@ -312,7 +312,7 @@ class APIAuthentication:
             APIKeyType.WEBHOOK: 10
         }
         
-        logger.info("🔑 API authentication initialized")
+        logger.info("[EMOJI] API authentication initialized")
 
     def generate_api_key(self, user_id: str, key_type: APIKeyType, 
                         permissions: List[str]) -> str:
@@ -330,11 +330,11 @@ class APIAuthentication:
                 'rate_limit': self.default_rate_limits.get(key_type, 60)
             }
             
-            logger.info(f"🔑 API key generated for user {user_id}, type {key_type.value}")
+            logger.info(f"[EMOJI] API key generated for user {user_id}, type {key_type.value}")
             return api_key
             
         except Exception as e:
-            logger.error(f"❌ API key generation failed: {e}")
+            logger.error(f"[ERROR] API key generation failed: {e}")
             raise SecurityError(f"API key generation failed: {e}")
 
     def validate_api_key(self, api_key: str, required_permission: str = None) -> Dict[str, Any]:
@@ -360,7 +360,7 @@ class APIAuthentication:
         except (AuthenticationError, AuthorizationError):
             raise
         except Exception as e:
-            logger.error(f"❌ API key validation error: {e}")
+            logger.error(f"[ERROR] API key validation error: {e}")
             raise AuthenticationError(f"API key validation failed: {e}")
 
     def check_rate_limit(self, api_key: str) -> bool:
@@ -389,7 +389,7 @@ class APIAuthentication:
             return True
             
         except Exception as e:
-            logger.error(f"❌ Rate limit check error: {e}")
+            logger.error(f"[ERROR] Rate limit check error: {e}")
             return False
 
     def record_failed_auth(self, api_key: str):
@@ -453,7 +453,7 @@ class ErrorSanitizer:
             return sanitized
             
         except Exception as e:
-            logger.error(f"❌ Error sanitization failed: {e}")
+            logger.error(f"[ERROR] Error sanitization failed: {e}")
             return self.error_templates.get(error_type, 'Error processing failed')
 
 
@@ -471,10 +471,10 @@ class SecurityManager:
             self.security_events = []
             self.max_security_events = 1000
             
-            logger.info("🛡️ Security manager initialized")
+            logger.info("[SEC] Security manager initialized")
             
         except Exception as e:
-            logger.error(f"❌ Security manager initialization failed: {e}")
+            logger.error(f"[ERROR] Security manager initialization failed: {e}")
             raise SecurityError(f"Security system initialization failed: {e}")
 
     def validate_api_request(self, api_key: str, endpoint: str, 
@@ -505,7 +505,7 @@ class SecurityManager:
         except ValidationError as e:
             return False, self.error_sanitizer.sanitize_error(str(e), 'validation_error')
         except Exception as e:
-            logger.error(f"❌ API request validation error: {e}")
+            logger.error(f"[ERROR] API request validation error: {e}")
             return False, self.error_sanitizer.sanitize_error(str(e), 'system_error')
 
     def get_required_permission(self, endpoint: str) -> str:
@@ -553,10 +553,10 @@ class SecurityManager:
             if len(self.security_events) > self.max_security_events:
                 self.security_events = self.security_events[-self.max_security_events:]
             
-            logger.info(f"🔍 Security event logged: {event_type}")
+            logger.info(f"[SEARCH] Security event logged: {event_type}")
             
         except Exception as e:
-            logger.error(f"❌ Failed to log security event: {e}")
+            logger.error(f"[ERROR] Failed to log security event: {e}")
 
     def get_security_metrics(self) -> Dict[str, Any]:
         """Get security metrics."""
@@ -579,7 +579,7 @@ class SecurityManager:
             }
             
         except Exception as e:
-            logger.error(f"❌ Failed to get security metrics: {e}")
+            logger.error(f"[ERROR] Failed to get security metrics: {e}")
             return {'error': 'Failed to retrieve metrics'}
 
 
@@ -613,7 +613,7 @@ __all__ = [
     security_file = security_dir / "security_manager.py"
     security_file.write_text(content, encoding='utf-8')
     
-    print(f"✅ Simplified security manager created: {security_file}")
+    print(f"[OK] Simplified security manager created: {security_file}")
     return True
 
 def create_simple_security_test():
@@ -634,20 +634,20 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def test_security_implementation():
     """Test all security components."""
-    print("🛡️ Simple Security Test Suite")
+    print("[SEC] Simple Security Test Suite")
     print("=" * 50)
     
     try:
         # Test 1: Import security manager
-        print("🧪 Testing security manager import...")
+        print("[TEST] Testing security manager import...")
         from app.core.security.security_manager import (
             get_security_manager, SecurityManager, APIKeyType, SecurityLevel
         )
         security_manager = get_security_manager()
-        print("  ✅ Security manager imported and initialized")
+        print("  [OK] Security manager imported and initialized")
         
         # Test 2: Wallet security
-        print("🧪 Testing wallet security...")
+        print("[TEST] Testing wallet security...")
         test_private_key = "a" * 64
         test_wallet_address = "0x" + "b" * 40
         
@@ -658,10 +658,10 @@ def test_security_implementation():
             encrypted_key, test_wallet_address
         )
         assert decrypted_key == test_private_key
-        print("  ✅ Wallet security: encryption/decryption working")
+        print("  [OK] Wallet security: encryption/decryption working")
         
         # Test 3: API authentication
-        print("🧪 Testing API authentication...")
+        print("[TEST] Testing API authentication...")
         api_key = security_manager.api_auth.generate_api_key(
             user_id="test_user",
             key_type=APIKeyType.TRADING,
@@ -670,54 +670,54 @@ def test_security_implementation():
         
         key_data = security_manager.api_auth.validate_api_key(api_key, 'read_access')
         assert key_data['user_id'] == 'test_user'
-        print("  ✅ API authentication: key generation/validation working")
+        print("  [OK] API authentication: key generation/validation working")
         
         # Test 4: Input validation
-        print("🧪 Testing input validation...")
+        print("[TEST] Testing input validation...")
         valid_address = "0x" + "a" * 40
         invalid_address = "0x123"
         
         assert security_manager.input_validator.validate_ethereum_address(valid_address)
         assert not security_manager.input_validator.validate_ethereum_address(invalid_address)
-        print("  ✅ Input validation: address validation working")
+        print("  [OK] Input validation: address validation working")
         
         # Test 5: Error sanitization
-        print("🧪 Testing error sanitization...")
+        print("[TEST] Testing error sanitization...")
         error_with_address = "Failed to connect to wallet 0x1234567890abcdef1234567890abcdef12345678"
         sanitized = security_manager.error_sanitizer.sanitize_error(error_with_address)
         assert "0x1234567890abcdef1234567890abcdef12345678" not in sanitized
         assert "[REDACTED]" in sanitized
-        print("  ✅ Error sanitization: sensitive data removal working")
+        print("  [OK] Error sanitization: sensitive data removal working")
         
         # Test 6: Full API request validation
-        print("🧪 Testing full API request validation...")
+        print("[TEST] Testing full API request validation...")
         is_valid, error = security_manager.validate_api_request(
             api_key=api_key,
             endpoint="/api/v1/dashboard/stats",
             request_data={}
         )
         assert is_valid and error is None
-        print("  ✅ Full API request validation working")
+        print("  [OK] Full API request validation working")
         
         # Test 7: Security metrics
-        print("🧪 Testing security metrics...")
+        print("[TEST] Testing security metrics...")
         metrics = security_manager.get_security_metrics()
         assert 'system_status' in metrics
         assert metrics['system_status'] == 'operational'
-        print("  ✅ Security metrics working")
+        print("  [OK] Security metrics working")
         
-        print("\\n🎉 ALL SECURITY TESTS PASSED!")
-        print("✅ Security implementation is working correctly")
-        print("✅ All 4 critical security failures resolved:")
-        print("   - 🔐 Wallet Security Implementation")
-        print("   - 🔑 API Authentication System") 
-        print("   - ✅ Input Validation Framework")
+        print("\\n[SUCCESS] ALL SECURITY TESTS PASSED!")
+        print("[OK] Security implementation is working correctly")
+        print("[OK] All 4 critical security failures resolved:")
+        print("   - [AUTH] Wallet Security Implementation")
+        print("   - [EMOJI] API Authentication System") 
+        print("   - [OK] Input Validation Framework")
         print("   - 🧹 Error Sanitization Protocols")
         
         return True
         
     except Exception as e:
-        print(f"❌ Security test failed: {e}")
+        print(f"[ERROR] Security test failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -726,10 +726,10 @@ if __name__ == "__main__":
     success = test_security_implementation()
     
     if success:
-        print("\\n🚀 Security implementation complete!")
-        print("📊 Ready to run full test suite")
+        print("\\n[START] Security implementation complete!")
+        print("[STATS] Ready to run full test suite")
     else:
-        print("\\n❌ Security implementation needs fixes")
+        print("\\n[ERROR] Security implementation needs fixes")
     
     sys.exit(0 if success else 1)
 '''
@@ -737,34 +737,34 @@ if __name__ == "__main__":
     test_file = Path("test_security_simple.py")
     test_file.write_text(content, encoding='utf-8')
     
-    print(f"✅ Simple security test created: {test_file}")
+    print(f"[OK] Simple security test created: {test_file}")
     return True
 
 def main():
     """Main fix function."""
-    print("🛡️ Quick Security Implementation Fix")
+    print("[SEC] Quick Security Implementation Fix")
     print("=" * 40)
     
     try:
         # Step 1: Create security directory and files
         if create_simplified_security_manager():
-            print("✅ Security manager created")
+            print("[OK] Security manager created")
         
         # Step 2: Create working test
         if create_simple_security_test():
-            print("✅ Security test created")
+            print("[OK] Security test created")
         
-        print("\\n🎯 Quick fix complete!")
-        print("\\n🧪 Now run the simple test:")
+        print("\\n[TARGET] Quick fix complete!")
+        print("\\n[TEST] Now run the simple test:")
         print("   python test_security_simple.py")
         
-        print("\\n🧪 Then run the full test suite:")
+        print("\\n[TEST] Then run the full test suite:")
         print("   python tests/test_security_implementation.py")
         
         return True
         
     except Exception as e:
-        print(f"❌ Quick fix failed: {e}")
+        print(f"[ERROR] Quick fix failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -774,5 +774,5 @@ if __name__ == "__main__":
         success = main()
         sys.exit(0 if success else 1)
     except Exception as e:
-        print(f"💥 Fix script error: {e}")
+        print(f"[EMOJI] Fix script error: {e}")
         sys.exit(1)

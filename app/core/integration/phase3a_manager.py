@@ -52,7 +52,7 @@ class Phase3AManager:
             True if initialization successful
         """
         try:
-            logger.info("🚀 Initializing Phase 3A: Block 0 Sniping System...")
+            logger.info("[START] Initializing Phase 3A: Block 0 Sniping System...")
             
             # Initialize multi-chain manager
             self.multi_chain_manager = MultiChainManager()
@@ -68,11 +68,11 @@ class Phase3AManager:
             self._initialized = True
             self._running = True
             
-            logger.info("✅ Phase 3A system initialized successfully!")
+            logger.info("[OK] Phase 3A system initialized successfully!")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Phase 3A initialization failed: {e}")
+            logger.error(f"[ERROR] Phase 3A initialization failed: {e}")
             return False
     
     async def _setup_integration_callbacks(self) -> None:
@@ -94,7 +94,7 @@ class Phase3AManager:
         """Handle token discovery with full integration."""
         try:
             logger.info(
-                f"🎯 Integrated Token Discovery: {liquidity_event.token_address} "
+                f"[TARGET] Integrated Token Discovery: {liquidity_event.token_address} "
                 f"on {liquidity_event.dex}"
             )
             
@@ -111,7 +111,7 @@ class Phase3AManager:
         """Handle snipe completion with full integration."""
         try:
             logger.info(
-                f"🎯 Integrated Snipe Completion: {snipe_result.status} "
+                f"[TARGET] Integrated Snipe Completion: {snipe_result.status} "
                 f"for {snipe_result.token_address}"
             )
             
@@ -206,7 +206,7 @@ class Phase3AManager:
         
         try:
             logger.info(
-                f"🎯 Manual snipe requested: {token_address} "
+                f"[TARGET] Manual snipe requested: {token_address} "
                 f"on {network} with {eth_amount} ETH"
             )
             
@@ -340,7 +340,7 @@ class Phase3AManager:
     
     async def shutdown(self) -> None:
         """Gracefully shutdown Phase 3A system."""
-        logger.info("🛑 Shutting down Phase 3A system...")
+        logger.info("[EMOJI] Shutting down Phase 3A system...")
         
         self._running = False
         
@@ -350,14 +350,14 @@ class Phase3AManager:
         if self.multi_chain_manager:
             await self.multi_chain_manager.close()
         
-        logger.info("✅ Phase 3A system shutdown complete")
+        logger.info("[OK] Phase 3A system shutdown complete")
 
 
 # Test and demonstration functions
 
 async def test_phase3a_system():
     """Test the complete Phase 3A system."""
-    print("🚀 Testing Phase 3A: Block 0 Sniping System")
+    print("[START] Testing Phase 3A: Block 0 Sniping System")
     print("=" * 50)
     
     try:
@@ -366,61 +366,61 @@ async def test_phase3a_system():
         success = await phase3a.initialize(['ethereum', 'polygon'])
         
         if not success:
-            print("❌ Phase 3A initialization failed")
+            print("[ERROR] Phase 3A initialization failed")
             return False
         
-        print("✅ Phase 3A system initialized successfully")
+        print("[OK] Phase 3A system initialized successfully")
         
         # Health check
         health = await phase3a.health_check()
-        print(f"🏥 System health: {health['status']}")
+        print(f"[EMOJI] System health: {health['status']}")
         
         # Get comprehensive stats
         stats = phase3a.get_comprehensive_stats()
-        print(f"📊 System stats: {stats['phase3a_overview']['status']}")
+        print(f"[STATS] System stats: {stats['phase3a_overview']['status']}")
         
         # Simulate running for a short time
-        print("⏱️ Running system for 30 seconds...")
+        print("⏱[EMOJI] Running system for 30 seconds...")
         await asyncio.sleep(30)
         
         # Final health check
         final_health = await phase3a.health_check()
-        print(f"🏥 Final health: {final_health['status']}")
+        print(f"[EMOJI] Final health: {final_health['status']}")
         
         # Shutdown
         await phase3a.shutdown()
-        print("✅ Phase 3A test completed successfully")
+        print("[OK] Phase 3A test completed successfully")
         
         return True
         
     except Exception as e:
-        print(f"❌ Phase 3A test failed: {e}")
+        print(f"[ERROR] Phase 3A test failed: {e}")
         return False
 
 
 async def demonstrate_block0_capabilities():
     """Demonstrate Block 0 sniping capabilities."""
-    print("🎯 Demonstrating Block 0 Sniping Capabilities")
+    print("[TARGET] Demonstrating Block 0 Sniping Capabilities")
     print("=" * 50)
     
-    print("✅ Features Implemented:")
-    print("  🔍 Real-time mempool monitoring")
-    print("  ⚡ Block 0 transaction detection")
-    print("  🎯 Instant token launch sniping")
-    print("  🛡️ MEV protection via Flashbots")
-    print("  🌐 Multi-chain support (8+ networks)")
-    print("  📊 Advanced analytics and monitoring")
-    print("  🔄 Circuit breaker fault tolerance")
-    print("  💾 High-performance caching")
+    print("[OK] Features Implemented:")
+    print("  [SEARCH] Real-time mempool monitoring")
+    print("  [TRADE] Block 0 transaction detection")
+    print("  [TARGET] Instant token launch sniping")
+    print("  [SEC] MEV protection via Flashbots")
+    print("  [API] Multi-chain support (8+ networks)")
+    print("  [STATS] Advanced analytics and monitoring")
+    print("  [REFRESH] Circuit breaker fault tolerance")
+    print("  [DB] High-performance caching")
     
-    print("\n🏆 Competitive Advantages:")
-    print("  💰 FREE vs $50-200/month competitors")
-    print("  🔓 Open source transparency")
-    print("  🏢 Enterprise-grade infrastructure")
-    print("  🚀 Superior multi-chain coverage")
-    print("  ⚡ Block 0 speed matching commercial bots")
+    print("\n[EMOJI] Competitive Advantages:")
+    print("  [PROFIT] FREE vs $50-200/month competitors")
+    print("  [EMOJI] Open source transparency")
+    print("  [EMOJI] Enterprise-grade infrastructure")
+    print("  [START] Superior multi-chain coverage")
+    print("  [TRADE] Block 0 speed matching commercial bots")
     
-    print("\n🎯 Ready for Production Use!")
+    print("\n[TARGET] Ready for Production Use!")
 
 
 if __name__ == "__main__":

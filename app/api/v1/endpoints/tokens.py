@@ -60,7 +60,7 @@ async def discover_new_tokens(
         if not networks:
             networks = ["Ethereum", "Polygon", "BSC", "Arbitrum"]
         
-        logger.info(f"🔍 Token discovery request: networks={networks}, limit={limit}")
+        logger.info(f"[SEARCH] Token discovery request: networks={networks}, limit={limit}")
         
         # Generate mock tokens for demonstration
         tokens = []
@@ -109,7 +109,7 @@ async def discover_new_tokens(
                     "social_score": round(random.uniform(1, 10), 1)
                 })
         
-        logger.info(f"✅ Generated {len(tokens)} tokens for discovery response")
+        logger.info(f"[OK] Generated {len(tokens)} tokens for discovery response")
         
         return TokenDiscoveryResponse(
             tokens=tokens,
@@ -121,7 +121,7 @@ async def discover_new_tokens(
         )
         
     except Exception as e:
-        logger.error(f"❌ Token discovery failed: {e}")
+        logger.error(f"[ERROR] Token discovery failed: {e}")
         raise HTTPException(
             status_code=500, 
             detail=f"Token discovery failed: {str(e)}"
@@ -135,7 +135,7 @@ async def get_token_info(
 ) -> TokenResponse:
     """Get detailed information about a specific token."""
     try:
-        logger.info(f"🔍 Getting token info: {network}/{address}")
+        logger.info(f"[SEARCH] Getting token info: {network}/{address}")
         
         # Generate mock token information
         symbols = ['TOKEN', 'COIN', 'DEFI', 'MOON']
@@ -155,7 +155,7 @@ async def get_token_info(
             discovered_at=datetime.utcnow().isoformat()
         )
     except Exception as e:
-        logger.error(f"❌ Failed to get token info: {e}")
+        logger.error(f"[ERROR] Failed to get token info: {e}")
         raise HTTPException(status_code=404, detail="Token not found")
 
 
@@ -166,7 +166,7 @@ async def analyze_token_risk(
 ) -> Dict[str, Any]:
     """Analyze token risk and return assessment."""
     try:
-        logger.info(f"📊 Analyzing token risk: {network}/{address}")
+        logger.info(f"[STATS] Analyzing token risk: {network}/{address}")
         
         risk_score = round(random.uniform(1, 10), 1)
         risk_level = "low" if risk_score <= 3 else ("medium" if risk_score <= 7 else "high")
@@ -195,7 +195,7 @@ async def analyze_token_risk(
             "analyzed_at": datetime.utcnow().isoformat()
         }
     except Exception as e:
-        logger.error(f"❌ Token analysis failed: {e}")
+        logger.error(f"[ERROR] Token analysis failed: {e}")
         raise HTTPException(status_code=500, detail="Analysis failed")
 
 
@@ -211,10 +211,10 @@ async def tokens_info():
             "analyze": "/api/v1/tokens/analyze"
         },
         "features": {
-            "token_discovery": "✅ Operational",
-            "multi_network_support": "✅ Operational",
-            "risk_analysis": "✅ Operational",
-            "real_time_filtering": "✅ Operational"
+            "token_discovery": "[OK] Operational",
+            "multi_network_support": "[OK] Operational",
+            "risk_analysis": "[OK] Operational",
+            "real_time_filtering": "[OK] Operational"
         },
         "supported_networks": [
             "Ethereum", "Polygon", "BSC", "Arbitrum"

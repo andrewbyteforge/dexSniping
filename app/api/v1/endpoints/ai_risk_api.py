@@ -72,8 +72,8 @@ class RiskAssessmentResponse(BaseModel):
                     "fundamental": {"market_cap_score": 0.9}
                 },
                 "recommendations": [
-                    "✅ Low risk detected - favorable conditions",
-                    "📈 Bullish trend - favorable for long positions"
+                    "[OK] Low risk detected - favorable conditions",
+                    "[PERF] Bullish trend - favorable for long positions"
                 ],
                 "max_position_size": 800.0,
                 "stop_loss_percentage": 5.5,
@@ -498,14 +498,14 @@ def _generate_batch_summary(assessments: List[RiskAssessmentResponse]) -> Dict[s
     recommendations = []
     
     if high_risk_count > 0:
-        recommendations.append(f"⚠️ {high_risk_count} high-risk tokens detected")
+        recommendations.append(f"[WARN] {high_risk_count} high-risk tokens detected")
     
     if average_risk_score < 30:
-        recommendations.append("✅ Overall low risk portfolio")
+        recommendations.append("[OK] Overall low risk portfolio")
     elif average_risk_score > 70:
-        recommendations.append("🚨 High-risk portfolio - exercise caution")
+        recommendations.append("[EMOJI] High-risk portfolio - exercise caution")
     else:
-        recommendations.append("📊 Moderate risk portfolio")
+        recommendations.append("[STATS] Moderate risk portfolio")
     
     return {
         "total_tokens": total_tokens,

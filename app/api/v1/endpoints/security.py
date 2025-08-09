@@ -115,7 +115,7 @@ async def generate_api_key(
     Requires admin access.
     """
     try:
-        logger.info(f"🔑 Generating API key for user {request.user_id}")
+        logger.info(f"[EMOJI] Generating API key for user {request.user_id}")
         
         # Generate API key
         api_key = security_manager.api_auth.generate_api_key(
@@ -132,7 +132,7 @@ async def generate_api_key(
         key_data['expires_at'] = expires_at
         key_data['description'] = request.description
         
-        logger.info(f"✅ API key generated successfully for {request.user_id}")
+        logger.info(f"[OK] API key generated successfully for {request.user_id}")
         
         return APIKeyResponse(
             api_key=api_key,
@@ -143,10 +143,10 @@ async def generate_api_key(
         )
         
     except SecurityError as e:
-        logger.error(f"❌ API key generation failed: {e}")
+        logger.error(f"[ERROR] API key generation failed: {e}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logger.error(f"❌ Unexpected error generating API key: {e}")
+        logger.error(f"[ERROR] Unexpected error generating API key: {e}")
         raise HTTPException(status_code=500, detail="API key generation failed")
 
 
@@ -162,7 +162,7 @@ async def list_api_keys(
     Requires admin access.
     """
     try:
-        logger.info("📋 Listing API keys")
+        logger.info("[LOG] Listing API keys")
         
         keys_data = []
         current_time = datetime.utcnow()
@@ -206,7 +206,7 @@ async def list_api_keys(
         }
         
     except Exception as e:
-        logger.error(f"❌ Error listing API keys: {e}")
+        logger.error(f"[ERROR] Error listing API keys: {e}")
         raise HTTPException(status_code=500, detail="Failed to list API keys")
 
 
@@ -220,7 +220,7 @@ async def revoke_api_key(
     Requires admin access.
     """
     try:
-        logger.info(f"🗑️ Revoking API key {key_id[:8]}...")
+        logger.info(f"[EMOJI] Revoking API key {key_id[:8]}...")
         
         # Find the full key (key_id is partial)
         matching_keys = [
@@ -244,7 +244,7 @@ async def revoke_api_key(
         if api_key in security_manager.api_auth.rate_limits:
             del security_manager.api_auth.rate_limits[api_key]
         
-        logger.info(f"✅ API key revoked for user {key_data.get('user_id')}")
+        logger.info(f"[OK] API key revoked for user {key_data.get('user_id')}")
         
         return {
             'success': True,
@@ -259,7 +259,7 @@ async def revoke_api_key(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Error revoking API key: {e}")
+        logger.error(f"[ERROR] Error revoking API key: {e}")
         raise HTTPException(status_code=500, detail="Failed to revoke API key")
 
 
@@ -274,7 +274,7 @@ async def validate_wallet(
     Validate wallet address and optional ownership proof.
     """
     try:
-        logger.info(f"🔍 Validating wallet {request.wallet_address[:8]}...")
+        logger.info(f"[SEARCH] Validating wallet {request.wallet_address[:8]}...")
         
         # Validate address format
         is_valid_address = security_manager.input_validator.validate_ethereum_address(
@@ -306,15 +306,15 @@ async def validate_wallet(
             validation_result['signature_valid'] = None
             validation_result['ownership_verified'] = False
         
-        logger.info(f"✅ Wallet validation completed for {request.wallet_address[:8]}...")
+        logger.info(f"[OK] Wallet validation completed for {request.wallet_address[:8]}...")
         
         return validation_result
         
     except ValidationError as e:
-        logger.warning(f"⚠️ Wallet validation failed: {e}")
+        logger.warning(f"[WARN] Wallet validation failed: {e}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logger.error(f"❌ Wallet validation error: {e}")
+        logger.error(f"[ERROR] Wallet validation error: {e}")
         raise HTTPException(status_code=500, detail="Wallet validation failed")
 
 
@@ -328,7 +328,7 @@ async def unlock_wallet(
     Unlock a locked wallet (admin only).
     """
     try:
-        logger.info(f"🔓 Unlocking wallet {wallet_address[:8]}...")
+        logger.info(f"[EMOJI] Unlocking wallet {wallet_address[:8]}...")
         
         # Validate admin signature (simplified)
         if len(admin_signature) < 64:
@@ -337,7 +337,7 @@ async def unlock_wallet(
         # Reset failed attempts
         security_manager.wallet_security.reset_failed_attempts(wallet_address)
         
-        logger.info(f"✅ Wallet {wallet_address[:8]}... unlocked successfully")
+        logger.info(f"[OK] Wallet {wallet_address[:8]}... unlocked successfully")
         
         return {
             'success': True,
@@ -347,10 +347,10 @@ async def unlock_wallet(
         }
         
     except ValidationError as e:
-        logger.warning(f"⚠️ Wallet unlock failed: {e}")
+        logger.warning(f"[WARN] Wallet unlock failed: {e}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logger.error(f"❌ Wallet unlock error: {e}")
+        logger.error(f"[ERROR] Wallet unlock error: {e}")
         raise HTTPException(status_code=500, detail="Wallet unlock failed")
 
 
@@ -364,7 +364,7 @@ async def get_security_status(
     Get comprehensive security system status.
     """
     try:
-        logger.info("📊 Retrieving security status")
+        logger.info("[STATS] Retrieving security status")
         
         # Get security metrics
         metrics = security_manager.get_security_metrics()
@@ -387,7 +387,7 @@ async def get_security_status(
         )
         
     except Exception as e:
-        logger.error(f"❌ Error getting security status: {e}")
+        logger.error(f"[ERROR] Error getting security status: {e}")
         raise HTTPException(status_code=500, detail="Failed to get security status")
 
 
@@ -402,7 +402,7 @@ async def get_security_events(
     Get security events for monitoring and analysis.
     """
     try:
-        logger.info(f"📋 Retrieving {limit} security events")
+        logger.info(f"[LOG] Retrieving {limit} security events")
         
         events = security_manager.security_events.copy()
         
@@ -434,7 +434,7 @@ async def get_security_events(
         }
         
     except Exception as e:
-        logger.error(f"❌ Error getting security events: {e}")
+        logger.error(f"[ERROR] Error getting security events: {e}")
         raise HTTPException(status_code=500, detail="Failed to get security events")
 
 
@@ -450,7 +450,7 @@ async def update_permissions(
     Requires admin access.
     """
     try:
-        logger.info(f"🔧 Updating permissions for API key {request.api_key[:8]}...")
+        logger.info(f"[FIX] Updating permissions for API key {request.api_key[:8]}...")
         
         # Find API key
         if request.api_key not in security_manager.api_auth.api_keys:
@@ -474,7 +474,7 @@ async def update_permissions(
         key_data['permissions'] = list(updated_permissions)
         key_data['permissions_updated_at'] = datetime.utcnow()
         
-        logger.info(f"✅ Permissions updated for API key {request.api_key[:8]}...")
+        logger.info(f"[OK] Permissions updated for API key {request.api_key[:8]}...")
         
         return {
             'success': True,
@@ -488,10 +488,10 @@ async def update_permissions(
     except HTTPException:
         raise
     except ValidationError as e:
-        logger.warning(f"⚠️ Permission update failed: {e}")
+        logger.warning(f"[WARN] Permission update failed: {e}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logger.error(f"❌ Permission update error: {e}")
+        logger.error(f"[ERROR] Permission update error: {e}")
         raise HTTPException(status_code=500, detail="Permission update failed")
 
 
@@ -521,7 +521,7 @@ async def get_available_permissions() -> Dict[str, Any]:
         }
         
     except Exception as e:
-        logger.error(f"❌ Error getting available permissions: {e}")
+        logger.error(f"[ERROR] Error getting available permissions: {e}")
         raise HTTPException(status_code=500, detail="Failed to get permissions")
 
 
@@ -536,7 +536,7 @@ async def get_security_config(
     Requires admin access.
     """
     try:
-        logger.info("⚙️ Retrieving security configuration")
+        logger.info("[CONFIG] Retrieving security configuration")
         
         config = {
             'wallet_security': {
@@ -564,7 +564,7 @@ async def get_security_config(
         return config
         
     except Exception as e:
-        logger.error(f"❌ Error getting security config: {e}")
+        logger.error(f"[ERROR] Error getting security config: {e}")
         raise HTTPException(status_code=500, detail="Failed to get security configuration")
 
 
@@ -602,7 +602,7 @@ def calculate_security_score(security_manager: SecurityManager, metrics: Dict[st
         return max(score, 0.0)
         
     except Exception as e:
-        logger.error(f"❌ Error calculating security score: {e}")
+        logger.error(f"[ERROR] Error calculating security score: {e}")
         return 50.0  # Default score on error
 
 
@@ -660,7 +660,7 @@ def count_active_threats(security_manager: SecurityManager) -> int:
         return threats
         
     except Exception as e:
-        logger.error(f"❌ Error counting threats: {e}")
+        logger.error(f"[ERROR] Error counting threats: {e}")
         return 0
 
 
@@ -690,7 +690,7 @@ async def security_health_check() -> Dict[str, Any]:
         return health_status
         
     except Exception as e:
-        logger.error(f"❌ Security health check failed: {e}")
+        logger.error(f"[ERROR] Security health check failed: {e}")
         return {
             'status': 'unhealthy',
             'error': 'Security system check failed',

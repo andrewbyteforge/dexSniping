@@ -30,7 +30,7 @@ try:
     from app.core.integration.live_dashboard_service import live_dashboard_service
     from app.utils.logger import setup_logger
 except ImportError as e:
-    print(f"❌ Import error: {e}")
+    print(f"[ERROR] Import error: {e}")
     print("Please make sure you're running from the project root directory")
     sys.exit(1)
 
@@ -55,7 +55,7 @@ class TestWebSocketIntegration(unittest.TestCase):
         self.assertIn('TRADING_STATUS', manager.MESSAGE_TYPES.values())
         self.assertIn('PORTFOLIO_UPDATE', manager.MESSAGE_TYPES.values())
         
-        logger.info("✅ WebSocket manager initialization test passed")
+        logger.info("[OK] WebSocket manager initialization test passed")
     
     def test_websocket_message_structure(self):
         """Test WebSocket message structure validation."""
@@ -75,7 +75,7 @@ class TestWebSocketIntegration(unittest.TestCase):
         self.assertEqual(message_dict['type'], 'test_message')
         self.assertEqual(message_dict['data']['key'], 'value')
         
-        logger.info("✅ WebSocket message structure test passed")
+        logger.info("[OK] WebSocket message structure test passed")
     
     def test_live_dashboard_service_initialization(self):
         """Test live dashboard service initializes correctly."""
@@ -85,7 +85,7 @@ class TestWebSocketIntegration(unittest.TestCase):
         self.assertIsNotNone(service.trading_metrics)
         self.assertIsNotNone(service.portfolio_metrics)
         
-        logger.info("✅ Live dashboard service initialization test passed")
+        logger.info("[OK] Live dashboard service initialization test passed")
     
     def test_websocket_endpoints_exist(self):
         """Test that all WebSocket endpoints are properly configured."""
@@ -98,7 +98,7 @@ class TestWebSocketIntegration(unittest.TestCase):
         self.assertIn('connected_clients', data)
         self.assertIn('message_types', data)
         
-        logger.info("✅ WebSocket endpoints test passed")
+        logger.info("[OK] WebSocket endpoints test passed")
     
     def test_websocket_test_page(self):
         """Test WebSocket test page is accessible."""
@@ -107,7 +107,7 @@ class TestWebSocketIntegration(unittest.TestCase):
         self.assertIn('WebSocket Test', response.text)
         self.assertIn('DEX Sniper Pro', response.text)
         
-        logger.info("✅ WebSocket test page test passed")
+        logger.info("[OK] WebSocket test page test passed")
     
     def test_broadcast_test_endpoint(self):
         """Test broadcast test endpoint functionality."""
@@ -128,7 +128,7 @@ class TestWebSocketIntegration(unittest.TestCase):
         self.assertEqual(data['status'], 'success')
         self.assertIn('recipients', data)
         
-        logger.info("✅ Broadcast test endpoint test passed")
+        logger.info("[OK] Broadcast test endpoint test passed")
     
     @pytest.mark.asyncio
     async def test_websocket_connection_lifecycle(self):
@@ -148,7 +148,7 @@ class TestWebSocketIntegration(unittest.TestCase):
         await manager.disconnect(self.test_client_id)
         self.assertNotIn(self.test_client_id, manager.connections)
         
-        logger.info("✅ WebSocket connection lifecycle test passed")
+        logger.info("[OK] WebSocket connection lifecycle test passed")
     
     @pytest.mark.asyncio
     async def test_message_broadcasting(self):
@@ -176,7 +176,7 @@ class TestWebSocketIntegration(unittest.TestCase):
         # Allow message processing
         await asyncio.sleep(0.1)
         
-        logger.info("✅ Message broadcasting test passed")
+        logger.info("[OK] Message broadcasting test passed")
     
     @pytest.mark.asyncio
     async def test_live_dashboard_service_integration(self):
@@ -211,7 +211,7 @@ class TestWebSocketIntegration(unittest.TestCase):
         
         await service.broadcast_token_discovery(token_data)
         
-        logger.info("✅ Live dashboard service integration test passed")
+        logger.info("[OK] Live dashboard service integration test passed")
     
     def test_enhanced_dashboard_health_check(self):
         """Test enhanced health check with WebSocket information."""
@@ -224,7 +224,7 @@ class TestWebSocketIntegration(unittest.TestCase):
         self.assertIn('active_connections', data['websocket'])
         self.assertIn('message_types', data['websocket'])
         
-        logger.info("✅ Enhanced health check test passed")
+        logger.info("[OK] Enhanced health check test passed")
     
     def test_live_dashboard_endpoint(self):
         """Test live dashboard endpoint with WebSocket integration."""
@@ -237,7 +237,7 @@ class TestWebSocketIntegration(unittest.TestCase):
         self.assertIn('portfolio-value', content)
         self.assertIn('connection-status', content)
         
-        logger.info("✅ Live dashboard endpoint test passed")
+        logger.info("[OK] Live dashboard endpoint test passed")
 
 
 class WebSocketClientSimulator:
@@ -254,9 +254,9 @@ class WebSocketClientSimulator:
         try:
             self.websocket = await websockets.connect(self.url)
             self.is_connected = True
-            logger.info(f"🔌 Simulator connected to {self.url}")
+            logger.info(f"[WS] Simulator connected to {self.url}")
         except Exception as e:
-            logger.error(f"❌ Simulator connection failed: {e}")
+            logger.error(f"[ERROR] Simulator connection failed: {e}")
             raise
     
     async def disconnect(self):
@@ -264,13 +264,13 @@ class WebSocketClientSimulator:
         if self.websocket:
             await self.websocket.close()
             self.is_connected = False
-            logger.info("🔌 Simulator disconnected")
+            logger.info("[WS] Simulator disconnected")
     
     async def send_message(self, message: Dict[str, Any]):
         """Send message to server."""
         if self.websocket:
             await self.websocket.send(json.dumps(message))
-            logger.info(f"📤 Simulator sent: {message}")
+            logger.info(f"[EMOJI] Simulator sent: {message}")
     
     async def receive_message(self, timeout: float = 5.0):
         """Receive message from server with timeout."""
@@ -282,7 +282,7 @@ class WebSocketClientSimulator:
                 )
                 message = json.loads(message_text)
                 self.received_messages.append(message)
-                logger.info(f"📨 Simulator received: {message}")
+                logger.info(f"[EMOJI] Simulator received: {message}")
                 return message
             except asyncio.TimeoutError:
                 logger.warning("⏰ Simulator receive timeout")
@@ -307,7 +307,7 @@ class WebSocketClientSimulator:
 @pytest.mark.asyncio
 async def test_end_to_end_websocket_integration():
     """End-to-end test of WebSocket integration."""
-    logger.info("🧪 Starting end-to-end WebSocket integration test")
+    logger.info("[TEST] Starting end-to-end WebSocket integration test")
     
     # Start WebSocket manager
     await websocket_manager.start()
@@ -398,10 +398,10 @@ async def test_end_to_end_websocket_integration():
         await simulator.disconnect()
         assert not simulator.is_connected
         
-        logger.info("✅ End-to-end WebSocket integration test completed successfully")
+        logger.info("[OK] End-to-end WebSocket integration test completed successfully")
         
     except Exception as e:
-        logger.error(f"❌ End-to-end test failed: {e}")
+        logger.error(f"[ERROR] End-to-end test failed: {e}")
         raise
     
     finally:
@@ -435,7 +435,7 @@ class TestLiveDashboardMetrics:
         assert 'total_trades_today' in metrics_dict
         assert 'success_rate' in metrics_dict
         
-        logger.info("✅ Trading metrics initialization test passed")
+        logger.info("[OK] Trading metrics initialization test passed")
     
     def test_portfolio_metrics_initialization(self):
         """Test portfolio metrics are properly initialized."""
@@ -463,7 +463,7 @@ class TestLiveDashboardMetrics:
         assert 'daily_change_percent' in metrics_dict
         assert isinstance(metrics_dict['total_value'], float)
         
-        logger.info("✅ Portfolio metrics initialization test passed")
+        logger.info("[OK] Portfolio metrics initialization test passed")
     
     @pytest.mark.asyncio
     async def test_metrics_update_from_trade(self):
@@ -487,7 +487,7 @@ class TestLiveDashboardMetrics:
         assert service.trading_metrics.successful_trades == initial_successful + 1
         assert service.trading_metrics.total_profit > 0
         
-        logger.info("✅ Metrics update from trade test passed")
+        logger.info("[OK] Metrics update from trade test passed")
     
     @pytest.mark.asyncio
     async def test_portfolio_metrics_update(self):
@@ -511,12 +511,12 @@ class TestLiveDashboardMetrics:
         assert service.portfolio_metrics.total_value == 130000.00
         assert len(service.portfolio_metrics.top_positions) == 2
         
-        logger.info("✅ Portfolio metrics update test passed")
+        logger.info("[OK] Portfolio metrics update test passed")
 
 
 def run_performance_test():
     """Run performance test for WebSocket message handling."""
-    logger.info("🚀 Starting WebSocket performance test")
+    logger.info("[START] Starting WebSocket performance test")
     
     async def performance_test():
         # Start WebSocket manager
@@ -538,7 +538,7 @@ def run_performance_test():
             await asyncio.gather(*[sim.connect() for sim in simulators])
             connection_time = time.time() - start_time
             
-            logger.info(f"⏱️ Connected {num_clients} clients in {connection_time:.2f}s")
+            logger.info(f"⏱[EMOJI] Connected {num_clients} clients in {connection_time:.2f}s")
             
             # Subscribe all clients to dashboard updates
             await asyncio.gather(*[sim.subscribe("dashboard") for sim in simulators])
@@ -556,16 +556,16 @@ def run_performance_test():
             
             broadcast_time = time.time() - start_time
             
-            logger.info(f"⏱️ Broadcasted {num_messages} messages in {broadcast_time:.2f}s")
-            logger.info(f"📊 Rate: {num_messages / broadcast_time:.1f} messages/second")
+            logger.info(f"⏱[EMOJI] Broadcasted {num_messages} messages in {broadcast_time:.2f}s")
+            logger.info(f"[STATS] Rate: {num_messages / broadcast_time:.1f} messages/second")
             
             # Disconnect all clients
             await asyncio.gather(*[sim.disconnect() for sim in simulators])
             
-            logger.info("✅ Performance test completed successfully")
+            logger.info("[OK] Performance test completed successfully")
             
         except Exception as e:
-            logger.error(f"❌ Performance test failed: {e}")
+            logger.error(f"[ERROR] Performance test failed: {e}")
             raise
         
         finally:
@@ -577,7 +577,7 @@ def run_performance_test():
 
 def run_all_tests():
     """Run all WebSocket integration tests."""
-    logger.info("🧪 Starting comprehensive WebSocket integration tests")
+    logger.info("[TEST] Starting comprehensive WebSocket integration tests")
     
     try:
         # Run unit tests
@@ -586,7 +586,7 @@ def run_all_tests():
         result = runner.run(suite)
         
         if not result.wasSuccessful():
-            logger.error("❌ Unit tests failed")
+            logger.error("[ERROR] Unit tests failed")
             return False
         
         # Run async tests
@@ -602,11 +602,11 @@ def run_all_tests():
         # Run performance test
         run_performance_test()
         
-        logger.info("✅ All WebSocket integration tests passed successfully!")
+        logger.info("[OK] All WebSocket integration tests passed successfully!")
         return True
         
     except Exception as e:
-        logger.error(f"❌ Test suite failed: {e}")
+        logger.error(f"[ERROR] Test suite failed: {e}")
         return False
 
 

@@ -133,7 +133,7 @@ async def execute_advanced_trade(
     - Portfolio integration and tracking
     """
     try:
-        logger.info(f"🚀 Executing advanced trade for {user_wallet[:10]}...")
+        logger.info(f"[START] Executing advanced trade for {user_wallet[:10]}...")
         
         # Get risk manager
         risk_manager = get_risk_manager(lambda: session)
@@ -257,7 +257,7 @@ async def execute_advanced_trade(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Advanced trade execution failed: {e}")
+        logger.error(f"[ERROR] Advanced trade execution failed: {e}")
         raise HTTPException(status_code=500, detail=f"Trade execution failed: {e}")
 
 
@@ -277,7 +277,7 @@ async def get_risk_assessment(
     - Personalized recommendations
     """
     try:
-        logger.info(f"📊 Getting risk assessment for {user_wallet[:10]}...")
+        logger.info(f"[STATS] Getting risk assessment for {user_wallet[:10]}...")
         
         risk_manager = get_risk_manager(lambda: session)
         assessment = await risk_manager.assess_portfolio_risk(user_wallet, session)
@@ -321,7 +321,7 @@ async def get_risk_assessment(
         }
         
     except Exception as e:
-        logger.error(f"❌ Risk assessment failed: {e}")
+        logger.error(f"[ERROR] Risk assessment failed: {e}")
         raise HTTPException(status_code=500, detail=f"Risk assessment failed: {e}")
 
 
@@ -342,7 +342,7 @@ async def calculate_position_size(
     - Equal weight
     """
     try:
-        logger.info(f"📊 Calculating position size for {user_wallet[:10]}...")
+        logger.info(f"[STATS] Calculating position size for {user_wallet[:10]}...")
         
         risk_manager = get_risk_manager(lambda: session)
         
@@ -371,7 +371,7 @@ async def calculate_position_size(
         }
         
     except Exception as e:
-        logger.error(f"❌ Position size calculation failed: {e}")
+        logger.error(f"[ERROR] Position size calculation failed: {e}")
         raise HTTPException(status_code=500, detail=f"Position size calculation failed: {e}")
 
 
@@ -392,7 +392,7 @@ async def get_comprehensive_portfolio(
     - Transaction history (optional)
     """
     try:
-        logger.info(f"📈 Getting comprehensive portfolio for {user_wallet[:10]}...")
+        logger.info(f"[PERF] Getting comprehensive portfolio for {user_wallet[:10]}...")
         
         # Get positions
         positions = await get_user_positions(user_wallet, session)
@@ -455,7 +455,7 @@ async def get_comprehensive_portfolio(
         }
         
     except Exception as e:
-        logger.error(f"❌ Comprehensive portfolio retrieval failed: {e}")
+        logger.error(f"[ERROR] Comprehensive portfolio retrieval failed: {e}")
         raise HTTPException(status_code=500, detail=f"Portfolio retrieval failed: {e}")
 
 
@@ -475,7 +475,7 @@ async def update_risk_limits(
     - Trading automation settings
     """
     try:
-        logger.info(f"⚙️ Updating risk limits for {user_wallet[:10]}...")
+        logger.info(f"[CONFIG] Updating risk limits for {user_wallet[:10]}...")
         
         # Get existing risk limits or create new
         risk_limit = await session.query(RiskLimit).filter(
@@ -502,7 +502,7 @@ async def update_risk_limits(
         }
         
     except Exception as e:
-        logger.error(f"❌ Risk limits update failed: {e}")
+        logger.error(f"[ERROR] Risk limits update failed: {e}")
         await session.rollback()
         raise HTTPException(status_code=500, detail=f"Risk limits update failed: {e}")
 
@@ -524,7 +524,7 @@ async def monitor_position(
     - Stop-loss/take-profit guidance
     """
     try:
-        logger.info(f"📊 Monitoring position {position_id} for {user_wallet[:10]}...")
+        logger.info(f"[STATS] Monitoring position {position_id} for {user_wallet[:10]}...")
         
         # Verify position ownership
         position = await session.query(TradingPosition).filter(
@@ -554,7 +554,7 @@ async def monitor_position(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Position monitoring failed: {e}")
+        logger.error(f"[ERROR] Position monitoring failed: {e}")
         raise HTTPException(status_code=500, detail=f"Position monitoring failed: {e}")
 
 
@@ -574,7 +574,7 @@ async def get_performance_analytics(
     - Comparative benchmarks
     """
     try:
-        logger.info(f"📈 Generating performance analytics for {user_wallet[:10]}...")
+        logger.info(f"[PERF] Generating performance analytics for {user_wallet[:10]}...")
         
         # Get historical data
         start_date = datetime.utcnow() - timedelta(days=days)
@@ -624,7 +624,7 @@ async def get_performance_analytics(
         }
         
     except Exception as e:
-        logger.error(f"❌ Performance analytics failed: {e}")
+        logger.error(f"[ERROR] Performance analytics failed: {e}")
         raise HTTPException(status_code=500, detail=f"Analytics generation failed: {e}")
 
 
@@ -633,7 +633,7 @@ async def get_performance_analytics(
 async def monitor_order_execution(order_id: str, user_wallet: str):
     """Background task to monitor order execution and manage risk."""
     try:
-        logger.info(f"🔄 Starting order monitoring: {order_id}")
+        logger.info(f"[REFRESH] Starting order monitoring: {order_id}")
         
         # Would implement real-time order monitoring
         # - Check execution status
@@ -642,10 +642,10 @@ async def monitor_order_execution(order_id: str, user_wallet: str):
         # - Update position records
         
         await asyncio.sleep(60)  # Placeholder monitoring interval
-        logger.info(f"✅ Order monitoring completed: {order_id}")
+        logger.info(f"[OK] Order monitoring completed: {order_id}")
         
     except Exception as e:
-        logger.error(f"❌ Order monitoring failed for {order_id}: {e}")
+        logger.error(f"[ERROR] Order monitoring failed for {order_id}: {e}")
 
 
 # Utility endpoints for testing and administration
@@ -672,7 +672,7 @@ async def check_risk_system_health() -> Dict[str, Any]:
         }
         
     except Exception as e:
-        logger.error(f"❌ Risk system health check failed: {e}")
+        logger.error(f"[ERROR] Risk system health check failed: {e}")
         return {
             "success": False,
             "error": str(e),

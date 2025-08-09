@@ -77,7 +77,7 @@ class TestWalletConnections:
     @pytest.mark.asyncio
     async def test_wallet_manager_initialization(self, wallet_manager):
         """Test wallet manager initialization."""
-        logger.info("🧪 Testing wallet manager initialization...")
+        logger.info("[TEST] Testing wallet manager initialization...")
         
         # Test network initialization
         success = await wallet_manager.initialize_networks([NetworkType.ETHEREUM])
@@ -86,12 +86,12 @@ class TestWalletConnections:
         # Verify network instances
         assert NetworkType.ETHEREUM in wallet_manager.web3_instances
         
-        logger.info("✅ Wallet manager initialization test passed")
+        logger.info("[OK] Wallet manager initialization test passed")
     
     @pytest.mark.asyncio
     async def test_metamask_connection(self, wallet_manager):
         """Test MetaMask wallet connection."""
-        logger.info("🧪 Testing MetaMask connection...")
+        logger.info("[TEST] Testing MetaMask connection...")
         
         test_address = "0x742d35Cc6634C0532925a3b8D8645dECBF3E5FAC"
         
@@ -117,12 +117,12 @@ class TestWalletConnections:
             assert connection.status == ConnectionStatus.CONNECTED
             assert NetworkType.ETHEREUM in connection.connected_networks
             
-            logger.info(f"✅ MetaMask connected: {connection.connection_id}")
+            logger.info(f"[OK] MetaMask connected: {connection.connection_id}")
     
     @pytest.mark.asyncio
     async def test_wallet_verification(self, wallet_manager):
         """Test wallet access verification."""
-        logger.info("🧪 Testing wallet verification...")
+        logger.info("[TEST] Testing wallet verification...")
         
         test_address = "0x742d35Cc6634C0532925a3b8D8645dECBF3E5FAC"
         
@@ -152,12 +152,12 @@ class TestWalletConnections:
                     required_balance_eth=Decimal("5.0")
                 )
             
-            logger.info("✅ Wallet verification test passed")
+            logger.info("[OK] Wallet verification test passed")
     
     @pytest.mark.asyncio
     async def test_wallet_disconnection(self, wallet_manager):
         """Test wallet disconnection."""
-        logger.info("🧪 Testing wallet disconnection...")
+        logger.info("[TEST] Testing wallet disconnection...")
         
         test_address = "0x742d35Cc6634C0532925a3b8D8645dECBF3E5FAC"
         
@@ -184,7 +184,7 @@ class TestWalletConnections:
             active_connections = wallet_manager.get_active_connections()
             assert connection_id not in active_connections
             
-            logger.info("✅ Wallet disconnection test passed")
+            logger.info("[OK] Wallet disconnection test passed")
 
 
 class TestDEXIntegration:
@@ -213,7 +213,7 @@ class TestDEXIntegration:
     @pytest.mark.asyncio
     async def test_dex_initialization(self, dex_integration):
         """Test DEX contract initialization."""
-        logger.info("🧪 Testing DEX initialization...")
+        logger.info("[TEST] Testing DEX initialization...")
         
         with patch.object(dex_integration, '_load_dex_contract') as mock_load:
             mock_contract = Mock()
@@ -225,12 +225,12 @@ class TestDEXIntegration:
             # Verify contracts loaded
             assert (NetworkType.ETHEREUM, DEXProtocol.UNISWAP_V2) in dex_integration.dex_contracts
             
-            logger.info("✅ DEX initialization test passed")
+            logger.info("[OK] DEX initialization test passed")
     
     @pytest.mark.asyncio
     async def test_live_price_fetching(self, dex_integration):
         """Test live price fetching from DEX."""
-        logger.info("🧪 Testing live price fetching...")
+        logger.info("[TEST] Testing live price fetching...")
         
         # Mock contract initialization
         mock_contract = Mock()
@@ -260,12 +260,12 @@ class TestDEXIntegration:
             assert price > 0, "Price should be positive"
             assert isinstance(timestamp, datetime), "Timestamp should be datetime"
             
-            logger.info(f"✅ Price fetched: {price} at {timestamp}")
+            logger.info(f"[OK] Price fetched: {price} at {timestamp}")
     
     @pytest.mark.asyncio
     async def test_swap_quote_generation(self, dex_integration):
         """Test swap quote generation."""
-        logger.info("🧪 Testing swap quote generation...")
+        logger.info("[TEST] Testing swap quote generation...")
         
         # Mock dependencies
         with patch.object(dex_integration, '_get_token_info') as mock_token_info:
@@ -305,12 +305,12 @@ class TestDEXIntegration:
                         assert quote.estimated_gas == 150000
                         assert not quote.is_expired
                         
-                        logger.info(f"✅ Quote generated: {quote.quote_id}")
+                        logger.info(f"[OK] Quote generated: {quote.quote_id}")
     
     @pytest.mark.asyncio
     async def test_swap_execution_simulation(self, dex_integration):
         """Test swap execution (simulation mode)."""
-        logger.info("🧪 Testing swap execution simulation...")
+        logger.info("[TEST] Testing swap execution simulation...")
         
         # Create mock quote
         quote = SwapQuote(
@@ -353,7 +353,7 @@ class TestDEXIntegration:
         assert transaction.input_amount == quote.input_amount
         assert transaction.output_amount == quote.output_amount
         
-        logger.info(f"✅ Swap executed (simulation): {transaction.transaction_hash}")
+        logger.info(f"[OK] Swap executed (simulation): {transaction.transaction_hash}")
 
 
 class TestLiveTradingEngine:
@@ -383,7 +383,7 @@ class TestLiveTradingEngine:
     @pytest.mark.asyncio
     async def test_system_initialization(self, trading_engine):
         """Test trading system initialization."""
-        logger.info("🧪 Testing trading system initialization...")
+        logger.info("[TEST] Testing trading system initialization...")
         
         # Test initialization
         success = await trading_engine.initialize_live_systems([NetworkType.ETHEREUM])
@@ -392,12 +392,12 @@ class TestLiveTradingEngine:
         # Verify state
         assert trading_engine.is_initialized
         
-        logger.info("✅ Trading system initialization test passed")
+        logger.info("[OK] Trading system initialization test passed")
     
     @pytest.mark.asyncio
     async def test_trading_session_lifecycle(self, trading_engine):
         """Test complete trading session lifecycle."""
-        logger.info("🧪 Testing trading session lifecycle...")
+        logger.info("[TEST] Testing trading session lifecycle...")
         
         # Initialize system
         await trading_engine.initialize_live_systems([NetworkType.ETHEREUM])
@@ -436,12 +436,12 @@ class TestLiveTradingEngine:
                 success = await trading_engine.stop_trading_session(session.session_id)
                 assert success, "Session stop should succeed"
                 
-                logger.info(f"✅ Session lifecycle test passed: {session.session_id}")
+                logger.info(f"[OK] Session lifecycle test passed: {session.session_id}")
     
     @pytest.mark.asyncio
     async def test_opportunity_detection(self, trading_engine):
         """Test trading opportunity detection."""
-        logger.info("🧪 Testing opportunity detection...")
+        logger.info("[TEST] Testing opportunity detection...")
         
         # Initialize system
         await trading_engine.initialize_live_systems([NetworkType.ETHEREUM])
@@ -478,12 +478,12 @@ class TestLiveTradingEngine:
             assert opportunities[0].opportunity_id == "test-opp-123"
             assert opportunities[0].strategy == TradingStrategy.ARBITRAGE
             
-            logger.info(f"✅ Opportunity detected: {opportunities[0].opportunity_id}")
+            logger.info(f"[OK] Opportunity detected: {opportunities[0].opportunity_id}")
     
     @pytest.mark.asyncio
     async def test_risk_management(self, trading_engine):
         """Test risk management functionality."""
-        logger.info("🧪 Testing risk management...")
+        logger.info("[TEST] Testing risk management...")
         
         # Create test session
         session = Mock()
@@ -504,12 +504,12 @@ class TestLiveTradingEngine:
                 trade_amount=Decimal("2000")  # Exceeds max single trade
             )
         
-        logger.info("✅ Risk management test passed")
+        logger.info("[OK] Risk management test passed")
     
     @pytest.mark.asyncio
     async def test_system_statistics(self, trading_engine):
         """Test system statistics collection."""
-        logger.info("🧪 Testing system statistics...")
+        logger.info("[TEST] Testing system statistics...")
         
         # Initialize system
         await trading_engine.initialize_live_systems([NetworkType.ETHEREUM])
@@ -527,7 +527,7 @@ class TestLiveTradingEngine:
         assert stats["is_initialized"] == True
         assert stats["system_uptime_hours"] >= 0
         
-        logger.info(f"✅ System statistics: {stats}")
+        logger.info(f"[OK] System statistics: {stats}")
 
 
 class TestIntegrationWorkflows:
@@ -536,7 +536,7 @@ class TestIntegrationWorkflows:
     @pytest.mark.asyncio
     async def test_complete_trading_workflow(self):
         """Test complete end-to-end trading workflow."""
-        logger.info("🧪 Testing complete trading workflow...")
+        logger.info("[TEST] Testing complete trading workflow...")
         
         try:
             # 1. Initialize wallet system
@@ -588,16 +588,16 @@ class TestIntegrationWorkflows:
             await wallet_manager.disconnect_wallet(connection.connection_id)
             await trading_engine.shutdown()
             
-            logger.info("✅ Complete trading workflow test passed")
+            logger.info("[OK] Complete trading workflow test passed")
             
         except Exception as e:
-            logger.error(f"❌ Complete workflow test failed: {e}")
+            logger.error(f"[ERROR] Complete workflow test failed: {e}")
             raise
     
     @pytest.mark.asyncio
     async def test_error_handling(self):
         """Test comprehensive error handling."""
-        logger.info("🧪 Testing error handling...")
+        logger.info("[TEST] Testing error handling...")
         
         # Test wallet connection with invalid address
         wallet_manager = WalletConnectionManager()
@@ -611,7 +611,7 @@ class TestIntegrationWorkflows:
         with pytest.raises(TradingError):
             await trading_engine.start_trading_session("nonexistent-wallet")
         
-        logger.info("✅ Error handling test passed")
+        logger.info("[OK] Error handling test passed")
 
 
 # ==================== TEST CONFIGURATION ====================
@@ -652,10 +652,10 @@ if __name__ == "__main__":
         "TestIntegrationWorkflows"
     ]
     
-    logger.info("🚀 Starting Phase 4B Test Suite...")
+    logger.info("[START] Starting Phase 4B Test Suite...")
     
     for test_class in test_classes:
-        logger.info(f"🧪 Running {test_class}...")
+        logger.info(f"[TEST] Running {test_class}...")
         
         # Run pytest for specific class
         exit_code = pytest.main([
@@ -667,12 +667,12 @@ if __name__ == "__main__":
         ])
         
         if exit_code != 0:
-            logger.error(f"❌ {test_class} tests failed with exit code {exit_code}")
+            logger.error(f"[ERROR] {test_class} tests failed with exit code {exit_code}")
             sys.exit(exit_code)
         else:
-            logger.info(f"✅ {test_class} tests passed")
+            logger.info(f"[OK] {test_class} tests passed")
     
-    logger.info("🎉 All Phase 4B tests completed successfully!")
+    logger.info("[SUCCESS] All Phase 4B tests completed successfully!")
 
 
 # ==================== PYTEST MARKERS ====================

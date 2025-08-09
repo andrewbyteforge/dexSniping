@@ -222,7 +222,7 @@ class BlockZeroSniper:
         
         try:
             logger.info(
-                f"🎯 Executing Block 0 snipe for {liquidity_event.token_address} "
+                f"[TARGET] Executing Block 0 snipe for {liquidity_event.token_address} "
                 f"with {eth_amount} ETH (priority: {priority})"
             )
             

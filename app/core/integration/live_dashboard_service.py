@@ -149,7 +149,7 @@ class LiveDashboardService:
             'token_discovered': []
         }
         
-        logger.info("✅ Live Dashboard Service initialized")
+        logger.info("[OK] Live Dashboard Service initialized")
     
     async def start(self) -> None:
         """Start the live dashboard service."""
@@ -171,7 +171,7 @@ class LiveDashboardService:
         if self.trading_engine:
             await self._register_trading_engine_callbacks()
         
-        logger.info("🚀 Live Dashboard Service started")
+        logger.info("[START] Live Dashboard Service started")
     
     async def stop(self) -> None:
         """Stop the live dashboard service."""
@@ -184,7 +184,7 @@ class LiveDashboardService:
         # Wait for tasks to complete
         await asyncio.gather(*self.background_tasks, return_exceptions=True)
         
-        logger.info("🛑 Live Dashboard Service stopped")
+        logger.info("[EMOJI] Live Dashboard Service stopped")
     
     def set_trading_engine(self, trading_engine: TradingEngine) -> None:
         """Set the trading engine for monitoring."""
@@ -215,7 +215,7 @@ class LiveDashboardService:
             # Also broadcast to dashboard subscribers
             await websocket_manager.broadcast_trading_status(self.trading_metrics.to_dict())
             
-            logger.info(f"📊 Broadcasted trade execution: {trade_data.get('symbol', 'unknown')}")
+            logger.info(f"[STATS] Broadcasted trade execution: {trade_data.get('symbol', 'unknown')}")
             
         except Exception as e:
             logger.error(f"Error broadcasting trade execution: {e}")
@@ -236,7 +236,7 @@ class LiveDashboardService:
             # Broadcast to WebSocket clients
             await websocket_manager.broadcast_portfolio_update(update_data)
             
-            logger.info("📊 Broadcasted portfolio update")
+            logger.info("[STATS] Broadcasted portfolio update")
             
         except Exception as e:
             logger.error(f"Error broadcasting portfolio update: {e}")
@@ -255,7 +255,7 @@ class LiveDashboardService:
             # Broadcast to WebSocket clients
             await websocket_manager.broadcast_token_discovery(alert_data)
             
-            logger.info(f"🎯 Broadcasted token discovery: {token_data.get('symbol', 'unknown')}")
+            logger.info(f"[TARGET] Broadcasted token discovery: {token_data.get('symbol', 'unknown')}")
             
         except Exception as e:
             logger.error(f"Error broadcasting token discovery: {e}")
@@ -274,7 +274,7 @@ class LiveDashboardService:
             # Broadcast to WebSocket clients
             await websocket_manager.broadcast_arbitrage_alert(alert_data)
             
-            logger.info(f"💰 Broadcasted arbitrage alert: {arbitrage_data.get('profit_percentage', 0)}% profit")
+            logger.info(f"[PROFIT] Broadcasted arbitrage alert: {arbitrage_data.get('profit_percentage', 0)}% profit")
             
         except Exception as e:
             logger.error(f"Error broadcasting arbitrage alert: {e}")
@@ -293,7 +293,7 @@ class LiveDashboardService:
             # Broadcast as system health update
             await websocket_manager.broadcast_system_health(alert_data)
             
-            logger.warning(f"⚠️ Broadcasted risk alert: {risk_data.get('message', 'Unknown risk')}")
+            logger.warning(f"[WARN] Broadcasted risk alert: {risk_data.get('message', 'Unknown risk')}")
             
         except Exception as e:
             logger.error(f"Error broadcasting risk alert: {e}")
@@ -320,7 +320,7 @@ class LiveDashboardService:
             # Broadcast to WebSocket clients
             await websocket_manager.broadcast_trading_status(update_data)
             
-            logger.info(f"🎯 Broadcasted strategy update: {strategy_name} {status}")
+            logger.info(f"[TARGET] Broadcasted strategy update: {strategy_name} {status}")
             
         except Exception as e:
             logger.error(f"Error broadcasting strategy update: {e}")
@@ -405,7 +405,7 @@ class LiveDashboardService:
         try:
             # Register trade execution callback
             # Note: This would be implemented when trading engine supports callbacks
-            logger.info("✅ Registered trading engine callbacks")
+            logger.info("[OK] Registered trading engine callbacks")
             
         except Exception as e:
             logger.error(f"Error registering trading engine callbacks: {e}")

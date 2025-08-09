@@ -38,7 +38,7 @@ class OrderExecutor:
         self.orders = {}
         self.order_counter = 0
         
-        logger.info("📋 OrderExecutor initialized")
+        logger.info("[LOG] OrderExecutor initialized")
     
     async def execute_order(self, order_params: Dict[str, Any]) -> Dict[str, Any]:
         """Execute an order."""
@@ -54,12 +54,12 @@ class OrderExecutor:
             }
             
             self.orders[order_id] = order
-            logger.info(f"✅ Order executed: {order_id}")
+            logger.info(f"[OK] Order executed: {order_id}")
             
             return order
             
         except Exception as e:
-            logger.error(f"❌ Order execution failed: {e}")
+            logger.error(f"[ERROR] Order execution failed: {e}")
             return {"status": "failed", "error": str(e)}
     
     def get_order_status(self, order_id: str) -> Optional[Dict[str, Any]]:

@@ -79,7 +79,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             'admin': 200,
         }
         
-        logger.info("🛡️ Security middleware initialized")
+        logger.info("[SEC] Security middleware initialized")
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         """
@@ -127,7 +127,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             # Re-raise HTTP exceptions
             raise
         except Exception as e:
-            logger.error(f"❌ Security middleware error: {e}")
+            logger.error(f"[ERROR] Security middleware error: {e}")
             
             # Sanitize error for response
             sanitized_error = self.security_manager.error_sanitizer.sanitize_error(
@@ -232,7 +232,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
                 'status_code': status.HTTP_400_BAD_REQUEST
             }
         except Exception as e:
-            logger.error(f"❌ Request validation error: {e}")
+            logger.error(f"[ERROR] Request validation error: {e}")
             return {
                 'valid': False,
                 'error': 'Request validation failed',
@@ -291,14 +291,14 @@ class SecurityMiddleware(BaseHTTPMiddleware):
                             json_data = json.loads(body.decode())
                             data.update(json_data)
                     except json.JSONDecodeError:
-                        logger.warning("⚠️ Invalid JSON in request body")
+                        logger.warning("[WARN] Invalid JSON in request body")
                     except Exception as e:
-                        logger.warning(f"⚠️ Error reading request body: {e}")
+                        logger.warning(f"[WARN] Error reading request body: {e}")
             
             return data
             
         except Exception as e:
-            logger.error(f"❌ Error extracting request data: {e}")
+            logger.error(f"[ERROR] Error extracting request data: {e}")
             return {}
 
     def check_rate_limit(self, request: Request, api_key: str) -> bool:
@@ -317,7 +317,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             return self.security_manager.api_auth.check_rate_limit(api_key)
             
         except Exception as e:
-            logger.error(f"❌ Rate limit check error: {e}")
+            logger.error(f"[ERROR] Rate limit check error: {e}")
             return True  # Allow request on error
 
     def add_security_headers(self, response: Response) -> Response:
@@ -410,7 +410,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             self.security_manager.log_security_event('api_request', log_data)
             
         except Exception as e:
-            logger.error(f"❌ Request logging error: {e}")
+            logger.error(f"[ERROR] Request logging error: {e}")
 
     def get_endpoint_security_level(self, path: str) -> SecurityLevel:
         """
@@ -466,7 +466,7 @@ def create_security_middleware(app: ASGIApp, config: Optional[SecurityConfig] = 
     
     middleware = SecurityMiddleware(app)
     
-    logger.info("🛡️ Security middleware created with full protection")
+    logger.info("[SEC] Security middleware created with full protection")
     return middleware
 
 

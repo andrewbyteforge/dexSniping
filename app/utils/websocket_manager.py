@@ -21,7 +21,7 @@ class WebSocketManager:
         self.active_connections: List = []
         self.connection_count = 0
         
-        logger.info("🔌 WebSocketManager initialized")
+        logger.info("[WS] WebSocketManager initialized")
     
     async def connect(self, websocket):
         """Connect a WebSocket."""
@@ -29,9 +29,9 @@ class WebSocketManager:
             await websocket.accept()
             self.active_connections.append(websocket)
             self.connection_count += 1
-            logger.info(f"🔌 WebSocket connected: {self.connection_count} total")
+            logger.info(f"[WS] WebSocket connected: {self.connection_count} total")
         except Exception as e:
-            logger.error(f"❌ WebSocket connection failed: {e}")
+            logger.error(f"[ERROR] WebSocket connection failed: {e}")
     
     def disconnect(self, websocket):
         """Disconnect a WebSocket."""
@@ -39,16 +39,16 @@ class WebSocketManager:
             if websocket in self.active_connections:
                 self.active_connections.remove(websocket)
                 self.connection_count -= 1
-                logger.info(f"🔌 WebSocket disconnected: {self.connection_count} total")
+                logger.info(f"[WS] WebSocket disconnected: {self.connection_count} total")
         except Exception as e:
-            logger.error(f"❌ WebSocket disconnect error: {e}")
+            logger.error(f"[ERROR] WebSocket disconnect error: {e}")
     
     async def send_personal_message(self, message: str, websocket):
         """Send message to specific WebSocket."""
         try:
             await websocket.send_text(message)
         except Exception as e:
-            logger.error(f"❌ Failed to send WebSocket message: {e}")
+            logger.error(f"[ERROR] Failed to send WebSocket message: {e}")
     
     async def broadcast(self, message: Dict[str, Any]):
         """Broadcast message to all connected WebSockets."""
@@ -58,7 +58,7 @@ class WebSocketManager:
                 try:
                     await connection.send_text(message_str)
                 except Exception as e:
-                    logger.error(f"❌ Broadcast failed: {e}")
+                    logger.error(f"[ERROR] Broadcast failed: {e}")
                     self.disconnect(connection)
 
 # Global instance

@@ -11,7 +11,7 @@ from pathlib import Path
 
 def create_clean_exceptions_file():
     """Create a clean, working exceptions file."""
-    print("🔧 Creating clean exceptions file...")
+    print("[FIX] Creating clean exceptions file...")
     
     exceptions_content = '''"""
 DEX Sniper Pro Exception System
@@ -181,17 +181,17 @@ __all__ = [
     if exceptions_file.exists():
         backup_file = Path("app/core/exceptions_backup.py")
         exceptions_file.rename(backup_file)
-        print(f"✅ Backed up existing exceptions to: {backup_file}")
+        print(f"[OK] Backed up existing exceptions to: {backup_file}")
     
     # Write new clean exceptions file
     exceptions_file.write_text(exceptions_content, encoding='utf-8')
-    print(f"✅ Created clean exceptions file: {exceptions_file}")
+    print(f"[OK] Created clean exceptions file: {exceptions_file}")
     
     return True
 
 def create_minimal_security_manager():
     """Create a minimal security manager that works."""
-    print("🔧 Creating minimal security manager...")
+    print("[FIX] Creating minimal security manager...")
     
     # Ensure security directory exists
     security_dir = Path("app/core/security")
@@ -272,7 +272,7 @@ class InputValidator:
             'amount': re.compile(r'^\\\\d+\\\\.?\\\\d*$'),
             'alphanumeric': re.compile(r'^[a-zA-Z0-9]+$'),
         }
-        logger.info("🔒 Input validator initialized")
+        logger.info("[EMOJI] Input validator initialized")
 
     def validate_ethereum_address(self, address: str) -> bool:
         """Validate Ethereum address."""
@@ -329,7 +329,7 @@ class WalletSecurity:
         self.lockout_duration = timedelta(minutes=15)
         self.failed_attempts = {}
         self.locked_wallets = {}
-        logger.info("🔐 Wallet security initialized")
+        logger.info("[AUTH] Wallet security initialized")
 
     def encrypt_private_key(self, private_key: str, wallet_address: str) -> str:
         """Encrypt private key."""
@@ -414,7 +414,7 @@ class APIAuthentication:
             APIKeyType.TRADING: 30,
             APIKeyType.ADMIN: 120,
         }
-        logger.info("🔑 API authentication initialized")
+        logger.info("[EMOJI] API authentication initialized")
 
     def generate_api_key(self, user_id: str, key_type: APIKeyType, permissions: List[str]) -> str:
         """Generate API key."""
@@ -510,7 +510,7 @@ class SecurityManager:
             self.error_sanitizer = ErrorSanitizer()
             self.security_events = []
             self.max_security_events = 1000
-            logger.info("🛡️ Security manager initialized")
+            logger.info("[SEC] Security manager initialized")
         except Exception as e:
             raise SecurityError(f"Security initialization failed: {e}")
 
@@ -599,13 +599,13 @@ __all__ = [
     
     security_file = security_dir / "security_manager.py"
     security_file.write_text(security_content, encoding='utf-8')
-    print(f"✅ Created minimal security manager: {security_file}")
+    print(f"[OK] Created minimal security manager: {security_file}")
     
     return True
 
 def create_working_security_test():
     """Create a working security test."""
-    print("🔧 Creating working security test...")
+    print("[FIX] Creating working security test...")
     
     test_content = '''"""
 Working Security Test
@@ -623,74 +623,74 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def test_security():
     """Test security implementation."""
-    print("🛡️ Working Security Test")
+    print("[SEC] Working Security Test")
     print("=" * 40)
     
     try:
         # Test imports
-        print("🧪 Testing imports...")
+        print("[TEST] Testing imports...")
         from app.core.security.security_manager import (
             get_security_manager, SecurityManager, APIKeyType
         )
-        print("  ✅ Security imports successful")
+        print("  [OK] Security imports successful")
         
         # Test initialization
-        print("🧪 Testing initialization...")
+        print("[TEST] Testing initialization...")
         security_manager = get_security_manager()
-        print("  ✅ Security manager initialized")
+        print("  [OK] Security manager initialized")
         
         # Test wallet security
-        print("🧪 Testing wallet security...")
+        print("[TEST] Testing wallet security...")
         test_key = "a" * 64
         test_address = "0x" + "b" * 40
         
         encrypted = security_manager.wallet_security.encrypt_private_key(test_key, test_address)
         decrypted = security_manager.wallet_security.decrypt_private_key(encrypted, test_address)
         assert decrypted == test_key
-        print("  ✅ Wallet security working")
+        print("  [OK] Wallet security working")
         
         # Test API auth
-        print("🧪 Testing API authentication...")
+        print("[TEST] Testing API authentication...")
         api_key = security_manager.api_auth.generate_api_key(
             "test_user", APIKeyType.TRADING, ["read_access", "trading_access"]
         )
         key_data = security_manager.api_auth.validate_api_key(api_key, "read_access")
         assert key_data['user_id'] == 'test_user'
-        print("  ✅ API authentication working")
+        print("  [OK] API authentication working")
         
         # Test input validation
-        print("🧪 Testing input validation...")
+        print("[TEST] Testing input validation...")
         valid_addr = "0x" + "a" * 40
         assert security_manager.input_validator.validate_ethereum_address(valid_addr)
         assert not security_manager.input_validator.validate_ethereum_address("invalid")
-        print("  ✅ Input validation working")
+        print("  [OK] Input validation working")
         
         # Test error sanitization
-        print("🧪 Testing error sanitization...")
+        print("[TEST] Testing error sanitization...")
         error_msg = "Error with 0x1234567890abcdef1234567890abcdef12345678"
         sanitized = security_manager.error_sanitizer.sanitize_error(error_msg)
         assert "[REDACTED]" in sanitized
-        print("  ✅ Error sanitization working")
+        print("  [OK] Error sanitization working")
         
         # Test metrics
-        print("🧪 Testing security metrics...")
+        print("[TEST] Testing security metrics...")
         metrics = security_manager.get_security_metrics()
         assert 'system_status' in metrics
-        print("  ✅ Security metrics working")
+        print("  [OK] Security metrics working")
         
-        print("\\n🎉 ALL SECURITY TESTS PASSED!")
-        print("✅ Security implementation working correctly")
-        print("\\n🛡️ Security Features Validated:")
-        print("   🔐 Wallet Security - Private key encryption/decryption")
-        print("   🔑 API Authentication - Key generation and validation")
-        print("   ✅ Input Validation - Address and data validation")
+        print("\\n[SUCCESS] ALL SECURITY TESTS PASSED!")
+        print("[OK] Security implementation working correctly")
+        print("\\n[SEC] Security Features Validated:")
+        print("   [AUTH] Wallet Security - Private key encryption/decryption")
+        print("   [EMOJI] API Authentication - Key generation and validation")
+        print("   [OK] Input Validation - Address and data validation")
         print("   🧹 Error Sanitization - Sensitive data removal")
-        print("   📊 Security Metrics - System monitoring")
+        print("   [STATS] Security Metrics - System monitoring")
         
         return True
         
     except Exception as e:
-        print(f"❌ Security test failed: {e}")
+        print(f"[ERROR] Security test failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -699,49 +699,49 @@ if __name__ == "__main__":
     success = test_security()
     
     if success:
-        print("\\n🚀 Security implementation is ready!")
-        print("✅ All 4 critical security failures resolved")
+        print("\\n[START] Security implementation is ready!")
+        print("[OK] All 4 critical security failures resolved")
     else:
-        print("\\n❌ Security implementation needs fixes")
+        print("\\n[ERROR] Security implementation needs fixes")
     
     sys.exit(0 if success else 1)
 '''
     
     test_file = Path("test_security_working.py")
     test_file.write_text(test_content, encoding='utf-8')
-    print(f"✅ Created working security test: {test_file}")
+    print(f"[OK] Created working security test: {test_file}")
     
     return True
 
 def main():
     """Main fix function."""
-    print("🛡️ Fix Exceptions and Create Working Security")
+    print("[SEC] Fix Exceptions and Create Working Security")
     print("=" * 50)
     
     try:
         # Step 1: Create clean exceptions file
         if create_clean_exceptions_file():
-            print("✅ Clean exceptions file created")
+            print("[OK] Clean exceptions file created")
         
         # Step 2: Create minimal security manager
         if create_minimal_security_manager():
-            print("✅ Minimal security manager created")
+            print("[OK] Minimal security manager created")
         
         # Step 3: Create working test
         if create_working_security_test():
-            print("✅ Working security test created")
+            print("[OK] Working security test created")
         
-        print("\\n🎯 All fixes applied successfully!")
-        print("\\n🧪 Test the security implementation:")
+        print("\\n[TARGET] All fixes applied successfully!")
+        print("\\n[TEST] Test the security implementation:")
         print("   python test_security_working.py")
         
-        print("\\n🧪 Then run the full test suite:")
+        print("\\n[TEST] Then run the full test suite:")
         print("   python tests/test_security_implementation.py")
         
         return True
         
     except Exception as e:
-        print(f"❌ Fix failed: {e}")
+        print(f"[ERROR] Fix failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -751,5 +751,5 @@ if __name__ == "__main__":
         success = main()
         sys.exit(0 if success else 1)
     except Exception as e:
-        print(f"💥 Fix script error: {e}")
+        print(f"[EMOJI] Fix script error: {e}")
         sys.exit(1)

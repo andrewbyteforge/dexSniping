@@ -20,7 +20,7 @@ def fix_unicode_in_logger():
     logger_file = Path("app/utils/logger.py")
     
     if not logger_file.exists():
-        print("❌ logger.py not found")
+        print("[ERROR] logger.py not found")
         return False
     
     try:
@@ -28,27 +28,27 @@ def fix_unicode_in_logger():
         
         # Replace emoji characters with simple text
         emoji_replacements = {
-            '📝': '[LOG]',
-            '✅': '[OK]',
-            '❌': '[ERROR]',
-            '⚠️': '[WARN]',
-            '🔧': '[FIX]',
-            '🚀': '[START]',
-            '💰': '[TRADE]',
-            '📊': '[STATS]',
-            '🔍': '[SEARCH]',
-            '💡': '[INFO]',
-            '🎯': '[TARGET]',
-            '🔄': '[UPDATE]',
-            '🛡️': '[SECURE]',
-            '📱': '[API]',
-            '⚡': '[FAST]',
-            '🤖': '[BOT]',
-            '🔗': '[LINK]',
-            '💾': '[DATA]',
-            '🧪': '[TEST]',
-            '🎉': '[SUCCESS]',
-            '🚨': '[ALERT]'
+            '[NOTE]': '[LOG]',
+            '[OK]': '[OK]',
+            '[ERROR]': '[ERROR]',
+            '[WARN]': '[WARN]',
+            '[FIX]': '[FIX]',
+            '[START]': '[START]',
+            '[PROFIT]': '[TRADE]',
+            '[STATS]': '[STATS]',
+            '[SEARCH]': '[SEARCH]',
+            '[TIP]': '[INFO]',
+            '[TARGET]': '[TARGET]',
+            '[REFRESH]': '[UPDATE]',
+            '[SEC]': '[SECURE]',
+            '[EMOJI]': '[API]',
+            '[TRADE]': '[FAST]',
+            '[BOT]': '[BOT]',
+            '[EMOJI]': '[LINK]',
+            '[DB]': '[DATA]',
+            '[TEST]': '[TEST]',
+            '[SUCCESS]': '[SUCCESS]',
+            '[EMOJI]': '[ALERT]'
         }
         
         # Replace emojis with text equivalents
@@ -58,11 +58,11 @@ def fix_unicode_in_logger():
         # Write back the content
         logger_file.write_text(content, encoding='utf-8')
         
-        print("✅ Fixed unicode characters in logger.py")
+        print("[OK] Fixed unicode characters in logger.py")
         return True
         
     except Exception as e:
-        print(f"❌ Error fixing logger.py: {e}")
+        print(f"[ERROR] Error fixing logger.py: {e}")
         return False
 
 
@@ -72,7 +72,7 @@ def add_missing_functions_to_persistence_manager():
     persistence_file = Path("app/core/database/persistence_manager.py")
     
     if not persistence_file.exists():
-        print("❌ persistence_manager.py not found")
+        print("[ERROR] persistence_manager.py not found")
         return False
     
     try:
@@ -175,14 +175,14 @@ def get_persistence_manager_sync() -> PersistenceManager:
             # Write back to file
             persistence_file.write_text(content, encoding='utf-8')
             
-            print("✅ Added missing functions to persistence_manager.py")
+            print("[OK] Added missing functions to persistence_manager.py")
             return True
         else:
-            print("✅ get_persistence_manager function already exists")
+            print("[OK] get_persistence_manager function already exists")
             return True
             
     except Exception as e:
-        print(f"❌ Error fixing persistence_manager.py: {e}")
+        print(f"[ERROR] Error fixing persistence_manager.py: {e}")
         return False
 
 
@@ -192,7 +192,7 @@ def add_missing_functions_to_settings_manager():
     settings_file = Path("app/core/config/settings_manager.py")
     
     if not settings_file.exists():
-        print("⚠️ settings_manager.py not found - skipping")
+        print("[WARN] settings_manager.py not found - skipping")
         return True
     
     try:
@@ -237,14 +237,14 @@ def get_settings():
             content += missing_function
             settings_file.write_text(content, encoding='utf-8')
             
-            print("✅ Added missing get_settings function")
+            print("[OK] Added missing get_settings function")
             return True
         else:
-            print("✅ get_settings function already exists")
+            print("[OK] get_settings function already exists")
             return True
             
     except Exception as e:
-        print(f"⚠️ Could not check settings_manager.py: {e}")
+        print(f"[WARN] Could not check settings_manager.py: {e}")
         return True  # Don't fail for this
 
 
@@ -339,16 +339,16 @@ print("=" * 60)
     try:
         test_file = Path("test_simple.py")
         test_file.write_text(simple_test_content, encoding='utf-8')
-        print("✅ Created simplified test: test_simple.py")
+        print("[OK] Created simplified test: test_simple.py")
         return True
     except Exception as e:
-        print(f"❌ Failed to create simplified test: {e}")
+        print(f"[ERROR] Failed to create simplified test: {e}")
         return False
 
 
 def main():
     """Main fix function."""
-    print("🔧 Fixing Unicode and Missing Function Issues")
+    print("[FIX] Fixing Unicode and Missing Function Issues")
     print("=" * 60)
     
     fixes_applied = 0

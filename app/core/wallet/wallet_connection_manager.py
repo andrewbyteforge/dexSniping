@@ -203,7 +203,7 @@ class WalletConnectionManager:
         self.session_timeout_minutes = 30
         self.balance_cache_minutes = 5
         
-        logger.info("🔗 Wallet Connection Manager initialized")
+        logger.info("[EMOJI] Wallet Connection Manager initialized")
     
     async def initialize_networks(self, networks: Optional[List[NetworkType]] = None) -> bool:
         """
@@ -219,7 +219,7 @@ class WalletConnectionManager:
             NetworkError: If network initialization fails
         """
         try:
-            logger.info("🌐 Initializing blockchain network connections...")
+            logger.info("[API] Initializing blockchain network connections...")
             
             if networks is None:
                 networks = list(self.network_configs.keys())
@@ -232,12 +232,12 @@ class WalletConnectionManager:
                     initialization_results.append((network, result))
                     
                     if result:
-                        logger.info(f"✅ {network.value} network initialized")
+                        logger.info(f"[OK] {network.value} network initialized")
                     else:
-                        logger.warning(f"⚠️ {network.value} network initialization failed")
+                        logger.warning(f"[WARN] {network.value} network initialization failed")
                         
                 except Exception as e:
-                    logger.error(f"❌ {network.value} network error: {e}")
+                    logger.error(f"[ERROR] {network.value} network error: {e}")
                     initialization_results.append((network, False))
             
             # Check if at least one network was initialized
@@ -246,11 +246,11 @@ class WalletConnectionManager:
             if not successful_networks:
                 raise NetworkError("No networks could be initialized")
             
-            logger.info(f"🎯 Network initialization complete: {len(successful_networks)}/{len(networks)} networks ready")
+            logger.info(f"[TARGET] Network initialization complete: {len(successful_networks)}/{len(networks)} networks ready")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Network initialization failed: {e}")
+            logger.error(f"[ERROR] Network initialization failed: {e}")
             raise NetworkError(f"Failed to initialize networks: {e}")
     
     async def _initialize_single_network(self, network: NetworkType) -> bool:
@@ -262,7 +262,7 @@ class WalletConnectionManager:
             try:
                 web3 = Web3(Web3.HTTPProvider(config.rpc_url))
             except Exception as e:
-                logger.error(f"❌ Failed to create Web3 instance for {network.value}: {e}")
+                logger.error(f"[ERROR] Failed to create Web3 instance for {network.value}: {e}")
                 return False
             
             # Add PoA middleware for networks that need it
@@ -270,7 +270,7 @@ class WalletConnectionManager:
                 try:
                     web3.middleware_onion.inject(geth_poa_middleware, layer=0)
                 except Exception as e:
-                    logger.warning(f"⚠️ Failed to add PoA middleware for {network.value}: {e}")
+                    logger.warning(f"[WARN] Failed to add PoA middleware for {network.value}: {e}")
             
             # Test connection with timeout and retries
             try:
@@ -283,14 +283,14 @@ class WalletConnectionManager:
                 )
                 
                 if latest_block == 0:
-                    logger.warning(f"⚠️ {network.value} returned block 0")
+                    logger.warning(f"[WARN] {network.value} returned block 0")
                     return False
                 
             except asyncio.TimeoutError:
-                logger.error(f"❌ {network.value} connection timeout")
+                logger.error(f"[ERROR] {network.value} connection timeout")
                 return False
             except Exception as e:
-                logger.error(f"❌ {network.value} block number check failed: {e}")
+                logger.error(f"[ERROR] {network.value} block number check failed: {e}")
                 return False
             
             # Verify chain ID with timeout
@@ -304,29 +304,29 @@ class WalletConnectionManager:
                 
                 if chain_id != config.chain_id:
                     logger.warning(
-                        f"⚠️ {network.value} chain ID mismatch: "
+                        f"[WARN] {network.value} chain ID mismatch: "
                         f"expected {config.chain_id}, got {chain_id}"
                     )
                     return False
                 
             except asyncio.TimeoutError:
-                logger.error(f"❌ {network.value} chain ID check timeout")
+                logger.error(f"[ERROR] {network.value} chain ID check timeout")
                 return False
             except Exception as e:
-                logger.error(f"❌ {network.value} chain ID check failed: {e}")
+                logger.error(f"[ERROR] {network.value} chain ID check failed: {e}")
                 return False
             
             # Store successful connection
             self.web3_instances[network] = web3
             
             logger.info(
-                f"✅ {network.value} connected - Block: {latest_block}, Chain ID: {chain_id}"
+                f"[OK] {network.value} connected - Block: {latest_block}, Chain ID: {chain_id}"
             )
             
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to initialize {network.value}: {e}")
+            logger.error(f"[ERROR] Failed to initialize {network.value}: {e}")
             return False
     
     async def connect_metamask(
@@ -375,7 +375,7 @@ class WalletConnectionManager:
                 if network in self.web3_instances:
                     available_networks[network] = True
                 else:
-                    logger.warning(f"⚠️ Network {network.value} not available")
+                    logger.warning(f"[WARN] Network {network.value} not available")
                     available_networks[network] = False
             
             # Get wallet balances
@@ -386,7 +386,7 @@ class WalletConnectionManager:
                         balance = await self._get_wallet_balance(network, normalized_address)
                         balances[network] = balance
                     except Exception as e:
-                        logger.warning(f"⚠️ Failed to get {network.value} balance: {e}")
+                        logger.warning(f"[WARN] Failed to get {network.value} balance: {e}")
                         balances[network] = WalletBalance(
                             network=network,
                             native_balance=Decimal("0"),
@@ -412,14 +412,14 @@ class WalletConnectionManager:
             await self._notify_connection_callbacks("connected", connection)
             
             logger.info(
-                f"✅ MetaMask connected: {normalized_address[:10]}... "
+                f"[OK] MetaMask connected: {normalized_address[:10]}... "
                 f"({len([n for n, a in available_networks.items() if a])} networks)"
             )
             
             return connection
             
         except Exception as e:
-            logger.error(f"❌ MetaMask connection failed: {e}")
+            logger.error(f"[ERROR] MetaMask connection failed: {e}")
             raise WalletError(f"Failed to connect MetaMask: {e}")
     
     async def connect_wallet_connect(
@@ -441,7 +441,7 @@ class WalletConnectionManager:
             WalletError: If connection fails
         """
         try:
-            logger.info(f"🔗 Connecting WalletConnect wallet: {wallet_address[:10]}...")
+            logger.info(f"[EMOJI] Connecting WalletConnect wallet: {wallet_address[:10]}...")
             
             # Validate wallet address
             if not self._validate_wallet_address(wallet_address):
@@ -464,7 +464,7 @@ class WalletConnectionManager:
                         balance = await self._get_wallet_balance(network, normalized_address)
                         balances[network] = balance
                     except Exception as e:
-                        logger.warning(f"⚠️ Failed to get {network.value} balance: {e}")
+                        logger.warning(f"[WARN] Failed to get {network.value} balance: {e}")
             
             # Create connection
             connection = WalletConnection(
@@ -484,11 +484,11 @@ class WalletConnectionManager:
             # Notify callbacks
             await self._notify_connection_callbacks("connected", connection)
             
-            logger.info(f"✅ WalletConnect connected: {normalized_address[:10]}...")
+            logger.info(f"[OK] WalletConnect connected: {normalized_address[:10]}...")
             return connection
             
         except Exception as e:
-            logger.error(f"❌ WalletConnect connection failed: {e}")
+            logger.error(f"[ERROR] WalletConnect connection failed: {e}")
             raise WalletError(f"Failed to connect WalletConnect: {e}")
     
     async def disconnect_wallet(self, connection_id: str) -> bool:
@@ -503,7 +503,7 @@ class WalletConnectionManager:
         """
         try:
             if connection_id not in self.active_connections:
-                logger.warning(f"⚠️ Connection {connection_id} not found")
+                logger.warning(f"[WARN] Connection {connection_id} not found")
                 return False
             
             connection = self.active_connections[connection_id]
@@ -518,11 +518,11 @@ class WalletConnectionManager:
             # Remove connection
             del self.active_connections[connection_id]
             
-            logger.info(f"✅ Wallet disconnected: {connection.wallet_address[:10]}...")
+            logger.info(f"[OK] Wallet disconnected: {connection.wallet_address[:10]}...")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Wallet disconnection failed: {e}")
+            logger.error(f"[ERROR] Wallet disconnection failed: {e}")
             return False
     
     async def verify_wallet_access(
@@ -565,7 +565,7 @@ class WalletConnectionManager:
                 connection.balances[network] = balance
                 connection.last_activity = datetime.utcnow()
             except Exception as e:
-                logger.warning(f"⚠️ Failed to update balance: {e}")
+                logger.warning(f"[WARN] Failed to update balance: {e}")
             
             # Check minimum balance if required
             if required_balance_eth:
@@ -577,11 +577,11 @@ class WalletConnectionManager:
                         f"available {current_balance.native_balance if current_balance else 0}"
                     )
             
-            logger.debug(f"✅ Wallet access verified: {connection.wallet_address[:10]}...")
+            logger.debug(f"[OK] Wallet access verified: {connection.wallet_address[:10]}...")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Wallet verification failed: {e}")
+            logger.error(f"[ERROR] Wallet verification failed: {e}")
             raise WalletError(f"Wallet verification failed: {e}")
     
     async def _get_wallet_balance(self, network: NetworkType, wallet_address: str) -> WalletBalance:
@@ -608,7 +608,7 @@ class WalletConnectionManager:
             )
             
         except Exception as e:
-            logger.error(f"❌ Failed to get {network.value} balance: {e}")
+            logger.error(f"[ERROR] Failed to get {network.value} balance: {e}")
             raise WalletError(f"Failed to get balance: {e}")
     
     def _validate_wallet_address(self, address: str) -> bool:
@@ -627,7 +627,7 @@ class WalletConnectionManager:
                 else:
                     callback(event, connection)
             except Exception as e:
-                logger.warning(f"⚠️ Callback error: {e}")
+                logger.warning(f"[WARN] Callback error: {e}")
     
     def register_connection_callback(self, callback: Callable) -> None:
         """Register callback for connection events."""
@@ -697,5 +697,5 @@ async def initialize_wallet_system(networks: Optional[List[NetworkType]] = None)
         manager = get_wallet_connection_manager()
         return await manager.initialize_networks(networks)
     except Exception as e:
-        logger.error(f"❌ Failed to initialize wallet system: {e}")
+        logger.error(f"[ERROR] Failed to initialize wallet system: {e}")
         return False

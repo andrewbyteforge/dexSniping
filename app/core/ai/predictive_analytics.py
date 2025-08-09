@@ -298,7 +298,7 @@ class PredictiveAnalytics:
             # Check cache first
             cached_result = await self.cache_manager.get(cache_key)
             if cached_result:
-                logger.debug(f"📋 Using cached prediction for {token_symbol}")
+                logger.debug(f"[LOG] Using cached prediction for {token_symbol}")
                 return PredictiveAnalysisResult(**cached_result)
             
             logger.info(f"[GROWTH] Starting predictive analysis for {token_symbol}")

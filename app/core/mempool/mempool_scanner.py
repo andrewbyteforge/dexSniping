@@ -580,7 +580,7 @@ class MempoolScanner:
                 self.stats.snipe_opportunities += 1
                 
                 logger.info(
-                    f"🚀 NEW TOKEN DETECTED: {liquidity_event.token_address} "
+                    f"[START] NEW TOKEN DETECTED: {liquidity_event.token_address} "
                     f"on {liquidity_event.dex} (Gas: {liquidity_event.pending_tx.gas_price_gwei:.1f} gwei)"
                 )
                 

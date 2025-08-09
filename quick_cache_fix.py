@@ -120,7 +120,7 @@ def get_cache_manager() -> CacheManager:
     manager_file = cache_dir / "cache_manager.py"
     manager_file.write_text(manager_content, encoding='utf-8')
     
-    print("✅ Force created cache structure")
+    print("[OK] Force created cache structure")
     return True
 
 
@@ -129,10 +129,10 @@ def test_cache_import():
     
     try:
         from app.core.cache import CacheManager
-        print("✅ Cache import successful")
+        print("[OK] Cache import successful")
         return True
     except Exception as e:
-        print(f"❌ Cache import failed: {e}")
+        print(f"[ERROR] Cache import failed: {e}")
         return False
 
 
@@ -207,13 +207,13 @@ print("=" * 60)
     
     test_file = Path("test_minimal.py")
     test_file.write_text(minimal_test_content, encoding='utf-8')
-    print("✅ Created minimal test: test_minimal.py")
+    print("[OK] Created minimal test: test_minimal.py")
     return True
 
 
 def main():
     """Main fix function."""
-    print("🔧 Quick Cache Import Fix")
+    print("[FIX] Quick Cache Import Fix")
     print("=" * 50)
     
     # Check current structure
@@ -237,12 +237,12 @@ def main():
     print("=" * 50)
     
     if import_ok:
-        print("✅ Cache import working")
+        print("[OK] Cache import working")
         print("\\nNext steps:")
         print("1. Run: python test_minimal.py")
         print("2. If successful, try: python test_all_features.py")
     else:
-        print("❌ Cache import still failing")
+        print("[ERROR] Cache import still failing")
         print("\\nTry running: python test_minimal.py")
         print("This will test components individually.")
 

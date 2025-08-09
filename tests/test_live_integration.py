@@ -51,7 +51,7 @@ class TestLiveIntegration:
     @pytest.mark.asyncio
     async def test_network_connection_ethereum(self, network_manager):
         """Test connection to Ethereum mainnet."""
-        logger.info("🧪 Testing Ethereum connection...")
+        logger.info("[TEST] Testing Ethereum connection...")
         
         # Test environment check
         infura_key = os.getenv("INFURA_API_KEY")
@@ -69,12 +69,12 @@ class TestLiveIntegration:
         assert latest_block > 0, "No blocks found"
         assert latest_block > 18000000, "Block number seems too low for mainnet"
         
-        logger.info(f"✅ Ethereum connected - Block: {latest_block}")
+        logger.info(f"[OK] Ethereum connected - Block: {latest_block}")
     
     @pytest.mark.asyncio
     async def test_network_connection_polygon(self, network_manager):
         """Test connection to Polygon network."""
-        logger.info("🧪 Testing Polygon connection...")
+        logger.info("[TEST] Testing Polygon connection...")
         
         try:
             success = await network_manager.connect_to_network(NetworkType.POLYGON)
@@ -82,17 +82,17 @@ class TestLiveIntegration:
                 web3 = await network_manager.get_web3_instance(NetworkType.POLYGON)
                 latest_block = await web3.eth.block_number
                 assert latest_block > 0
-                logger.info(f"✅ Polygon connected - Block: {latest_block}")
+                logger.info(f"[OK] Polygon connected - Block: {latest_block}")
             else:
-                logger.warning("⚠️ Polygon connection failed - may be network issue")
+                logger.warning("[WARN] Polygon connection failed - may be network issue")
         except Exception as e:
-            logger.warning(f"⚠️ Polygon test failed: {e}")
+            logger.warning(f"[WARN] Polygon test failed: {e}")
             # Don't fail the test for secondary networks
     
     @pytest.mark.asyncio
     async def test_gas_price_estimation(self, network_manager):
         """Test gas price estimation."""
-        logger.info("🧪 Testing gas price estimation...")
+        logger.info("[TEST] Testing gas price estimation...")
         
         # Connect to Ethereum
         await network_manager.connect_to_network(NetworkType.ETHEREUM)
@@ -112,12 +112,12 @@ class TestLiveIntegration:
         assert gas_prices["fast"] >= gas_prices["standard"]
         assert gas_prices["standard"] >= gas_prices["safe"]
         
-        logger.info(f"✅ Gas prices: Fast {gas_prices['fast']}, Standard {gas_prices['standard']}, Safe {gas_prices['safe']} Gwei")
+        logger.info(f"[OK] Gas prices: Fast {gas_prices['fast']}, Standard {gas_prices['standard']}, Safe {gas_prices['safe']} Gwei")
     
     @pytest.mark.asyncio
     async def test_token_info_retrieval(self, live_dex, test_config):
         """Test token information retrieval."""
-        logger.info("🧪 Testing token info retrieval...")
+        logger.info("[TEST] Testing token info retrieval...")
         
         # Connect to network first
         await live_dex.network_manager.connect_to_network(NetworkType.ETHEREUM)
@@ -132,12 +132,12 @@ class TestLiveIntegration:
         assert usdc_info.decimals in [6, 18]  # USDC can be 6 or 18 decimals
         assert usdc_info.network == NetworkType.ETHEREUM
         
-        logger.info(f"✅ Token info: {usdc_info.symbol} ({usdc_info.name}) - {usdc_info.decimals} decimals")
+        logger.info(f"[OK] Token info: {usdc_info.symbol} ({usdc_info.name}) - {usdc_info.decimals} decimals")
     
     @pytest.mark.asyncio
     async def test_dex_quote_retrieval(self, live_dex, test_config):
         """Test DEX quote retrieval from Uniswap."""
-        logger.info("🧪 Testing DEX quote retrieval...")
+        logger.info("[TEST] Testing DEX quote retrieval...")
         
         # Connect to network
         await live_dex.network_manager.connect_to_network(NetworkType.ETHEREUM)
@@ -160,20 +160,20 @@ class TestLiveIntegration:
                 assert quote.gas_estimate > 0
                 assert quote.expires_at > datetime.utcnow()
                 
-                logger.info(f"✅ Quote: {quote.input_amount} WETH -> {quote.output_amount} USDC")
+                logger.info(f"[OK] Quote: {quote.input_amount} WETH -> {quote.output_amount} USDC")
                 logger.info(f"   Price: {quote.price_per_token} USDC per WETH")
                 logger.info(f"   Gas: {quote.gas_estimate}, Slippage: {quote.slippage_tolerance}")
             else:
-                logger.warning("⚠️ No quote received - may be liquidity or network issue")
+                logger.warning("[WARN] No quote received - may be liquidity or network issue")
                 
         except Exception as e:
-            logger.warning(f"⚠️ Quote test failed: {e}")
+            logger.warning(f"[WARN] Quote test failed: {e}")
             # Don't fail test for quote issues in test environment
     
     @pytest.mark.asyncio
     async def test_balance_checking(self, network_manager, test_config):
         """Test balance checking functionality."""
-        logger.info("🧪 Testing balance checking...")
+        logger.info("[TEST] Testing balance checking...")
         
         # Connect to Ethereum
         await network_manager.connect_to_network(NetworkType.ETHEREUM)
@@ -188,7 +188,7 @@ class TestLiveIntegration:
         assert isinstance(eth_balance, Decimal)
         assert eth_balance >= 0
         
-        logger.info(f"✅ ETH balance for test address: {eth_balance}")
+        logger.info(f"[OK] ETH balance for test address: {eth_balance}")
         
         # Check token balance
         try:
@@ -201,15 +201,15 @@ class TestLiveIntegration:
             assert isinstance(token_balance, Decimal)
             assert token_balance >= 0
             
-            logger.info(f"✅ USDC balance for test address: {token_balance}")
+            logger.info(f"[OK] USDC balance for test address: {token_balance}")
             
         except Exception as e:
-            logger.info(f"ℹ️ Token balance check info: {e}")
+            logger.info(f"ℹ[EMOJI] Token balance check info: {e}")
     
     @pytest.mark.asyncio
     async def test_multiple_dex_quotes(self, live_dex, test_config):
         """Test quotes from multiple DEXes."""
-        logger.info("🧪 Testing multiple DEX quotes...")
+        logger.info("[TEST] Testing multiple DEX quotes...")
         
         await live_dex.network_manager.connect_to_network(NetworkType.ETHEREUM)
         
@@ -228,10 +228,10 @@ class TestLiveIntegration:
                 
                 if quote:
                     quotes.append((dex, quote))
-                    logger.info(f"✅ {dex.value}: {quote.output_amount} USDC for 1 WETH")
+                    logger.info(f"[OK] {dex.value}: {quote.output_amount} USDC for 1 WETH")
                 
             except Exception as e:
-                logger.warning(f"⚠️ {dex.value} quote failed: {e}")
+                logger.warning(f"[WARN] {dex.value} quote failed: {e}")
         
         if len(quotes) >= 2:
             # Compare prices
@@ -243,23 +243,23 @@ class TestLiveIntegration:
             
             if avg_price > 0:
                 diff_percent = (price_diff / avg_price) * 100
-                logger.info(f"💰 Price difference: {diff_percent:.2f}%")
+                logger.info(f"[PROFIT] Price difference: {diff_percent:.2f}%")
                 
                 if diff_percent > 0.1:
-                    logger.info("🎯 Potential arbitrage opportunity detected!")
+                    logger.info("[TARGET] Potential arbitrage opportunity detected!")
     
     @pytest.mark.asyncio
     async def test_live_trading_engine_initialization(self):
         """Test live trading engine initialization."""
-        logger.info("🧪 Testing live trading engine initialization...")
+        logger.info("[TEST] Testing live trading engine initialization...")
         
         # Check if we have required environment variables
         required_vars = ["INFURA_API_KEY"]
         missing_vars = [var for var in required_vars if not os.getenv(var)]
         
         if missing_vars:
-            logger.warning(f"⚠️ Missing environment variables: {missing_vars}")
-            logger.info("ℹ️ Skipping live engine test - set environment variables for full test")
+            logger.warning(f"[WARN] Missing environment variables: {missing_vars}")
+            logger.info("ℹ[EMOJI] Skipping live engine test - set environment variables for full test")
             return
         
         # Create test configuration
@@ -296,18 +296,18 @@ class TestLiveIntegration:
         try:
             # This should work without private key
             await engine.network_manager.connect_to_network(NetworkType.ETHEREUM)
-            logger.info("✅ Live trading engine network connection successful")
+            logger.info("[OK] Live trading engine network connection successful")
             
             # Cleanup
             await engine.shutdown_live_trading()
             
         except Exception as e:
-            logger.warning(f"⚠️ Live engine test failed: {e}")
+            logger.warning(f"[WARN] Live engine test failed: {e}")
     
     @pytest.mark.asyncio
     async def test_health_check(self, live_dex):
         """Test DEX integration health check."""
-        logger.info("🧪 Testing health check...")
+        logger.info("[TEST] Testing health check...")
         
         await live_dex.network_manager.connect_to_network(NetworkType.ETHEREUM)
         
@@ -317,25 +317,25 @@ class TestLiveIntegration:
         assert "supported_dexes" in health
         assert "last_checked" in health
         
-        logger.info(f"✅ Health check: {health['status']}")
+        logger.info(f"[OK] Health check: {health['status']}")
         logger.info(f"   Supported DEXes: {health['supported_dexes']}")
 
 
 @pytest.mark.asyncio
 async def test_environment_setup():
     """Test that the environment is properly set up."""
-    logger.info("🧪 Testing environment setup...")
+    logger.info("[TEST] Testing environment setup...")
     
     # Check Python packages
     try:
         import web3
-        logger.info(f"✅ Web3 version: {web3.__version__}")
+        logger.info(f"[OK] Web3 version: {web3.__version__}")
     except ImportError:
         pytest.fail("Web3 not installed")
     
     try:
         import eth_account
-        logger.info("✅ eth-account imported successfully")
+        logger.info("[OK] eth-account imported successfully")
     except ImportError:
         pytest.fail("eth-account not installed")
     
@@ -348,18 +348,18 @@ async def test_environment_setup():
     available_providers = [name for name, value in env_vars.items() if value]
     
     if available_providers:
-        logger.info(f"✅ Available providers: {available_providers}")
+        logger.info(f"[OK] Available providers: {available_providers}")
     else:
-        logger.warning("⚠️ No API keys found - will use public RPCs")
-        logger.info("ℹ️ For better performance, set INFURA_API_KEY or ALCHEMY_API_KEY")
+        logger.warning("[WARN] No API keys found - will use public RPCs")
+        logger.info("ℹ[EMOJI] For better performance, set INFURA_API_KEY or ALCHEMY_API_KEY")
     
-    logger.info("✅ Environment setup test complete")
+    logger.info("[OK] Environment setup test complete")
 
 
 @pytest.mark.asyncio 
 async def test_quick_integration():
     """Quick integration test that can run without API keys."""
-    logger.info("🚀 Running quick integration test...")
+    logger.info("[START] Running quick integration test...")
     
     # Test basic imports and initialization
     from app.core.blockchain.network_manager import NetworkManager
@@ -378,7 +378,7 @@ async def test_quick_integration():
     eth_dexes = await live_dex.get_supported_dexes(NetworkType.ETHEREUM)
     assert DEXProtocol.UNISWAP_V2 in eth_dexes
     
-    logger.info("✅ Quick integration test passed")
+    logger.info("[OK] Quick integration test passed")
     
     # Cleanup
     await network_manager.disconnect_all()
@@ -394,7 +394,7 @@ if __name__ == "__main__":
     
     async def run_tests():
         """Run all tests."""
-        logger.info("🧪 Starting Live Integration Tests - Phase 4B")
+        logger.info("[TEST] Starting Live Integration Tests - Phase 4B")
         logger.info("=" * 60)
         
         try:
@@ -404,11 +404,11 @@ if __name__ == "__main__":
             # Run environment test
             await test_environment_setup()
             
-            logger.info("✅ Basic tests passed")
+            logger.info("[OK] Basic tests passed")
             
             # If API keys are available, run full tests
             if os.getenv("INFURA_API_KEY") or os.getenv("ALCHEMY_API_KEY"):
-                logger.info("🔗 API keys found - running full integration tests...")
+                logger.info("[EMOJI] API keys found - running full integration tests...")
                 
                 # Run with pytest for full test suite
                 import subprocess
@@ -421,16 +421,16 @@ if __name__ == "__main__":
                     print("STDERR:", result.stderr)
                     
                 if result.returncode == 0:
-                    logger.info("✅ All integration tests passed!")
+                    logger.info("[OK] All integration tests passed!")
                 else:
-                    logger.error("❌ Some tests failed")
+                    logger.error("[ERROR] Some tests failed")
                     
             else:
-                logger.info("ℹ️ For full tests, set INFURA_API_KEY in .env file")
-                logger.info("✅ Basic integration tests completed successfully")
+                logger.info("ℹ[EMOJI] For full tests, set INFURA_API_KEY in .env file")
+                logger.info("[OK] Basic integration tests completed successfully")
                 
         except Exception as e:
-            logger.error(f"❌ Test execution failed: {e}")
+            logger.error(f"[ERROR] Test execution failed: {e}")
             raise
     
     # Run the tests

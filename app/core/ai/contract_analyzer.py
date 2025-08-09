@@ -144,7 +144,7 @@ class ContractAnalyzer:
         self.known_signatures = self._load_function_signatures()
         self.honeypot_patterns = self._load_honeypot_patterns()
         self.suspicious_patterns = self._load_suspicious_patterns()
-        logger.info("✅ Contract Analyzer initialized")
+        logger.info("[OK] Contract Analyzer initialized")
     
     async def analyze_contract(
         self,
@@ -166,7 +166,7 @@ class ContractAnalyzer:
         start_time = datetime.utcnow()
         
         try:
-            logger.info(f"🔍 Starting contract analysis for {token_address}")
+            logger.info(f"[SEARCH] Starting contract analysis for {token_address}")
             
             # Get basic token information
             token_info = await chain.get_token_info(token_address)
@@ -281,13 +281,13 @@ class ContractAnalyzer:
                 recommendations=recommendations
             )
             
-            logger.info(f"✅ Contract analysis complete for {token_address} - "
+            logger.info(f"[OK] Contract analysis complete for {token_address} - "
                        f"Risk: {security_risk.value}, Score: {risk_score:.2f}")
             
             return analysis
             
         except Exception as e:
-            logger.error(f"❌ Contract analysis failed for {token_address}: {e}")
+            logger.error(f"[ERROR] Contract analysis failed for {token_address}: {e}")
             raise ContractAnalysisError(f"Analysis failed: {e}")
     
     async def _classify_contract_type(

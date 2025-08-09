@@ -29,7 +29,7 @@ class PortfolioManager:
         self.portfolios = {}
         self.transactions = {}
         
-        logger.info("💼 PortfolioManager initialized")
+        logger.info("[EMOJI] PortfolioManager initialized")
     
     async def get_portfolio_balance(self, wallet_address: str) -> Dict[str, Any]:
         """Get portfolio balance for wallet."""
@@ -58,7 +58,7 @@ class PortfolioManager:
             return portfolio
             
         except Exception as e:
-            logger.error(f"❌ Failed to get portfolio: {e}")
+            logger.error(f"[ERROR] Failed to get portfolio: {e}")
             return {}
     
     async def record_transaction(self, transaction: Dict[str, Any]) -> bool:
@@ -69,12 +69,12 @@ class PortfolioManager:
             transaction["recorded_at"] = datetime.utcnow().isoformat()
             
             self.transactions[tx_id] = transaction
-            logger.info(f"📝 Transaction recorded: {tx_id}")
+            logger.info(f"[NOTE] Transaction recorded: {tx_id}")
             
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to record transaction: {e}")
+            logger.error(f"[ERROR] Failed to record transaction: {e}")
             return False
 
 # Global instance

@@ -10,7 +10,7 @@ from pathlib import Path
 
 def test_logging():
     """Test the enhanced logging system."""
-    print("🧪 Quick Logging System Test")
+    print("[TEST] Quick Logging System Test")
     print("=" * 40)
     
     try:
@@ -21,14 +21,14 @@ def test_logging():
             get_trading_logger,
             get_performance_logger
         )
-        print("✅ Enhanced logger imports successful")
+        print("[OK] Enhanced logger imports successful")
         
         # Test basic logger
         logger = setup_logger("test.quick", "application")
-        logger.info("🎯 Testing enhanced logging system")
-        logger.warning("⚠️ This is a test warning")
-        logger.error("❌ This is a test error")
-        print("✅ Basic logging test completed")
+        logger.info("[TARGET] Testing enhanced logging system")
+        logger.warning("[WARN] This is a test warning")
+        logger.error("[ERROR] This is a test error")
+        print("[OK] Basic logging test completed")
         
         # Test trading logger
         trading_logger = get_trading_logger("test.trading")
@@ -37,7 +37,7 @@ def test_logging():
             "amount": "1.0",
             "type": "test"
         })
-        print("✅ Trading logger test completed")
+        print("[OK] Trading logger test completed")
         
         # Test performance logger
         perf_logger = get_performance_logger("test.performance")
@@ -45,26 +45,26 @@ def test_logging():
         import time
         time.sleep(0.1)
         perf_logger.end_timer("test_operation")
-        print("✅ Performance logger test completed")
+        print("[OK] Performance logger test completed")
         
         # Check log files
         logs_dir = Path("logs")
         if logs_dir.exists():
-            print(f"\n📁 Log files created:")
+            print(f"\n[DIR] Log files created:")
             for log_file in logs_dir.rglob("*.log"):
                 if log_file.stat().st_size > 0:
-                    print(f"  ✅ {log_file} ({log_file.stat().st_size} bytes)")
+                    print(f"  [OK] {log_file} ({log_file.stat().st_size} bytes)")
         else:
-            print("⚠️ Logs directory not found")
+            print("[WARN] Logs directory not found")
         
-        print("\n🎉 Enhanced logging system is working!")
+        print("\n[SUCCESS] Enhanced logging system is working!")
         return True
         
     except ImportError as e:
-        print(f"❌ Import error: {e}")
+        print(f"[ERROR] Import error: {e}")
         return False
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"[ERROR] Error: {e}")
         return False
 
 

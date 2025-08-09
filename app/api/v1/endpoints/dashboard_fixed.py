@@ -184,10 +184,10 @@ async def get_dashboard_stats():
     """Get dashboard statistics."""
     try:
         stats = generate_sample_stats()
-        logger.info("✅ Dashboard stats generated successfully")
+        logger.info("[OK] Dashboard stats generated successfully")
         return stats
     except Exception as e:
-        logger.error(f"❌ Failed to get dashboard stats: {e}")
+        logger.error(f"[ERROR] Failed to get dashboard stats: {e}")
         raise HTTPException(status_code=500, detail="Failed to get dashboard statistics")
 
 @router.get("/live-tokens", response_model=List[TokenDiscoveryItem])
@@ -217,11 +217,11 @@ async def get_live_tokens(
         # Apply limit
         result = filtered_tokens[:limit]
         
-        logger.info(f"✅ Returned {len(result)} live tokens")
+        logger.info(f"[OK] Returned {len(result)} live tokens")
         return result
         
     except Exception as e:
-        logger.error(f"❌ Failed to get live tokens: {e}")
+        logger.error(f"[ERROR] Failed to get live tokens: {e}")
         raise HTTPException(status_code=500, detail="Failed to get live tokens")
 
 @router.get("/alerts", response_model=List[AlertItem])
@@ -237,11 +237,11 @@ async def get_alerts(
         
         result = sorted_alerts[:limit]
         
-        logger.info(f"✅ Returned {len(result)} alerts")
+        logger.info(f"[OK] Returned {len(result)} alerts")
         return result
         
     except Exception as e:
-        logger.error(f"❌ Failed to get alerts: {e}")
+        logger.error(f"[ERROR] Failed to get alerts: {e}")
         raise HTTPException(status_code=500, detail="Failed to get alerts")
 
 @router.get("/health")
@@ -291,11 +291,11 @@ async def analyze_token(address: str):
             "analyzed_at": datetime.utcnow().isoformat()
         }
         
-        logger.info(f"✅ Token analysis completed for {address}")
+        logger.info(f"[OK] Token analysis completed for {address}")
         return analysis
         
     except Exception as e:
-        logger.error(f"❌ Failed to analyze token {address}: {e}")
+        logger.error(f"[ERROR] Failed to analyze token {address}: {e}")
         raise HTTPException(status_code=500, detail="Token analysis failed")
 
 # Portfolio endpoints

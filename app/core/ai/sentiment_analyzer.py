@@ -228,7 +228,7 @@ class SentimentAnalyzer:
         self.cache_ttl = 600  # 10 minutes
         self.trend_cache_ttl = 1800  # 30 minutes
         
-        logger.info("📊 Market Sentiment Analyzer initialized")
+        logger.info("[STATS] Market Sentiment Analyzer initialized")
     
     async def initialize(self) -> bool:
         """
@@ -247,11 +247,11 @@ class SentimentAnalyzer:
             # Validate model performance
             await self._validate_models()
             
-            logger.info(f"✅ Sentiment analyzer ready (v{self.model_version})")
+            logger.info(f"[OK] Sentiment analyzer ready (v{self.model_version})")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to initialize sentiment analyzer: {e}")
+            logger.error(f"[ERROR] Failed to initialize sentiment analyzer: {e}")
             return False
     
     async def analyze_sentiment(
@@ -286,10 +286,10 @@ class SentimentAnalyzer:
             # Check cache first
             cached_result = await self.cache_manager.get(cache_key)
             if cached_result:
-                logger.debug(f"📋 Using cached sentiment analysis for {token_symbol}")
+                logger.debug(f"[LOG] Using cached sentiment analysis for {token_symbol}")
                 return SentimentAnalysisResult(**cached_result)
             
-            logger.info(f"📊 Starting sentiment analysis for {token_symbol} ({analysis_period})")
+            logger.info(f"[STATS] Starting sentiment analysis for {token_symbol} ({analysis_period})")
             
             # Collect data from multiple sources
             social_data = await self._collect_social_data(token_symbol, analysis_period)
@@ -362,13 +362,13 @@ class SentimentAnalyzer:
                 ttl=self.cache_ttl
             )
             
-            logger.info(f"✅ Sentiment analysis complete for {token_symbol} - "
+            logger.info(f"[OK] Sentiment analysis complete for {token_symbol} - "
                        f"Sentiment: {overall_sentiment.value} ({overall_sentiment_score:.3f})")
             
             return result
             
         except Exception as e:
-            logger.error(f"❌ Sentiment analysis failed for {token_symbol}: {e}")
+            logger.error(f"[ERROR] Sentiment analysis failed for {token_symbol}: {e}")
             raise SentimentAnalysisError(f"Sentiment analysis failed: {str(e)}")
     
     async def get_trending_tokens(
@@ -389,7 +389,7 @@ class SentimentAnalyzer:
             List of trending tokens with sentiment data
         """
         try:
-            logger.info(f"📈 Finding trending tokens ({period}, min {min_mentions} mentions)")
+            logger.info(f"[PERF] Finding trending tokens ({period}, min {min_mentions} mentions)")
             
             # Mock trending tokens data
             trending_tokens = []
@@ -414,11 +414,11 @@ class SentimentAnalyzer:
             # Sort by trend strength
             trending_tokens.sort(key=lambda x: x["trend_strength"], reverse=True)
             
-            logger.info(f"✅ Found {len(trending_tokens)} trending tokens")
+            logger.info(f"[OK] Found {len(trending_tokens)} trending tokens")
             return trending_tokens
             
         except Exception as e:
-            logger.error(f"❌ Failed to get trending tokens: {e}")
+            logger.error(f"[ERROR] Failed to get trending tokens: {e}")
             return []
     
     async def monitor_sentiment_alerts(
@@ -437,7 +437,7 @@ class SentimentAnalyzer:
             List of triggered alerts
         """
         try:
-            logger.info(f"🚨 Monitoring sentiment alerts for {len(tokens)} tokens")
+            logger.info(f"[EMOJI] Monitoring sentiment alerts for {len(tokens)} tokens")
             
             alerts = []
             
@@ -460,11 +460,11 @@ class SentimentAnalyzer:
                     }
                     alerts.append(alert)
             
-            logger.info(f"🚨 Generated {len(alerts)} sentiment alerts")
+            logger.info(f"[EMOJI] Generated {len(alerts)} sentiment alerts")
             return alerts
             
         except Exception as e:
-            logger.error(f"❌ Sentiment monitoring failed: {e}")
+            logger.error(f"[ERROR] Sentiment monitoring failed: {e}")
             return []
     
     # ==================== PRIVATE METHODS ====================
@@ -478,10 +478,10 @@ class SentimentAnalyzer:
             self.text_vectorizer = joblib.load(f"{self.models_path}text_vectorizer_v{self.model_version}.pkl")
             self.feature_scaler = joblib.load(f"{self.models_path}feature_scaler_v{self.model_version}.pkl")
             
-            logger.info("📁 Loaded existing sentiment analysis models")
+            logger.info("[DIR] Loaded existing sentiment analysis models")
             
         except FileNotFoundError:
-            logger.info("🔧 Training new sentiment analysis models...")
+            logger.info("[FIX] Training new sentiment analysis models...")
             await self._train_models()
     
     async def _train_models(self) -> None:
@@ -516,7 +516,7 @@ class SentimentAnalyzer:
         self.trend_predictor = LogisticRegression(random_state=42)
         self.trend_predictor.fit(X_features_scaled, y)
         
-        logger.info("✅ Sentiment analysis models trained")
+        logger.info("[OK] Sentiment analysis models trained")
     
     async def _generate_training_data(self) -> Tuple[List[str], np.ndarray, np.ndarray]:
         """Generate synthetic training data."""
@@ -561,12 +561,12 @@ class SentimentAnalyzer:
     async def _initialize_apis(self) -> None:
         """Initialize API connections."""
         # Mock API initialization
-        logger.info("🔗 API connections initialized (mock mode)")
+        logger.info("[EMOJI] API connections initialized (mock mode)")
     
     async def _validate_models(self) -> None:
         """Validate model performance."""
         # Mock validation
-        logger.info("✅ Model validation passed")
+        logger.info("[OK] Model validation passed")
     
     async def _collect_social_data(self, token_symbol: str, period: str) -> List[Dict[str, Any]]:
         """Collect social media data."""
@@ -586,7 +586,7 @@ class SentimentAnalyzer:
             }
             social_posts.append(post)
         
-        logger.debug(f"📱 Collected {len(social_posts)} social media posts")
+        logger.debug(f"[EMOJI] Collected {len(social_posts)} social media posts")
         return social_posts
     
     async def _collect_news_data(self, token_symbol: str, period: str) -> List[Dict[str, Any]]:
@@ -607,7 +607,7 @@ class SentimentAnalyzer:
             }
             news_articles.append(article)
         
-        logger.debug(f"📰 Collected {len(news_articles)} news articles")
+        logger.debug(f"[EMOJI] Collected {len(news_articles)} news articles")
         return news_articles
     
     async def _collect_community_data(self, token_symbol: str) -> Dict[str, Any]:
@@ -623,7 +623,7 @@ class SentimentAnalyzer:
             "engagement_score": np.random.uniform(0.1, 1.0)
         }
         
-        logger.debug(f"👥 Collected community data for {token_symbol}")
+        logger.debug(f"[EMOJI] Collected community data for {token_symbol}")
         return community_data
     
     async def _analyze_social_sentiment(self, social_data: List[Dict[str, Any]]) -> SocialMetrics:

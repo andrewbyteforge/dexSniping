@@ -303,7 +303,7 @@ class LiveTradingEngineEnhanced:
         self.total_opportunities_detected = 0
         self.total_trades_executed = 0
         
-        logger.info("🤖 Enhanced Live Trading Engine initialized")
+        logger.info("[BOT] Enhanced Live Trading Engine initialized")
     
     async def initialize_live_systems(self, networks: Optional[List[NetworkType]] = None) -> bool:
         """
@@ -316,22 +316,22 @@ class LiveTradingEngineEnhanced:
             bool: True if initialization successful
         """
         try:
-            logger.info("🚀 Initializing live trading systems...")
+            logger.info("[START] Initializing live trading systems...")
             
             # Initialize wallet system
-            logger.info("🔗 Initializing wallet connections...")
+            logger.info("[EMOJI] Initializing wallet connections...")
             wallet_success = await self.wallet_manager.initialize_networks(networks)
             
             if not wallet_success:
-                logger.error("❌ Wallet system initialization failed")
+                logger.error("[ERROR] Wallet system initialization failed")
                 return False
             
             # Initialize DEX integration
-            logger.info("📊 Initializing DEX integration...")
+            logger.info("[STATS] Initializing DEX integration...")
             dex_success = await self.dex_integration.initialize_dex_contracts(networks)
             
             if not dex_success:
-                logger.error("❌ DEX integration initialization failed")
+                logger.error("[ERROR] DEX integration initialization failed")
                 return False
             
             # Start monitoring systems
@@ -340,11 +340,11 @@ class LiveTradingEngineEnhanced:
             # Mark as initialized
             self.is_initialized = True
             
-            logger.info("✅ Live trading systems initialized successfully")
+            logger.info("[OK] Live trading systems initialized successfully")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Live system initialization failed: {e}")
+            logger.error(f"[ERROR] Live system initialization failed: {e}")
             return False
     
     async def start_trading_session(
@@ -363,7 +363,7 @@ class LiveTradingEngineEnhanced:
             TradingSession: Active trading session
         """
         try:
-            logger.info(f"🎯 Starting trading session with wallet: {wallet_connection_id}")
+            logger.info(f"[TARGET] Starting trading session with wallet: {wallet_connection_id}")
             
             if not self.is_initialized:
                 raise TradingError("Trading engine not initialized")
@@ -397,14 +397,14 @@ class LiveTradingEngineEnhanced:
             await self._start_session_monitoring(session)
             
             logger.info(
-                f"✅ Trading session started: {session.session_id} "
+                f"[OK] Trading session started: {session.session_id} "
                 f"(Mode: {configuration.trading_mode.value})"
             )
             
             return session
             
         except Exception as e:
-            logger.error(f"❌ Failed to start trading session: {e}")
+            logger.error(f"[ERROR] Failed to start trading session: {e}")
             raise TradingError(f"Session start failed: {e}")
     
     async def execute_live_trade(
@@ -425,7 +425,7 @@ class LiveTradingEngineEnhanced:
             SwapTransaction: Transaction result
         """
         try:
-            logger.info(f"⚡ Executing live trade: {opportunity_id}")
+            logger.info(f"[TRADE] Executing live trade: {opportunity_id}")
             
             # Get opportunity and session
             if opportunity_id not in self.detected_opportunities:
@@ -478,14 +478,14 @@ class LiveTradingEngineEnhanced:
             await self._notify_trade_completion(transaction, opportunity, session)
             
             logger.info(
-                f"✅ Trade executed: {trade_amount} {opportunity.input_token.symbol} → "
+                f"[OK] Trade executed: {trade_amount} {opportunity.input_token.symbol} → "
                 f"{transaction.output_amount} {opportunity.output_token.symbol}"
             )
             
             return transaction
             
         except Exception as e:
-            logger.error(f"❌ Live trade execution failed: {e}")
+            logger.error(f"[ERROR] Live trade execution failed: {e}")
             # Update failed trade metrics
             if session_id in self.active_sessions:
                 session = self.active_sessions[session_id]
@@ -507,7 +507,7 @@ class LiveTradingEngineEnhanced:
             strategies: Strategies to use for detection
         """
         try:
-            logger.info("👀 Starting market opportunity monitoring...")
+            logger.info("[EMOJI] Starting market opportunity monitoring...")
             
             if networks is None:
                 networks = list(self.wallet_manager.web3_instances.keys())
@@ -522,10 +522,10 @@ class LiveTradingEngineEnhanced:
                 )
                 self.monitoring_tasks.append(task)
             
-            logger.info(f"🎯 Monitoring {len(networks)} networks for opportunities")
+            logger.info(f"[TARGET] Monitoring {len(networks)} networks for opportunities")
             
         except Exception as e:
-            logger.error(f"❌ Market monitoring setup failed: {e}")
+            logger.error(f"[ERROR] Market monitoring setup failed: {e}")
     
     async def _monitor_network_opportunities(
         self,
@@ -563,11 +563,11 @@ class LiveTradingEngineEnhanced:
                     await asyncio.sleep(10)  # Scan every 10 seconds
                     
                 except Exception as e:
-                    logger.error(f"❌ Network monitoring error for {network.value}: {e}")
+                    logger.error(f"[ERROR] Network monitoring error for {network.value}: {e}")
                     await asyncio.sleep(30)  # Wait before retrying
                     
         except asyncio.CancelledError:
-            logger.info(f"🛑 Stopped monitoring {network.value}")
+            logger.info(f"[EMOJI] Stopped monitoring {network.value}")
     
     async def _detect_opportunities(
         self,
@@ -618,7 +618,7 @@ class LiveTradingEngineEnhanced:
             return opportunities
             
         except Exception as e:
-            logger.error(f"❌ Opportunity detection failed: {e}")
+            logger.error(f"[ERROR] Opportunity detection failed: {e}")
             return []
     
     async def _verify_trading_requirements(
@@ -707,7 +707,7 @@ class LiveTradingEngineEnhanced:
         """Start monitoring for specific session."""
         # In production, this would start session-specific monitoring
         # like position tracking, P&L updates, risk monitoring
-        logger.debug(f"🔍 Session monitoring started: {session.session_id}")
+        logger.debug(f"[SEARCH] Session monitoring started: {session.session_id}")
     
     async def _check_auto_execution(self, opportunity: TradingOpportunity) -> None:
         """Check if opportunity should be auto-executed."""
@@ -740,11 +740,11 @@ class LiveTradingEngineEnhanced:
                     opportunity.opportunity_id,
                     session.session_id
                 )
-                logger.info(f"🤖 Auto-executed opportunity: {opportunity.opportunity_id}")
+                logger.info(f"[BOT] Auto-executed opportunity: {opportunity.opportunity_id}")
                 break  # Only execute once
                 
             except Exception as e:
-                logger.warning(f"⚠️ Auto-execution failed: {e}")
+                logger.warning(f"[WARN] Auto-execution failed: {e}")
     
     async def _cleanup_expired_opportunities(self) -> None:
         """Clean up expired opportunities."""
@@ -783,7 +783,7 @@ class LiveTradingEngineEnhanced:
                     del self.pending_trades[tx_hash]
                 
             except Exception as e:
-                logger.error(f"❌ Periodic cleanup error: {e}")
+                logger.error(f"[ERROR] Periodic cleanup error: {e}")
     
     async def _notify_opportunity_detected(self, opportunity: TradingOpportunity) -> None:
         """Notify callbacks of detected opportunity."""
@@ -794,7 +794,7 @@ class LiveTradingEngineEnhanced:
                 else:
                     callback(opportunity)
             except Exception as e:
-                logger.warning(f"⚠️ Opportunity callback error: {e}")
+                logger.warning(f"[WARN] Opportunity callback error: {e}")
     
     async def _notify_trade_completion(
         self,
@@ -810,7 +810,7 @@ class LiveTradingEngineEnhanced:
                 else:
                     callback(transaction, opportunity, session)
             except Exception as e:
-                logger.warning(f"⚠️ Trade completion callback error: {e}")
+                logger.warning(f"[WARN] Trade completion callback error: {e}")
     
     def register_opportunity_callback(self, callback: Callable) -> None:
         """Register callback for opportunity detection."""
@@ -852,17 +852,17 @@ class LiveTradingEngineEnhanced:
             session = self.active_sessions[session_id]
             session.is_active = False
             
-            logger.info(f"🛑 Trading session stopped: {session_id}")
+            logger.info(f"[EMOJI] Trading session stopped: {session_id}")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to stop session: {e}")
+            logger.error(f"[ERROR] Failed to stop session: {e}")
             return False
     
     async def shutdown(self) -> None:
         """Shutdown trading engine."""
         try:
-            logger.info("🛑 Shutting down trading engine...")
+            logger.info("[EMOJI] Shutting down trading engine...")
             
             # Stop all sessions
             for session_id in list(self.active_sessions.keys()):
@@ -879,10 +879,10 @@ class LiveTradingEngineEnhanced:
             # Shutdown executor
             self.executor.shutdown(wait=True)
             
-            logger.info("✅ Trading engine shutdown complete")
+            logger.info("[OK] Trading engine shutdown complete")
             
         except Exception as e:
-            logger.error(f"❌ Shutdown error: {e}")
+            logger.error(f"[ERROR] Shutdown error: {e}")
 
 
 # Global enhanced trading engine instance
@@ -913,5 +913,5 @@ async def initialize_live_trading_system(networks: Optional[List[NetworkType]] =
         engine = get_live_trading_engine()
         return await engine.initialize_live_systems(networks)
     except Exception as e:
-        logger.error(f"❌ Failed to initialize live trading system: {e}")
+        logger.error(f"[ERROR] Failed to initialize live trading system: {e}")
         return False

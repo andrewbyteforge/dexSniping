@@ -345,11 +345,11 @@ def _setup_essential_routes(app: FastAPI) -> None:
         </head>
         <body>
             <div class="container">
-                <h1>🤖 DEX Sniper Pro</h1>
+                <h1>[BOT] DEX Sniper Pro</h1>
                 <h2>Phase 4C - AI Risk Assessment Integration</h2>
                 
                 <div class="status">
-                    <h3>✅ System Status: Operational</h3>
+                    <h3>[OK] System Status: Operational</h3>
                     <p>All 8 components loaded successfully<br>
                        AI Risk Assessment: Available<br>
                        Health Score: 88.9%</p>
@@ -359,25 +359,25 @@ def _setup_essential_routes(app: FastAPI) -> None:
                 
                 <div class="features">
                     <div class="feature">🧠 AI-Powered Risk Assessment</div>
-                    <div class="feature">📊 Intelligent Portfolio Analysis</div>
-                    <div class="feature">⚡ Real-time Market Insights</div>
-                    <div class="feature">🛡️ Automated Risk Management</div>
-                    <div class="feature">📈 Smart Trading Recommendations</div>
-                    <div class="feature">🔗 Live Blockchain Integration</div>
-                    <div class="feature">💳 Multi-Wallet Support</div>
-                    <div class="feature">🌐 Cross-Chain Trading</div>
+                    <div class="feature">[STATS] Intelligent Portfolio Analysis</div>
+                    <div class="feature">[TRADE] Real-time Market Insights</div>
+                    <div class="feature">[SEC] Automated Risk Management</div>
+                    <div class="feature">[PERF] Smart Trading Recommendations</div>
+                    <div class="feature">[EMOJI] Live Blockchain Integration</div>
+                    <div class="feature">[EMOJI] Multi-Wallet Support</div>
+                    <div class="feature">[API] Cross-Chain Trading</div>
                 </div>
                 
                 <div class="links">
-                    <a href="/docs">📖 API Documentation</a>
-                    <a href="/health">🔍 System Health</a>
-                    <a href="/api/v1/dashboard/stats">📊 Dashboard API</a>
+                    <a href="/docs">[EMOJI] API Documentation</a>
+                    <a href="/health">[SEARCH] System Health</a>
+                    <a href="/api/v1/dashboard/stats">[STATS] Dashboard API</a>
                     <a href="/risk-analysis">🧠 AI Risk Analysis</a>
                 </div>
                 
                 <div style="margin-top: 2rem; font-size: 0.9rem; opacity: 0.7;">
                     Version: {__version__} | Phase: {__phase__}<br>
-                    Built with ❤️ for the DeFi community
+                    Built with [EMOJI] for the DeFi community
                 </div>
             </div>
         </body>
@@ -471,34 +471,34 @@ def _setup_essential_routes(app: FastAPI) -> None:
         <body>
             <div class="container">
                 <h1>🧠 AI Risk Analysis</h1>
-                <div class="status-indicator">✅ AI System Active</div>
+                <div class="status-indicator">[OK] AI System Active</div>
                 
                 <p>Advanced AI-powered risk assessment system for intelligent trading decisions.</p>
                 
                 <div class="ai-features">
                     <div class="ai-feature">
-                        <h3>🎯 Token Risk Scoring</h3>
+                        <h3>[TARGET] Token Risk Scoring</h3>
                         <p>AI evaluates token safety, liquidity, and potential risks using advanced algorithms.</p>
                     </div>
                     <div class="ai-feature">
-                        <h3>📊 Portfolio Analysis</h3>
+                        <h3>[STATS] Portfolio Analysis</h3>
                         <p>Comprehensive portfolio health checks with risk distribution analysis.</p>
                     </div>
                     <div class="ai-feature">
-                        <h3>📈 Market Intelligence</h3>
+                        <h3>[PERF] Market Intelligence</h3>
                         <p>Real-time market condition analysis with sentiment-based risk assessment.</p>
                     </div>
                     <div class="ai-feature">
-                        <h3>🛡️ Automated Risk Management</h3>
+                        <h3>[SEC] Automated Risk Management</h3>
                         <p>Intelligent position sizing and stop-loss recommendations.</p>
                     </div>
                 </div>
                 
                 <div class="links">
-                    <a href="/api/v1/ai-risk/health">🔍 AI System Health</a>
-                    <a href="/api/v1/ai-risk/risk-levels">📊 Risk Levels</a>
-                    <a href="/docs#/ai-risk">📖 AI API Docs</a>
-                    <a href="/dashboard">🏠 Dashboard</a>
+                    <a href="/api/v1/ai-risk/health">[SEARCH] AI System Health</a>
+                    <a href="/api/v1/ai-risk/risk-levels">[STATS] Risk Levels</a>
+                    <a href="/docs#/ai-risk">[EMOJI] AI API Docs</a>
+                    <a href="/dashboard">[EMOJI] Dashboard</a>
                 </div>
                 
                 <div style="margin-top: 2rem; font-size: 0.9rem; opacity: 0.7;">

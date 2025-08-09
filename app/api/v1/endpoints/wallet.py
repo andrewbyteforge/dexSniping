@@ -178,7 +178,7 @@ async def get_active_connections(
     Get information about all active wallet connections.
     """
     try:
-        logger.info("📋 API: Getting active wallet connections")
+        logger.info("[LOG] API: Getting active wallet connections")
         
         connections = wallet_manager.get_active_connections()
         
@@ -203,7 +203,7 @@ async def get_supported_wallets(
     Get information about supported wallet types and their capabilities.
     """
     try:
-        logger.info("📋 API: Getting supported wallets")
+        logger.info("[LOG] API: Getting supported wallets")
         
         supported_wallets = wallet_manager.get_supported_wallets()
         
@@ -352,7 +352,7 @@ async def get_wallet_transactions(
         limit: Maximum number of transactions to retrieve
     """
     try:
-        logger.info(f"📜 API: Getting transaction history - ID: {connection_id}, Limit: {limit}")
+        logger.info(f"[EMOJI] API: Getting transaction history - ID: {connection_id}, Limit: {limit}")
         
         result = await wallet_manager.get_wallet_transaction_history(
             connection_id=connection_id,
@@ -395,7 +395,7 @@ async def wallet_system_health(
     Get wallet system health and status information.
     """
     try:
-        logger.info("❤️ API: Checking wallet system health")
+        logger.info("[EMOJI] API: Checking wallet system health")
         
         connections = wallet_manager.get_active_connections()
         supported_wallets = wallet_manager.get_supported_wallets()

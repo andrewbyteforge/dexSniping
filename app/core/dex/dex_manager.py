@@ -178,7 +178,7 @@ class DEXManager:
             bool: True if initialization successful
         """
         try:
-            logger.info("🚀 Initializing DEX Manager for Phase 3B...")
+            logger.info("[START] Initializing DEX Manager for Phase 3B...")
             
             # Initialize multi-chain manager
             if networks is None:
@@ -194,15 +194,15 @@ class DEXManager:
                         aggregator = DEXAggregator(chain)
                         await aggregator.initialize()
                         self.dex_aggregators[network] = aggregator
-                        logger.info(f"   ✅ {network.title()} DEX integration ready")
+                        logger.info(f"   [OK] {network.title()} DEX integration ready")
                 except Exception as e:
-                    logger.warning(f"   ⚠️ Failed to initialize {network} DEX: {e}")
+                    logger.warning(f"   [WARN] Failed to initialize {network} DEX: {e}")
             
             # Initialize default trading strategies
             await self._initialize_default_strategies()
             
             self._initialized = True
-            logger.info("🎉 DEX Manager initialization complete!")
+            logger.info("[SUCCESS] DEX Manager initialization complete!")
             
             return True
             
@@ -249,7 +249,7 @@ class DEXManager:
         
         self.strategies[momentum_strategy.name] = momentum_strategy
         
-        logger.info(f"   ✅ Initialized {len(self.strategies)} default strategies")
+        logger.info(f"   [OK] Initialized {len(self.strategies)} default strategies")
     
     async def start_monitoring(self) -> bool:
         """
@@ -284,7 +284,7 @@ class DEXManager:
     
     async def _monitor_prices(self):
         """Monitor real-time prices across all DEXs."""
-        logger.info("📊 Starting price monitoring...")
+        logger.info("[STATS] Starting price monitoring...")
         
         while self._running:
             try:
@@ -303,7 +303,7 @@ class DEXManager:
     
     async def _monitor_arbitrage_opportunities(self):
         """Monitor for arbitrage opportunities."""
-        logger.info("🔍 Starting arbitrage monitoring...")
+        logger.info("[SEARCH] Starting arbitrage monitoring...")
         
         while self._running:
             try:
@@ -328,7 +328,7 @@ class DEXManager:
                 ]
                 
                 if high_value_opportunities:
-                    logger.info(f"🎯 Found {len(high_value_opportunities)} high-value arbitrage opportunities")
+                    logger.info(f"[TARGET] Found {len(high_value_opportunities)} high-value arbitrage opportunities")
                 
                 await asyncio.sleep(10)  # Check every 10 seconds
                 
@@ -338,7 +338,7 @@ class DEXManager:
     
     async def _update_portfolio(self):
         """Update portfolio positions and P&L."""
-        logger.info("💼 Starting portfolio monitoring...")
+        logger.info("[EMOJI] Starting portfolio monitoring...")
         
         while self._running:
             try:
@@ -353,7 +353,7 @@ class DEXManager:
     
     async def _execute_strategies(self):
         """Execute active trading strategies."""
-        logger.info("🎯 Starting strategy execution...")
+        logger.info("[TARGET] Starting strategy execution...")
         
         while self._running:
             try:
@@ -426,7 +426,7 @@ class DEXManager:
         
         self.trading_pairs[pair_id] = trading_pair
         
-        logger.info(f"✅ Added trading pair: {token_a_info.symbol}/{token_b_info.symbol}")
+        logger.info(f"[OK] Added trading pair: {token_a_info.symbol}/{token_b_info.symbol}")
         
         return pair_id
     
@@ -501,7 +501,7 @@ class DEXManager:
     
     async def shutdown(self):
         """Gracefully shutdown DEX manager."""
-        logger.info("🛑 Shutting down DEX manager...")
+        logger.info("[EMOJI] Shutting down DEX manager...")
         
         self._running = False
         
@@ -515,7 +515,7 @@ class DEXManager:
         # Close multi-chain manager
         await self.multi_chain_manager.close()
         
-        logger.info("✅ DEX manager shutdown complete")
+        logger.info("[OK] DEX manager shutdown complete")
     
     # Helper methods
     async def _update_pair_prices(self, trading_pair: TradingPair):
@@ -554,23 +554,23 @@ async def create_dex_manager(networks: Optional[List[str]] = None) -> DEXManager
 # Test function
 async def test_dex_manager():
     """Test DEX manager functionality."""
-    print("🧪 Testing DEX Manager...")
+    print("[TEST] Testing DEX Manager...")
     
     try:
         manager = DEXManager()
         await manager.initialize(['ethereum'])
         
-        print("   ✅ DEX manager initialized")
-        print("   ✅ Multi-network support ready")
-        print("   ✅ Arbitrage detection ready")
-        print("   ✅ Portfolio tracking ready")
-        print("   ✅ Strategy execution ready")
+        print("   [OK] DEX manager initialized")
+        print("   [OK] Multi-network support ready")
+        print("   [OK] Arbitrage detection ready")
+        print("   [OK] Portfolio tracking ready")
+        print("   [OK] Strategy execution ready")
         
         await manager.shutdown()
         return True
         
     except Exception as e:
-        print(f"   ❌ DEX manager test failed: {e}")
+        print(f"   [ERROR] DEX manager test failed: {e}")
         return False
 
 

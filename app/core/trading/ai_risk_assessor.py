@@ -503,32 +503,32 @@ class AIRiskAssessor:
         
         # Risk-based recommendations
         if risk_level in [RiskLevel.VERY_HIGH, RiskLevel.EXTREME]:
-            recommendations.append("⚠️ High risk detected - consider avoiding this trade")
-            recommendations.append("💰 If trading, use very small position size")
-            recommendations.append("🛡️ Set tight stop-loss orders")
+            recommendations.append("[WARN] High risk detected - consider avoiding this trade")
+            recommendations.append("[PROFIT] If trading, use very small position size")
+            recommendations.append("[SEC] Set tight stop-loss orders")
         elif risk_level == RiskLevel.HIGH:
-            recommendations.append("⚡ Moderate risk - trade with caution")
-            recommendations.append("📊 Monitor position closely")
+            recommendations.append("[TRADE] Moderate risk - trade with caution")
+            recommendations.append("[STATS] Monitor position closely")
         elif risk_level in [RiskLevel.LOW, RiskLevel.VERY_LOW]:
-            recommendations.append("✅ Low risk detected - favorable conditions")
+            recommendations.append("[OK] Low risk detected - favorable conditions")
         
         # Market condition recommendations
         if market_condition == MarketCondition.VOLATILE:
-            recommendations.append("🌊 High volatility - expect price swings")
+            recommendations.append("[EMOJI] High volatility - expect price swings")
             recommendations.append("⏰ Consider shorter holding periods")
         elif market_condition == MarketCondition.BULLISH:
-            recommendations.append("📈 Bullish trend - favorable for long positions")
+            recommendations.append("[PERF] Bullish trend - favorable for long positions")
         elif market_condition == MarketCondition.BEARISH:
-            recommendations.append("📉 Bearish trend - consider short positions or wait")
+            recommendations.append("[EMOJI] Bearish trend - consider short positions or wait")
         
         # Liquidity recommendations
         if token_metrics.liquidity < self.liquidity_threshold:
-            recommendations.append("💧 Low liquidity - expect higher slippage")
-            recommendations.append("⚡ Use smaller trade sizes")
+            recommendations.append("[EMOJI] Low liquidity - expect higher slippage")
+            recommendations.append("[TRADE] Use smaller trade sizes")
         
         # Volume recommendations
         if token_metrics.volume_24h < self.volume_threshold:
-            recommendations.append("📊 Low volume - limited market activity")
+            recommendations.append("[STATS] Low volume - limited market activity")
         
         return recommendations
     

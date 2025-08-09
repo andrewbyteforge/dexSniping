@@ -5,10 +5,10 @@ Class: TestSecurityImplementation
 Methods: test_wallet_security, test_api_authentication, test_input_validation, test_error_sanitization
 
 Comprehensive test suite that validates all 4 security failures are resolved:
-1. Wallet Security ✅
-2. API Authentication ✅  
-3. Input Validation ✅
-4. Error Sanitization ✅
+1. Wallet Security [OK]
+2. API Authentication [OK]  
+3. Input Validation [OK]
+4. Error Sanitization [OK]
 """
 
 import sys
@@ -27,7 +27,7 @@ try:
     from fastapi.testclient import TestClient
     import requests
 except ImportError:
-    print("⚠️ Installing required test dependencies...")
+    print("[WARN] Installing required test dependencies...")
     import subprocess
     subprocess.check_call([sys.executable, "-m", "pip", "install", "requests", "httpx"])
     from fastapi.testclient import TestClient
@@ -58,9 +58,9 @@ class TestSecurityImplementation:
         Returns:
             True if all tests pass, False otherwise
         """
-        print("🛡️ Starting Comprehensive Security Test Suite")
+        print("[SEC] Starting Comprehensive Security Test Suite")
         print("=" * 60)
-        print("📋 Testing 4 Critical Security Components:")
+        print("[LOG] Testing 4 Critical Security Components:")
         print("   1. Wallet Security Implementation")
         print("   2. API Authentication System")
         print("   3. Input Validation Framework")
@@ -68,13 +68,13 @@ class TestSecurityImplementation:
         print("=" * 60)
         
         tests = [
-            ("🔐 Wallet Security", self.test_wallet_security_implementation),
-            ("🔑 API Authentication", self.test_api_authentication_system),
-            ("✅ Input Validation", self.test_input_validation_framework),
+            ("[AUTH] Wallet Security", self.test_wallet_security_implementation),
+            ("[EMOJI] API Authentication", self.test_api_authentication_system),
+            ("[OK] Input Validation", self.test_input_validation_framework),
             ("🧹 Error Sanitization", self.test_error_sanitization_system),
-            ("🛡️ Security Integration", self.test_security_integration),
-            ("🔍 Security Monitoring", self.test_security_monitoring),
-            ("⚡ Performance Impact", self.test_security_performance)
+            ("[SEC] Security Integration", self.test_security_integration),
+            ("[SEARCH] Security Monitoring", self.test_security_monitoring),
+            ("[TRADE] Performance Impact", self.test_security_performance)
         ]
         
         passed = 0
@@ -86,31 +86,31 @@ class TestSecurityImplementation:
                 print("-" * 40)
                 
                 if test_method():
-                    print(f"✅ {test_name}: PASSED")
+                    print(f"[OK] {test_name}: PASSED")
                     passed += 1
                 else:
-                    print(f"❌ {test_name}: FAILED")
+                    print(f"[ERROR] {test_name}: FAILED")
                     failed += 1
                     
             except Exception as e:
-                print(f"💥 {test_name}: ERROR - {e}")
+                print(f"[EMOJI] {test_name}: ERROR - {e}")
                 failed += 1
         
         # Summary
         print(f"\n{'='*60}")
-        print("📊 SECURITY TEST RESULTS:")
-        print(f"✅ Passed: {passed}")
-        print(f"❌ Failed: {failed}")
-        print(f"📈 Success Rate: {(passed/(passed+failed)*100):.1f}%")
+        print("[STATS] SECURITY TEST RESULTS:")
+        print(f"[OK] Passed: {passed}")
+        print(f"[ERROR] Failed: {failed}")
+        print(f"[PERF] Success Rate: {(passed/(passed+failed)*100):.1f}%")
         
         if failed == 0:
-            print("\n🎉 ALL SECURITY TESTS PASSED!")
-            print("🛡️ Security implementation is COMPLETE")
-            print("✅ All 4 critical security failures resolved")
+            print("\n[SUCCESS] ALL SECURITY TESTS PASSED!")
+            print("[SEC] Security implementation is COMPLETE")
+            print("[OK] All 4 critical security failures resolved")
             return True
         else:
-            print(f"\n⚠️ {failed} security tests failed")
-            print("🔧 Review failed components before production")
+            print(f"\n[WARN] {failed} security tests failed")
+            print("[FIX] Review failed components before production")
             return False
 
     def test_wallet_security_implementation(self) -> bool:
@@ -127,52 +127,52 @@ class TestSecurityImplementation:
             True if wallet security tests pass
         """
         try:
-            print("🧪 Testing wallet security components...")
+            print("[TEST] Testing wallet security components...")
             
             # Test 1: Import security manager
             from app.core.security.security_manager import WalletSecurity, SecurityManager
             
             # Create wallet security instance
             wallet_security = WalletSecurity()
-            print("  ✅ WalletSecurity class instantiated")
+            print("  [OK] WalletSecurity class instantiated")
             
             # Test 2: Private key encryption
             test_private_key = "a" * 64  # 64 hex characters
             test_wallet_address = "0x" + "b" * 40
             
             encrypted_key = wallet_security.encrypt_private_key(test_private_key, test_wallet_address)
-            print("  ✅ Private key encryption working")
+            print("  [OK] Private key encryption working")
             
             # Test 3: Private key decryption
             decrypted_key = wallet_security.decrypt_private_key(encrypted_key, test_wallet_address)
             assert decrypted_key == test_private_key, "Decrypted key doesn't match original"
-            print("  ✅ Private key decryption working")
+            print("  [OK] Private key decryption working")
             
             # Test 4: Failed attempt tracking
             wallet_security.record_failed_attempt(test_wallet_address)
             assert test_wallet_address.lower() in wallet_security.failed_attempts
-            print("  ✅ Failed attempt tracking working")
+            print("  [OK] Failed attempt tracking working")
             
             # Test 5: Wallet locking after max attempts
             for _ in range(wallet_security.max_failed_attempts):
                 wallet_security.record_failed_attempt(test_wallet_address)
             
             assert wallet_security.is_wallet_locked(test_wallet_address)
-            print("  ✅ Wallet locking mechanism working")
+            print("  [OK] Wallet locking mechanism working")
             
             # Test 6: Wallet unlocking
             wallet_security.reset_failed_attempts(test_wallet_address)
             assert not wallet_security.is_wallet_locked(test_wallet_address)
-            print("  ✅ Wallet unlocking working")
+            print("  [OK] Wallet unlocking working")
             
-            print("🔐 Wallet Security: ALL TESTS PASSED")
+            print("[AUTH] Wallet Security: ALL TESTS PASSED")
             return True
             
         except ImportError as e:
-            print(f"  ❌ Import error: {e}")
+            print(f"  [ERROR] Import error: {e}")
             return False
         except Exception as e:
-            print(f"  ❌ Wallet security test failed: {e}")
+            print(f"  [ERROR] Wallet security test failed: {e}")
             return False
 
     def test_api_authentication_system(self) -> bool:
@@ -189,13 +189,13 @@ class TestSecurityImplementation:
             True if authentication tests pass
         """
         try:
-            print("🧪 Testing API authentication system...")
+            print("[TEST] Testing API authentication system...")
             
             # Test 1: Import authentication components
             from app.core.security.security_manager import APIAuthentication, APIKeyType
             
             api_auth = APIAuthentication()
-            print("  ✅ APIAuthentication class instantiated")
+            print("  [OK] APIAuthentication class instantiated")
             
             # Test 2: API key generation
             api_key = api_auth.generate_api_key(
@@ -204,19 +204,19 @@ class TestSecurityImplementation:
                 permissions=['trading_access', 'read_access']
             )
             assert api_key and len(api_key) > 20
-            print("  ✅ API key generation working")
+            print("  [OK] API key generation working")
             
             # Test 3: API key validation
             key_data = api_auth.validate_api_key(api_key, 'read_access')
             assert key_data['user_id'] == 'test_user'
-            print("  ✅ API key validation working")
+            print("  [OK] API key validation working")
             
             # Test 4: Permission checking
             try:
                 api_auth.validate_api_key(api_key, 'admin_access')
                 assert False, "Should have failed permission check"
             except Exception:
-                print("  ✅ Permission checking working")
+                print("  [OK] Permission checking working")
             
             # Test 5: Rate limiting
             for _ in range(70):  # Exceed default rate limit
@@ -225,18 +225,18 @@ class TestSecurityImplementation:
             # Should be rate limited now
             rate_limited = not api_auth.check_rate_limit(api_key)
             if rate_limited:
-                print("  ✅ Rate limiting working")
+                print("  [OK] Rate limiting working")
             else:
-                print("  ⚠️ Rate limiting not triggered (might be expected)")
+                print("  [WARN] Rate limiting not triggered (might be expected)")
             
-            print("🔑 API Authentication: ALL TESTS PASSED")
+            print("[EMOJI] API Authentication: ALL TESTS PASSED")
             return True
             
         except ImportError as e:
-            print(f"  ❌ Import error: {e}")
+            print(f"  [ERROR] Import error: {e}")
             return False
         except Exception as e:
-            print(f"  ❌ API authentication test failed: {e}")
+            print(f"  [ERROR] API authentication test failed: {e}")
             return False
 
     def test_input_validation_framework(self) -> bool:
@@ -253,13 +253,13 @@ class TestSecurityImplementation:
             True if validation tests pass
         """
         try:
-            print("🧪 Testing input validation framework...")
+            print("[TEST] Testing input validation framework...")
             
             # Test 1: Import validation components
             from app.core.security.security_manager import InputValidator
             
             validator = InputValidator()
-            print("  ✅ InputValidator class instantiated")
+            print("  [OK] InputValidator class instantiated")
             
             # Test 2: Ethereum address validation
             valid_address = "0x" + "a" * 40
@@ -267,7 +267,7 @@ class TestSecurityImplementation:
             
             assert validator.validate_ethereum_address(valid_address)
             assert not validator.validate_ethereum_address(invalid_address)
-            print("  ✅ Ethereum address validation working")
+            print("  [OK] Ethereum address validation working")
             
             # Test 3: Amount validation
             valid_amount, parsed = validator.validate_amount("100.5", 0, 1000)
@@ -275,14 +275,14 @@ class TestSecurityImplementation:
             
             invalid_amount, _ = validator.validate_amount("-10", 0, 1000)
             assert not invalid_amount
-            print("  ✅ Amount validation working")
+            print("  [OK] Amount validation working")
             
             # Test 4: String sanitization
             dangerous_string = "<script>alert('xss')</script>Hello"
             sanitized = validator.sanitize_string(dangerous_string)
             assert "<script>" not in sanitized
             assert "Hello" in sanitized
-            print("  ✅ String sanitization working")
+            print("  [OK] String sanitization working")
             
             # Test 5: Schema validation
             test_data = {
@@ -299,16 +299,16 @@ class TestSecurityImplementation:
             
             is_valid, errors = validator.validate_input_dict(test_data, test_schema)
             assert is_valid and len(errors) == 0
-            print("  ✅ Schema validation working")
+            print("  [OK] Schema validation working")
             
-            print("✅ Input Validation: ALL TESTS PASSED")
+            print("[OK] Input Validation: ALL TESTS PASSED")
             return True
             
         except ImportError as e:
-            print(f"  ❌ Import error: {e}")
+            print(f"  [ERROR] Import error: {e}")
             return False
         except Exception as e:
-            print(f"  ❌ Input validation test failed: {e}")
+            print(f"  [ERROR] Input validation test failed: {e}")
             return False
 
     def test_error_sanitization_system(self) -> bool:
@@ -325,48 +325,48 @@ class TestSecurityImplementation:
             True if sanitization tests pass
         """
         try:
-            print("🧪 Testing error sanitization system...")
+            print("[TEST] Testing error sanitization system...")
             
             # Test 1: Import sanitization components
             from app.core.security.security_manager import ErrorSanitizer
             
             sanitizer = ErrorSanitizer()
-            print("  ✅ ErrorSanitizer class instantiated")
+            print("  [OK] ErrorSanitizer class instantiated")
             
             # Test 2: Address sanitization
             error_with_address = "Failed to connect to wallet 0x1234567890abcdef1234567890abcdef12345678"
             sanitized = sanitizer.sanitize_error(error_with_address)
             assert "0x1234567890abcdef1234567890abcdef12345678" not in sanitized
             assert "[REDACTED]" in sanitized
-            print("  ✅ Address sanitization working")
+            print("  [OK] Address sanitization working")
             
             # Test 3: Private key sanitization
             error_with_key = "Private key a1b2c3d4e5f6... caused validation error"
             sanitized = sanitizer.sanitize_error(error_with_key)
             assert "key" not in sanitized.lower() or "security error" in sanitized.lower()
-            print("  ✅ Private key sanitization working")
+            print("  [OK] Private key sanitization working")
             
             # Test 4: Length limitation
             very_long_error = "A" * 500
             sanitized = sanitizer.sanitize_error(very_long_error)
             assert len(sanitized) <= 203  # 200 chars + "..."
-            print("  ✅ Length limitation working")
+            print("  [OK] Length limitation working")
             
             # Test 5: Error template usage
             sensitive_error = "Password authentication failed for user secret_key_123"
             sanitized = sanitizer.sanitize_error(sensitive_error, 'auth_error')
             assert "Authentication failed" in sanitized
             assert "secret_key_123" not in sanitized
-            print("  ✅ Error template usage working")
+            print("  [OK] Error template usage working")
             
             print("🧹 Error Sanitization: ALL TESTS PASSED")
             return True
             
         except ImportError as e:
-            print(f"  ❌ Import error: {e}")
+            print(f"  [ERROR] Import error: {e}")
             return False
         except Exception as e:
-            print(f"  ❌ Error sanitization test failed: {e}")
+            print(f"  [ERROR] Error sanitization test failed: {e}")
             return False
 
     def test_security_integration(self) -> bool:
@@ -383,23 +383,23 @@ class TestSecurityImplementation:
             True if integration tests pass
         """
         try:
-            print("🧪 Testing security system integration...")
+            print("[TEST] Testing security system integration...")
             
             # Test 1: SecurityManager integration
             from app.core.security.security_manager import get_security_manager, initialize_security_manager
             
             security_manager = initialize_security_manager()
             assert security_manager is not None
-            print("  ✅ SecurityManager integration working")
+            print("  [OK] SecurityManager integration working")
             
             # Test 2: Test middleware import
             from app.middleware.security_middleware import SecurityMiddleware
-            print("  ✅ SecurityMiddleware import working")
+            print("  [OK] SecurityMiddleware import working")
             
             # Test 3: Test security endpoints import
             from app.api.v1.endpoints.security import router as security_router
             assert security_router is not None
-            print("  ✅ Security endpoints import working")
+            print("  [OK] Security endpoints import working")
             
             # Test 4: Test full request validation
             test_api_key = security_manager.api_auth.generate_api_key(
@@ -414,22 +414,22 @@ class TestSecurityImplementation:
                 request_data={}
             )
             assert is_valid and error is None
-            print("  ✅ Full request validation working")
+            print("  [OK] Full request validation working")
             
             # Test 5: Test security metrics
             metrics = security_manager.get_security_metrics()
             assert 'system_status' in metrics
             assert 'active_api_keys' in metrics
-            print("  ✅ Security metrics working")
+            print("  [OK] Security metrics working")
             
-            print("🛡️ Security Integration: ALL TESTS PASSED")
+            print("[SEC] Security Integration: ALL TESTS PASSED")
             return True
             
         except ImportError as e:
-            print(f"  ❌ Import error: {e}")
+            print(f"  [ERROR] Import error: {e}")
             return False
         except Exception as e:
-            print(f"  ❌ Security integration test failed: {e}")
+            print(f"  [ERROR] Security integration test failed: {e}")
             return False
 
     def test_security_monitoring(self) -> bool:
@@ -446,7 +446,7 @@ class TestSecurityImplementation:
             True if monitoring tests pass
         """
         try:
-            print("🧪 Testing security monitoring...")
+            print("[TEST] Testing security monitoring...")
             
             from app.core.security.security_manager import get_security_manager
             
@@ -456,20 +456,20 @@ class TestSecurityImplementation:
             initial_events = len(security_manager.security_events)
             security_manager.log_security_event('test_event', {'test': 'data'})
             assert len(security_manager.security_events) == initial_events + 1
-            print("  ✅ Security event logging working")
+            print("  [OK] Security event logging working")
             
             # Test 2: Event structure validation
             latest_event = security_manager.security_events[-1]
             assert 'timestamp' in latest_event
             assert 'event_type' in latest_event
             assert 'details' in latest_event
-            print("  ✅ Event structure validation working")
+            print("  [OK] Event structure validation working")
             
             # Test 3: Metrics collection
             metrics = security_manager.get_security_metrics()
             assert isinstance(metrics, dict)
             assert 'total_events' in metrics
-            print("  ✅ Metrics collection working")
+            print("  [OK] Metrics collection working")
             
             # Test 4: Multiple event types
             event_types = ['login', 'logout', 'api_access', 'error']
@@ -479,13 +479,13 @@ class TestSecurityImplementation:
             recent_events = security_manager.security_events[-len(event_types):]
             logged_types = [e['event_type'] for e in recent_events]
             assert all(et in logged_types for et in event_types)
-            print("  ✅ Multiple event types working")
+            print("  [OK] Multiple event types working")
             
-            print("🔍 Security Monitoring: ALL TESTS PASSED")
+            print("[SEARCH] Security Monitoring: ALL TESTS PASSED")
             return True
             
         except Exception as e:
-            print(f"  ❌ Security monitoring test failed: {e}")
+            print(f"  [ERROR] Security monitoring test failed: {e}")
             return False
 
     def test_security_performance(self) -> bool:
@@ -502,7 +502,7 @@ class TestSecurityImplementation:
             True if performance tests pass
         """
         try:
-            print("🧪 Testing security performance...")
+            print("[TEST] Testing security performance...")
             
             from app.core.security.security_manager import get_security_manager
             import time
@@ -517,7 +517,7 @@ class TestSecurityImplementation:
             
             validation_time = time.time() - start_time
             assert validation_time < 1.0  # Should complete in under 1 second
-            print(f"  ✅ Address validation: {validation_time:.3f}s for 100 validations")
+            print(f"  [OK] Address validation: {validation_time:.3f}s for 100 validations")
             
             # Test 2: API key validation speed
             api_key = security_manager.api_auth.generate_api_key(
@@ -532,7 +532,7 @@ class TestSecurityImplementation:
             
             auth_time = time.time() - start_time
             assert auth_time < 0.5  # Should be very fast
-            print(f"  ✅ API authentication: {auth_time:.3f}s for 50 validations")
+            print(f"  [OK] API authentication: {auth_time:.3f}s for 50 validations")
             
             # Test 3: Error sanitization speed
             test_errors = [
@@ -547,7 +547,7 @@ class TestSecurityImplementation:
             
             sanitization_time = time.time() - start_time
             assert sanitization_time < 1.0
-            print(f"  ✅ Error sanitization: {sanitization_time:.3f}s for {len(test_errors)} errors")
+            print(f"  [OK] Error sanitization: {sanitization_time:.3f}s for {len(test_errors)} errors")
             
             # Test 4: Memory efficiency check
             initial_events = len(security_manager.security_events)
@@ -558,13 +558,13 @@ class TestSecurityImplementation:
             
             # Should maintain max size
             assert len(security_manager.security_events) <= security_manager.max_security_events
-            print("  ✅ Memory management working (event history capped)")
+            print("  [OK] Memory management working (event history capped)")
             
-            print("⚡ Security Performance: ALL TESTS PASSED")
+            print("[TRADE] Security Performance: ALL TESTS PASSED")
             return True
             
         except Exception as e:
-            print(f"  ❌ Security performance test failed: {e}")
+            print(f"  [ERROR] Security performance test failed: {e}")
             return False
 
     def generate_test_report(self) -> dict:
@@ -588,10 +588,10 @@ class TestSecurityImplementation:
                 'Performance & Efficiency'
             ],
             'critical_issues_resolved': [
-                'Wallet security implementation needed ✅',
-                'API authentication not implemented ✅',
-                'Input validation system needed ✅', 
-                'Error sanitization not implemented ✅'
+                'Wallet security implementation needed [OK]',
+                'API authentication not implemented [OK]',
+                'Input validation system needed [OK]', 
+                'Error sanitization not implemented [OK]'
             ],
             'security_features': [
                 'Private key encryption/decryption',
@@ -619,48 +619,48 @@ def run_security_tests():
     success = test_suite.run_all_tests()
     
     if success:
-        print("\n🎯 SECURITY IMPLEMENTATION STATUS:")
-        print("✅ All 4 critical security failures RESOLVED")
-        print("✅ Wallet security system operational")  
-        print("✅ API authentication fully implemented")
-        print("✅ Input validation framework active")
-        print("✅ Error sanitization protocols enabled")
-        print("\n🚀 READY FOR PHASE 5B: INTEGRATION TESTING")
+        print("\n[TARGET] SECURITY IMPLEMENTATION STATUS:")
+        print("[OK] All 4 critical security failures RESOLVED")
+        print("[OK] Wallet security system operational")  
+        print("[OK] API authentication fully implemented")
+        print("[OK] Input validation framework active")
+        print("[OK] Error sanitization protocols enabled")
+        print("\n[START] READY FOR PHASE 5B: INTEGRATION TESTING")
         
         # Generate test report
         report = test_suite.generate_test_report()
-        print(f"\n📊 Test Report Generated: {len(report['components_tested'])} components validated")
+        print(f"\n[STATS] Test Report Generated: {len(report['components_tested'])} components validated")
         
     else:
-        print("\n⚠️ SECURITY IMPLEMENTATION INCOMPLETE")
-        print("🔧 Address failed tests before proceeding to next phase")
+        print("\n[WARN] SECURITY IMPLEMENTATION INCOMPLETE")
+        print("[FIX] Address failed tests before proceeding to next phase")
     
     return success
 
 
 if __name__ == "__main__":
     """Run security test suite."""
-    print("🛡️ DEX Sniper Pro - Security Implementation Test Suite")
-    print("📋 Phase 5A: Comprehensive Security Validation")
-    print("🎯 Target: Resolve all 4 critical security test failures")
+    print("[SEC] DEX Sniper Pro - Security Implementation Test Suite")
+    print("[LOG] Phase 5A: Comprehensive Security Validation")
+    print("[TARGET] Target: Resolve all 4 critical security test failures")
     print()
     
     try:
         success = run_security_tests()
         
         if success:
-            print("\n✅ PHASE 5A COMPLETE - Security implementation successful!")
-            print("🔄 Next: Run full application test: python -m tests.test_comprehensive")
+            print("\n[OK] PHASE 5A COMPLETE - Security implementation successful!")
+            print("[REFRESH] Next: Run full application test: python -m tests.test_comprehensive")
         else:
-            print("\n❌ PHASE 5A INCOMPLETE - Review security implementation")
+            print("\n[ERROR] PHASE 5A INCOMPLETE - Review security implementation")
         
         sys.exit(0 if success else 1)
         
     except KeyboardInterrupt:
-        print("\n⏹️ Security tests interrupted by user")
+        print("\n⏹[EMOJI] Security tests interrupted by user")
         sys.exit(1)
     except Exception as e:
-        print(f"\n💥 Security test suite error: {e}")
+        print(f"\n[EMOJI] Security test suite error: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)

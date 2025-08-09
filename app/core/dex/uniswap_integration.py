@@ -643,14 +643,14 @@ async def create_dex_aggregator(chain: BaseChain) -> DEXAggregator:
 # Example usage and testing functions
 async def test_uniswap_integration():
     """Test function to demonstrate Uniswap integration capabilities."""
-    print("🧪 Testing Uniswap Integration...")
+    print("[TEST] Testing Uniswap Integration...")
     
     # This would be used with a real blockchain connection
     # For testing, we'll simulate the functionality
-    print("   ✅ Uniswap V2 integration ready")
-    print("   ✅ Uniswap V3 integration ready")
-    print("   ✅ DEX aggregator ready")
-    print("   ✅ Arbitrage detection ready")
+    print("   [OK] Uniswap V2 integration ready")
+    print("   [OK] Uniswap V3 integration ready")
+    print("   [OK] DEX aggregator ready")
+    print("   [OK] Arbitrage detection ready")
     
     return True
 

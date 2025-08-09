@@ -1,9 +1,4 @@
-<!-- 
-DEX Sniper Pro - Sidebar Navigation Component
-File: frontend/templates/base/sidebar.html
-Professional navigation component with proper layout
--->
-
+<!-- DEX Sniper Pro - Sidebar Navigation Component -->
 <nav class="sidebar" id="sidebar">
     <!-- Brand Section -->
     <div class="sidebar-brand">
@@ -13,7 +8,7 @@ Professional navigation component with proper layout
             </div>
             <div class="brand-text">
                 <h5 class="mb-0 fw-bold">DEX Sniper</h5>
-                <small class="text-light opacity-75">Pro v3.1.0</small>
+                <small class="text-light opacity-75">Pro v5.0</small>
             </div>
         </div>
     </div>
@@ -37,7 +32,7 @@ Professional navigation component with proper layout
                 <a class="nav-link" href="/token-discovery">
                     <i class="bi bi-search"></i>
                     <span class="nav-text">Token Discovery</span>
-                    <span class="badge bg-success ms-auto" id="new-tokens-count">10</span>
+                    <span class="badge bg-success ms-auto" id="new-tokens-count">Live</span>
                 </a>
             </li>
 
@@ -53,28 +48,23 @@ Professional navigation component with proper layout
             <!-- Portfolio -->
             <li class="nav-item">
                 <a class="nav-link" href="/portfolio">
-                    <i class="bi bi-briefcase"></i>
+                    <i class="bi bi-pie-chart"></i>
                     <span class="nav-text">Portfolio</span>
-                    <span class="badge bg-info ms-auto">$125K</span>
+                    <span class="badge bg-info ms-auto">3</span>
                 </a>
             </li>
 
-            <!-- Risk Management -->
+            <!-- Wallet Connection -->
             <li class="nav-item">
-                <a class="nav-link" href="/risk-management">
-                    <i class="bi bi-shield-check"></i>
-                    <span class="nav-text">Risk Management</span>
-                    <span class="badge bg-secondary ms-auto">99%</span>
+                <a class="nav-link" href="/wallet">
+                    <i class="bi bi-wallet2"></i>
+                    <span class="nav-text">Wallet</span>
+                    <span class="badge bg-secondary ms-auto">Connect</span>
                 </a>
             </li>
 
-            <!-- Analytics -->
             <li class="nav-item">
-                <a class="nav-link" href="/analytics">
-                    <i class="bi bi-bar-chart"></i>
-                    <span class="nav-text">Analytics</span>
-                    <span class="badge bg-primary ms-auto">AI</span>
-                </a>
+                <hr class="text-light opacity-25">
             </li>
 
             <!-- Settings -->
@@ -85,12 +75,9 @@ Professional navigation component with proper layout
                 </a>
             </li>
 
-            <!-- Divider -->
-            <li><hr class="nav-divider" style="border-color: rgba(255, 255, 255, 0.1); margin: 0.5rem 1.5rem;"></li>
-
             <!-- API Documentation -->
             <li class="nav-item">
-                <a class="nav-link" href="/docs" target="_blank">
+                <a class="nav-link" href="/api/docs" target="_blank">
                     <i class="bi bi-book"></i>
                     <span class="nav-text">API Docs</span>
                     <i class="bi bi-box-arrow-up-right ms-auto"></i>
@@ -99,7 +86,7 @@ Professional navigation component with proper layout
 
             <!-- Health Status -->
             <li class="nav-item">
-                <a class="nav-link" href="/api/v1/health" target="_blank">
+                <a class="nav-link" href="/health">
                     <i class="bi bi-heart-pulse"></i>
                     <span class="nav-text">Health Status</span>
                     <span class="badge bg-success ms-auto">OK</span>
@@ -121,8 +108,8 @@ Professional navigation component with proper layout
                     </div>
                 </div>
                 <div class="text-end">
-                    <small class="text-light opacity-75">Uptime</small>
-                    <div class="fw-bold">99.8%</div>
+                    <small class="text-light opacity-75">Success</small>
+                    <div class="fw-bold">93.8%</div>
                 </div>
             </div>
         </div>
@@ -136,11 +123,11 @@ Professional navigation component with proper layout
                 </div>
                 <div class="col-4">
                     <small class="text-light opacity-75">Active</small>
-                    <div class="fw-bold">23</div>
+                    <div class="fw-bold">3</div>
                 </div>
                 <div class="col-4">
                     <small class="text-light opacity-75">P&L</small>
-                    <div class="fw-bold text-warning">+2.6%</div>
+                    <div class="fw-bold text-warning">+78.5%</div>
                 </div>
             </div>
         </div>

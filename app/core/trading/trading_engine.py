@@ -29,27 +29,27 @@ class TradingEngine:
         self.orders = {}
         self.positions = {}
         
-        logger.info("⚡ TradingEngine initialized")
+        logger.info("[TRADE] TradingEngine initialized")
     
     async def initialize(self) -> bool:
         """Initialize trading engine."""
         try:
             self.is_running = True
-            logger.info("✅ Trading engine initialized successfully")
+            logger.info("[OK] Trading engine initialized successfully")
             return True
         except Exception as e:
-            logger.error(f"❌ Trading engine initialization failed: {e}")
+            logger.error(f"[ERROR] Trading engine initialization failed: {e}")
             return False
     
     async def start(self):
         """Start trading engine."""
         self.is_running = True
-        logger.info("🚀 Trading engine started")
+        logger.info("[START] Trading engine started")
     
     async def stop(self):
         """Stop trading engine."""
         self.is_running = False
-        logger.info("⏹️ Trading engine stopped")
+        logger.info("⏹[EMOJI] Trading engine stopped")
     
     def get_status(self) -> Dict[str, Any]:
         """Get engine status."""

@@ -34,7 +34,7 @@ class Phase4BIntegrationTester:
         self.temp_dir = None
         self.db_path = None
         
-        logger.info("🧪 Phase 4B Integration Test Suite initialized")
+        logger.info("[TEST] Phase 4B Integration Test Suite initialized")
     
     async def run_comprehensive_tests(self) -> Dict[str, Any]:
         """
@@ -44,14 +44,14 @@ class Phase4BIntegrationTester:
             Dict containing comprehensive test results
         """
         logger.info("="*80)
-        logger.info("🚀 Phase 4B Integration Test Suite - STARTING")
+        logger.info("[START] Phase 4B Integration Test Suite - STARTING")
         logger.info("="*80)
         
         # Create temporary directory for tests
         self.temp_dir = tempfile.mkdtemp(prefix="phase4b_test_")
         self.db_path = os.path.join(self.temp_dir, "test_db.sqlite")
         
-        logger.info(f"📁 Test environment: {self.temp_dir}")
+        logger.info(f"[DIR] Test environment: {self.temp_dir}")
         
         # Test categories
         test_categories = [
@@ -91,27 +91,27 @@ class Phase4BIntegrationTester:
         
         # Run all test categories
         for category_name, test_methods in test_categories:
-            logger.info(f"\n🔍 {category_name}")
+            logger.info(f"\n[SEARCH] {category_name}")
             logger.info("-" * 60)
             
             for test_method in test_methods:
                 try:
-                    logger.info(f"🧪 Running {test_method.__name__}...")
+                    logger.info(f"[TEST] Running {test_method.__name__}...")
                     
                     result = await test_method()
                     
                     if result.get("passed", False):
-                        logger.info(f"✅ {test_method.__name__} - PASSED")
+                        logger.info(f"[OK] {test_method.__name__} - PASSED")
                         passed_tests += 1
                     else:
-                        logger.error(f"❌ {test_method.__name__} - FAILED")
+                        logger.error(f"[ERROR] {test_method.__name__} - FAILED")
                         logger.error(f"   Reason: {result.get('error', 'Unknown error')}")
                         failed_tests += 1
                     
                     self.test_results.append(result)
                     
                 except Exception as e:
-                    logger.error(f"💥 {test_method.__name__} - EXCEPTION: {e}")
+                    logger.error(f"[EMOJI] {test_method.__name__} - EXCEPTION: {e}")
                     failed_tests += 1
                     
                     self.test_results.append({
@@ -140,17 +140,17 @@ class Phase4BIntegrationTester:
         await self._cleanup_test_environment()
         
         logger.info("=" * 80)
-        logger.info(f"📊 Phase 4B Integration Test Summary:")
+        logger.info(f"[STATS] Phase 4B Integration Test Summary:")
         logger.info(f"   Total Tests: {total_tests}")
         logger.info(f"   Passed: {passed_tests}")
         logger.info(f"   Failed: {failed_tests}")
         logger.info(f"   Success Rate: {success_rate:.1f}%")
         
         if failed_tests == 0:
-            logger.info("🎉 All Phase 4B integration tests passed!")
-            logger.info("✅ Phase 4B components are ready for deployment")
+            logger.info("[SUCCESS] All Phase 4B integration tests passed!")
+            logger.info("[OK] Phase 4B components are ready for deployment")
         else:
-            logger.warning(f"⚠️ {failed_tests} tests failed - review implementation")
+            logger.warning(f"[WARN] {failed_tests} tests failed - review implementation")
         
         return summary
     
@@ -1504,7 +1504,7 @@ class Phase4BIntegrationTester:
                 logger.info(f"🧹 Test environment cleaned up: {self.temp_dir}")
         
         except Exception as e:
-            logger.warning(f"⚠️ Error cleaning up test environment: {e}")
+            logger.warning(f"[WARN] Error cleaning up test environment: {e}")
 
 
 async def run_phase_4b_tests():
@@ -1516,7 +1516,7 @@ async def run_phase_4b_tests():
 def print_test_summary(results: Dict[str, Any]):
     """Print formatted test summary."""
     print("\n" + "="*80)
-    print("📊 PHASE 4B INTEGRATION TEST SUMMARY")
+    print("[STATS] PHASE 4B INTEGRATION TEST SUMMARY")
     print("="*80)
     
     total_tests = results.get("total_tests", 0)
@@ -1524,37 +1524,37 @@ def print_test_summary(results: Dict[str, Any]):
     failed_tests = results.get("failed_tests", 0)
     success_rate = results.get("success_rate", 0)
     
-    print(f"📋 Total Tests: {total_tests}")
-    print(f"✅ Passed: {passed_tests}")
-    print(f"❌ Failed: {failed_tests}")
-    print(f"📈 Success Rate: {success_rate:.1f}%")
-    print(f"🕐 Test Time: {results.get('timestamp', 'Unknown')}")
+    print(f"[LOG] Total Tests: {total_tests}")
+    print(f"[OK] Passed: {passed_tests}")
+    print(f"[ERROR] Failed: {failed_tests}")
+    print(f"[PERF] Success Rate: {success_rate:.1f}%")
+    print(f"[EMOJI] Test Time: {results.get('timestamp', 'Unknown')}")
     
     if failed_tests > 0:
-        print(f"\n⚠️ FAILED TESTS:")
+        print(f"\n[WARN] FAILED TESTS:")
         print("-" * 40)
         
         for result in results.get("all_results", []):
             if not result.get("passed", True):
-                print(f"❌ {result.get('test_name', 'Unknown')}")
+                print(f"[ERROR] {result.get('test_name', 'Unknown')}")
                 print(f"   Category: {result.get('category', 'Unknown')}")
                 print(f"   Error: {result.get('error', 'Unknown error')}")
                 print()
     
     if failed_tests == 0:
-        print("\n🎉 ALL TESTS PASSED!")
-        print("✅ Phase 4B components are fully operational")
-        print("✅ Ready for production deployment")
+        print("\n[SUCCESS] ALL TESTS PASSED!")
+        print("[OK] Phase 4B components are fully operational")
+        print("[OK] Ready for production deployment")
     else:
-        print(f"\n⚠️ {failed_tests} tests failed")
-        print("🔧 Please review and fix failing components")
+        print(f"\n[WARN] {failed_tests} tests failed")
+        print("[FIX] Please review and fix failing components")
     
     print("="*80)
 
 
 async def main():
     """Main test execution function."""
-    print("🤖 DEX Sniper Pro - Phase 4B Integration Test Suite")
+    print("[BOT] DEX Sniper Pro - Phase 4B Integration Test Suite")
     print("="*60)
     print("Testing: Database Persistence, Transaction Execution,")
     print("         Configuration Management, System Integration")
@@ -1569,14 +1569,14 @@ async def main():
         
         # Return exit code based on results
         if results.get("failed_tests", 0) == 0:
-            print("\n✅ Phase 4B Integration Tests: ALL PASSED")
+            print("\n[OK] Phase 4B Integration Tests: ALL PASSED")
             return 0
         else:
-            print(f"\n❌ Phase 4B Integration Tests: {results.get('failed_tests', 0)} FAILED")
+            print(f"\n[ERROR] Phase 4B Integration Tests: {results.get('failed_tests', 0)} FAILED")
             return 1
     
     except Exception as e:
-        print(f"\n💥 Test suite execution failed: {e}")
+        print(f"\n[EMOJI] Test suite execution failed: {e}")
         logger.error(f"Test suite error: {e}")
         return 1
 
@@ -1587,8 +1587,8 @@ if __name__ == "__main__":
         exit_code = asyncio.run(main())
         sys.exit(exit_code)
     except KeyboardInterrupt:
-        print("\n🛑 Test suite interrupted by user")
+        print("\n[EMOJI] Test suite interrupted by user")
         sys.exit(1)
     except Exception as e:
-        print(f"\n💥 Fatal error in test suite: {e}")
+        print(f"\n[EMOJI] Fatal error in test suite: {e}")
         sys.exit(1)

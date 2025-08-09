@@ -51,7 +51,7 @@ class Phase4BIntegrationTester:
         Returns:
             Dict containing test results and summary
         """
-        logger.info("🧪 Starting Phase 4B Integration Test Suite")
+        logger.info("[TEST] Starting Phase 4B Integration Test Suite")
         logger.info("=" * 80)
         
         test_categories = [
@@ -79,27 +79,27 @@ class Phase4BIntegrationTester:
         failed_tests = 0
         
         for category_name, test_methods in test_categories:
-            logger.info(f"\n🔍 {category_name}")
+            logger.info(f"\n[SEARCH] {category_name}")
             logger.info("-" * 60)
             
             for test_method in test_methods:
                 try:
-                    logger.info(f"🧪 Running {test_method.__name__}...")
+                    logger.info(f"[TEST] Running {test_method.__name__}...")
                     
                     result = await test_method()
                     
                     if result.get("passed", False):
-                        logger.info(f"✅ {test_method.__name__} - PASSED")
+                        logger.info(f"[OK] {test_method.__name__} - PASSED")
                         passed_tests += 1
                     else:
-                        logger.error(f"❌ {test_method.__name__} - FAILED")
+                        logger.error(f"[ERROR] {test_method.__name__} - FAILED")
                         logger.error(f"   Reason: {result.get('error', 'Unknown error')}")
                         failed_tests += 1
                     
                     self.test_results.append(result)
                     
                 except Exception as e:
-                    logger.error(f"💥 {test_method.__name__} - EXCEPTION: {e}")
+                    logger.error(f"[EMOJI] {test_method.__name__} - EXCEPTION: {e}")
                     logger.error(f"   Traceback: {traceback.format_exc()}")
                     failed_tests += 1
                     
@@ -125,17 +125,17 @@ class Phase4BIntegrationTester:
         }
         
         logger.info("=" * 80)
-        logger.info(f"📊 Phase 4B Integration Test Summary:")
+        logger.info(f"[STATS] Phase 4B Integration Test Summary:")
         logger.info(f"   Total Tests: {total_tests}")
         logger.info(f"   Passed: {passed_tests}")
         logger.info(f"   Failed: {failed_tests}")
         logger.info(f"   Success Rate: {success_rate:.1f}%")
         
         if failed_tests == 0:
-            logger.info("🎉 All Phase 4B integration tests passed!")
-            logger.info("✅ Ready for Phase 4B deployment")
+            logger.info("[SUCCESS] All Phase 4B integration tests passed!")
+            logger.info("[OK] Ready for Phase 4B deployment")
         else:
-            logger.warning(f"⚠️ {failed_tests} tests failed - review implementation")
+            logger.warning(f"[WARN] {failed_tests} tests failed - review implementation")
         
         return summary
     
@@ -808,24 +808,24 @@ async def run_phase_4b_integration_tests() -> bool:
         return results["failed_tests"] == 0
         
     except Exception as e:
-        logger.error(f"❌ Phase 4B integration test suite execution failed: {e}")
+        logger.error(f"[ERROR] Phase 4B integration test suite execution failed: {e}")
         return False
 
 
 if __name__ == "__main__":
     """Run the Phase 4B integration tests."""
     async def main():
-        logger.info("🧪 Phase 4B Integration Test Suite")
+        logger.info("[TEST] Phase 4B Integration Test Suite")
         logger.info("=" * 80)
         
         success = await run_phase_4b_integration_tests()
         
         if success:
-            logger.info("🎉 All Phase 4B integration tests passed!")
-            logger.info("✅ Phase 4B implementation is ready for deployment")
+            logger.info("[SUCCESS] All Phase 4B integration tests passed!")
+            logger.info("[OK] Phase 4B implementation is ready for deployment")
             sys.exit(0)
         else:
-            logger.error("❌ Some Phase 4B tests failed - review implementation")
+            logger.error("[ERROR] Some Phase 4B tests failed - review implementation")
             sys.exit(1)
     
     # Run the async main function

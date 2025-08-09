@@ -272,7 +272,7 @@ async def detect_honeypot(
         if not honeypot_detector:
             raise HTTPException(status_code=503, detail="Honeypot Detector not initialized")
         
-        logger.info(f"🍯 Starting honeypot detection for {token_address}")
+        logger.info(f"[EMOJI] Starting honeypot detection for {token_address}")
         
         # Perform honeypot detection
         detection_result = await honeypot_detector.detect_honeypot(
@@ -354,7 +354,7 @@ async def batch_honeypot_detection(
         if not honeypot_detector:
             raise HTTPException(status_code=503, detail="Honeypot Detector not initialized")
         
-        logger.info(f"🍯 Starting batch honeypot detection for {len(request.token_addresses)} tokens")
+        logger.info(f"[EMOJI] Starting batch honeypot detection for {len(request.token_addresses)} tokens")
         
         # Perform batch detection
         detection_results = await honeypot_detector.batch_detect(
@@ -856,7 +856,7 @@ async def get_sentiment_alerts(
         if not sentiment_analyzer:
             raise HTTPException(status_code=503, detail="Sentiment Analyzer not initialized")
         
-        logger.info(f"📥 Getting sentiment alerts for monitoring {monitoring_id}")
+        logger.info(f"[EMOJI] Getting sentiment alerts for monitoring {monitoring_id}")
         
         # Mock alert data
         alerts = [

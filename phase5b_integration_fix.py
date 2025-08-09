@@ -13,7 +13,7 @@ import json
 
 def create_missing_directories():
     """Create any missing directories for proper structure."""
-    print("🔧 Creating missing directories...")
+    print("[FIX] Creating missing directories...")
     
     directories = [
         "app/core/database",
@@ -32,16 +32,16 @@ def create_missing_directories():
         if not dir_path.exists():
             dir_path.mkdir(parents=True, exist_ok=True)
             created += 1
-            print(f"  ✅ Created: {directory}")
+            print(f"  [OK] Created: {directory}")
         else:
-            print(f"  ✅ Exists: {directory}")
+            print(f"  [OK] Exists: {directory}")
     
-    print(f"📁 Created {created} directories")
+    print(f"[DIR] Created {created} directories")
     return True
 
 def create_database_persistence_manager():
     """Create a working persistence manager."""
-    print("🔧 Creating database persistence manager...")
+    print("[FIX] Creating database persistence manager...")
     
     content = '''"""
 Database Persistence Manager - Phase 5B
@@ -145,7 +145,7 @@ class PersistenceManager:
         self._connection = None
         self._initialized = False
         
-        logger.info(f"💾 PersistenceManager initialized with path: {self.db_path}")
+        logger.info(f"[DB] PersistenceManager initialized with path: {self.db_path}")
     
     async def initialize(self) -> bool:
         """Initialize database connection and tables."""
@@ -156,25 +156,25 @@ class PersistenceManager:
                 self._connection = await aiosqlite.connect(str(self.db_path))
                 await self._create_tables()
                 self._initialized = True
-                logger.info("✅ Database initialized with aiosqlite")
+                logger.info("[OK] Database initialized with aiosqlite")
                 return True
                 
             except ImportError:
                 # Fallback to synchronous sqlite3
-                logger.warning("⚠️ aiosqlite not available, using fallback mode")
+                logger.warning("[WARN] aiosqlite not available, using fallback mode")
                 self._connection = sqlite3.connect(str(self.db_path))
                 self._connection.row_factory = sqlite3.Row
                 self._create_tables_sync()
                 self._initialized = True
-                logger.info("✅ Database initialized with sqlite3 fallback")
+                logger.info("[OK] Database initialized with sqlite3 fallback")
                 return True
                 
         except Exception as e:
-            logger.error(f"❌ Database initialization failed: {e}")
+            logger.error(f"[ERROR] Database initialization failed: {e}")
             # Create mock mode for testing
             self._connection = None
             self._initialized = True  # Allow testing without database
-            logger.warning("⚠️ Database running in mock mode")
+            logger.warning("[WARN] Database running in mock mode")
             return True
     
     async def _create_tables(self):
@@ -241,11 +241,11 @@ class PersistenceManager:
         """Save trade record."""
         try:
             if not self._initialized:
-                logger.warning("⚠️ Database not initialized")
+                logger.warning("[WARN] Database not initialized")
                 return False
             
             if self._connection is None:
-                logger.info("📝 Mock mode: Trade would be saved")
+                logger.info("[NOTE] Mock mode: Trade would be saved")
                 return True
             
             trade_data = trade.to_dict()
@@ -273,11 +273,11 @@ class PersistenceManager:
                 """, tuple(trade_data.values()))
                 self._connection.commit()
             
-            logger.info(f"💾 Trade saved: {trade.trade_id}")
+            logger.info(f"[DB] Trade saved: {trade.trade_id}")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to save trade: {e}")
+            logger.error(f"[ERROR] Failed to save trade: {e}")
             return False
     
     async def get_trade_history(self, wallet_address: str, limit: int = 100) -> List[Dict[str, Any]]:
@@ -319,7 +319,7 @@ class PersistenceManager:
             return [dict(row) for row in rows]
             
         except Exception as e:
-            logger.error(f"❌ Failed to get trade history: {e}")
+            logger.error(f"[ERROR] Failed to get trade history: {e}")
             return []
     
     def get_database_status(self) -> Dict[str, Any]:
@@ -340,9 +340,9 @@ class PersistenceManager:
                     await self._connection.close()
                 else:
                     self._connection.close()
-            logger.info("✅ Database connection closed")
+            logger.info("[OK] Database connection closed")
         except Exception as e:
-            logger.error(f"❌ Error closing database: {e}")
+            logger.error(f"[ERROR] Error closing database: {e}")
     
     async def shutdown(self):
         """Shutdown persistence manager."""
@@ -365,12 +365,12 @@ __all__ = ['PersistenceManager', 'TradeRecord', 'WalletSession', 'TradeStatus', 
     
     db_file = Path("app/core/database/persistence_manager.py")
     db_file.write_text(content, encoding='utf-8')
-    print("✅ Database persistence manager created")
+    print("[OK] Database persistence manager created")
     return True
 
 def create_trading_engine_components():
     """Create missing trading engine components."""
-    print("🔧 Creating trading engine components...")
+    print("[FIX] Creating trading engine components...")
     
     # Trading Engine
     trading_engine_content = '''"""
@@ -404,27 +404,27 @@ class TradingEngine:
         self.orders = {}
         self.positions = {}
         
-        logger.info("⚡ TradingEngine initialized")
+        logger.info("[TRADE] TradingEngine initialized")
     
     async def initialize(self) -> bool:
         """Initialize trading engine."""
         try:
             self.is_running = True
-            logger.info("✅ Trading engine initialized successfully")
+            logger.info("[OK] Trading engine initialized successfully")
             return True
         except Exception as e:
-            logger.error(f"❌ Trading engine initialization failed: {e}")
+            logger.error(f"[ERROR] Trading engine initialization failed: {e}")
             return False
     
     async def start(self):
         """Start trading engine."""
         self.is_running = True
-        logger.info("🚀 Trading engine started")
+        logger.info("[START] Trading engine started")
     
     async def stop(self):
         """Stop trading engine."""
         self.is_running = False
-        logger.info("⏹️ Trading engine stopped")
+        logger.info("⏹[EMOJI] Trading engine stopped")
     
     def get_status(self) -> Dict[str, Any]:
         """Get engine status."""
@@ -484,7 +484,7 @@ class OrderExecutor:
         self.orders = {}
         self.order_counter = 0
         
-        logger.info("📋 OrderExecutor initialized")
+        logger.info("[LOG] OrderExecutor initialized")
     
     async def execute_order(self, order_params: Dict[str, Any]) -> Dict[str, Any]:
         """Execute an order."""
@@ -500,12 +500,12 @@ class OrderExecutor:
             }
             
             self.orders[order_id] = order
-            logger.info(f"✅ Order executed: {order_id}")
+            logger.info(f"[OK] Order executed: {order_id}")
             
             return order
             
         except Exception as e:
-            logger.error(f"❌ Order execution failed: {e}")
+            logger.error(f"[ERROR] Order execution failed: {e}")
             return {"status": "failed", "error": str(e)}
     
     def get_order_status(self, order_id: str) -> Optional[Dict[str, Any]]:
@@ -522,12 +522,12 @@ __all__ = ['OrderExecutor', 'OrderSide', 'OrderType', 'OrderStatus', 'order_exec
     executor_file = Path("app/core/trading/order_executor.py")
     executor_file.write_text(order_executor_content, encoding='utf-8')
     
-    print("✅ Trading engine components created")
+    print("[OK] Trading engine components created")
     return True
 
 def create_portfolio_manager():
     """Create portfolio manager component."""
-    print("🔧 Creating portfolio manager...")
+    print("[FIX] Creating portfolio manager...")
     
     content = '''"""
 Portfolio Manager - Phase 5B
@@ -560,7 +560,7 @@ class PortfolioManager:
         self.portfolios = {}
         self.transactions = {}
         
-        logger.info("💼 PortfolioManager initialized")
+        logger.info("[EMOJI] PortfolioManager initialized")
     
     async def get_portfolio_balance(self, wallet_address: str) -> Dict[str, Any]:
         """Get portfolio balance for wallet."""
@@ -589,7 +589,7 @@ class PortfolioManager:
             return portfolio
             
         except Exception as e:
-            logger.error(f"❌ Failed to get portfolio: {e}")
+            logger.error(f"[ERROR] Failed to get portfolio: {e}")
             return {}
     
     async def record_transaction(self, transaction: Dict[str, Any]) -> bool:
@@ -600,12 +600,12 @@ class PortfolioManager:
             transaction["recorded_at"] = datetime.utcnow().isoformat()
             
             self.transactions[tx_id] = transaction
-            logger.info(f"📝 Transaction recorded: {tx_id}")
+            logger.info(f"[NOTE] Transaction recorded: {tx_id}")
             
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to record transaction: {e}")
+            logger.error(f"[ERROR] Failed to record transaction: {e}")
             return False
 
 # Global instance
@@ -626,12 +626,12 @@ __all__ = ['PortfolioManager', 'TransactionType', 'get_portfolio_manager']
     portfolio_file.parent.mkdir(exist_ok=True)
     portfolio_file.write_text(content, encoding='utf-8')
     
-    print("✅ Portfolio manager created")
+    print("[OK] Portfolio manager created")
     return True
 
 def fix_api_endpoints():
     """Fix API endpoint issues."""
-    print("🔧 Fixing API endpoints...")
+    print("[FIX] Fixing API endpoints...")
     
     # Fix trading API
     trading_api_content = '''"""
@@ -661,7 +661,7 @@ async def get_trading_status() -> Dict[str, Any]:
             "last_updated": datetime.utcnow().isoformat()
         }
     except Exception as e:
-        logger.error(f"❌ Trading status error: {e}")
+        logger.error(f"[ERROR] Trading status error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/execute")
@@ -675,11 +675,11 @@ async def execute_trade(trade_data: Dict[str, Any]) -> Dict[str, Any]:
             "timestamp": datetime.utcnow().isoformat()
         }
         
-        logger.info(f"✅ Trade executed: {result['trade_id']}")
+        logger.info(f"[OK] Trade executed: {result['trade_id']}")
         return result
         
     except Exception as e:
-        logger.error(f"❌ Trade execution error: {e}")
+        logger.error(f"[ERROR] Trade execution error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # Export
@@ -689,12 +689,12 @@ __all__ = ["router"]
     trading_api_file = Path("app/api/v1/endpoints/trading.py")
     trading_api_file.write_text(trading_api_content, encoding='utf-8')
     
-    print("✅ API endpoints fixed")
+    print("[OK] API endpoints fixed")
     return True
 
 def fix_main_app():
     """Fix main FastAPI application."""
-    print("🔧 Fixing main FastAPI application...")
+    print("[FIX] Fixing main FastAPI application...")
     
     main_app_content = '''"""
 Main FastAPI Application - Phase 5B Fixed
@@ -737,22 +737,22 @@ async def health_check():
 try:
     from app.api.v1.endpoints.dashboard import router as dashboard_router
     app.include_router(dashboard_router, prefix="/api/v1")
-    logger.info("✅ Dashboard router included")
+    logger.info("[OK] Dashboard router included")
 except ImportError as e:
-    logger.warning(f"⚠️ Dashboard router not available: {e}")
+    logger.warning(f"[WARN] Dashboard router not available: {e}")
 
 try:
     from app.api.v1.endpoints.trading import router as trading_router
     app.include_router(trading_router, prefix="/api/v1")
-    logger.info("✅ Trading router included")
+    logger.info("[OK] Trading router included")
 except ImportError as e:
-    logger.warning(f"⚠️ Trading router not available: {e}")
+    logger.warning(f"[WARN] Trading router not available: {e}")
 
 # Global exception handler
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     """Global exception handler."""
-    logger.error(f"❌ Unhandled exception: {exc}")
+    logger.error(f"[ERROR] Unhandled exception: {exc}")
     return JSONResponse(
         status_code=500,
         content={"error": "Internal server error", "detail": str(exc)}
@@ -769,12 +769,12 @@ __all__ = ["app"]
     main_file = Path("app/main.py")
     main_file.write_text(main_app_content, encoding='utf-8')
     
-    print("✅ Main FastAPI application fixed")
+    print("[OK] Main FastAPI application fixed")
     return True
 
 def create_websocket_manager():
     """Create WebSocket manager for frontend."""
-    print("🔧 Creating WebSocket manager...")
+    print("[FIX] Creating WebSocket manager...")
     
     content = '''"""
 WebSocket Manager - Phase 5B
@@ -799,7 +799,7 @@ class WebSocketManager:
         self.active_connections: List = []
         self.connection_count = 0
         
-        logger.info("🔌 WebSocketManager initialized")
+        logger.info("[WS] WebSocketManager initialized")
     
     async def connect(self, websocket):
         """Connect a WebSocket."""
@@ -807,9 +807,9 @@ class WebSocketManager:
             await websocket.accept()
             self.active_connections.append(websocket)
             self.connection_count += 1
-            logger.info(f"🔌 WebSocket connected: {self.connection_count} total")
+            logger.info(f"[WS] WebSocket connected: {self.connection_count} total")
         except Exception as e:
-            logger.error(f"❌ WebSocket connection failed: {e}")
+            logger.error(f"[ERROR] WebSocket connection failed: {e}")
     
     def disconnect(self, websocket):
         """Disconnect a WebSocket."""
@@ -817,16 +817,16 @@ class WebSocketManager:
             if websocket in self.active_connections:
                 self.active_connections.remove(websocket)
                 self.connection_count -= 1
-                logger.info(f"🔌 WebSocket disconnected: {self.connection_count} total")
+                logger.info(f"[WS] WebSocket disconnected: {self.connection_count} total")
         except Exception as e:
-            logger.error(f"❌ WebSocket disconnect error: {e}")
+            logger.error(f"[ERROR] WebSocket disconnect error: {e}")
     
     async def send_personal_message(self, message: str, websocket):
         """Send message to specific WebSocket."""
         try:
             await websocket.send_text(message)
         except Exception as e:
-            logger.error(f"❌ Failed to send WebSocket message: {e}")
+            logger.error(f"[ERROR] Failed to send WebSocket message: {e}")
     
     async def broadcast(self, message: Dict[str, Any]):
         """Broadcast message to all connected WebSockets."""
@@ -836,7 +836,7 @@ class WebSocketManager:
                 try:
                     await connection.send_text(message_str)
                 except Exception as e:
-                    logger.error(f"❌ Broadcast failed: {e}")
+                    logger.error(f"[ERROR] Broadcast failed: {e}")
                     self.disconnect(connection)
 
 # Global instance
@@ -849,12 +849,12 @@ __all__ = ['WebSocketManager', 'websocket_manager']
     ws_file = Path("app/utils/websocket_manager.py")
     ws_file.write_text(content, encoding='utf-8')
     
-    print("✅ WebSocket manager created")
+    print("[OK] WebSocket manager created")
     return True
 
 def fix_dashboard_template():
     """Fix dashboard template for UI test."""
-    print("🔧 Fixing dashboard template...")
+    print("[FIX] Fixing dashboard template...")
     
     template_content = '''<!DOCTYPE html>
 <html lang="en">
@@ -877,17 +877,17 @@ def fix_dashboard_template():
     </div>
     
     <div class="status success">
-        <h3>✅ System Status: Operational</h3>
+        <h3>[OK] System Status: Operational</h3>
         <p>Security: Enabled | Trading: Active | Database: Connected</p>
     </div>
     
     <div class="status warning">
-        <h3>⚠️ Phase 5B: Integration Testing Active</h3>
+        <h3>[WARN] Phase 5B: Integration Testing Active</h3>
         <p>Currently testing system integration and component communication.</p>
     </div>
     
     <div class="status">
-        <h3>📊 Quick Stats</h3>
+        <h3>[STATS] Quick Stats</h3>
         <p>Active Trades: 0 | Portfolio Value: $0 | Success Rate: 100%</p>
     </div>
 </body>
@@ -897,12 +897,12 @@ def fix_dashboard_template():
     template_file.parent.mkdir(parents=True, exist_ok=True)
     template_file.write_text(template_content, encoding='utf-8')
     
-    print("✅ Dashboard template fixed")
+    print("[OK] Dashboard template fixed")
     return True
 
 def create_init_files():
     """Create missing __init__.py files."""
-    print("🔧 Creating missing __init__.py files...")
+    print("[FIX] Creating missing __init__.py files...")
     
     init_files = [
         "app/__init__.py",
@@ -924,14 +924,14 @@ def create_init_files():
             init_path.write_text('"""Package init file."""\\n', encoding='utf-8')
             created += 1
     
-    print(f"✅ Created {created} __init__.py files")
+    print(f"[OK] Created {created} __init__.py files")
     return True
 
 def main():
     """Main integration fix function."""
-    print("🚀 Phase 5B Integration Fix")
+    print("[START] Phase 5B Integration Fix")
     print("=" * 50)
-    print("🎯 Target: Fix integration issues to achieve 85%+ success rate")
+    print("[TARGET] Target: Fix integration issues to achieve 85%+ success rate")
     print("=" * 50)
     
     fixes_applied = 0
@@ -970,30 +970,30 @@ def main():
         if create_websocket_manager() and fix_dashboard_template():
             fixes_applied += 1
         
-        print(f"\\n📊 Integration Fix Results: {fixes_applied}/{total_fixes} fixes applied")
+        print(f"\\n[STATS] Integration Fix Results: {fixes_applied}/{total_fixes} fixes applied")
         
         if fixes_applied == total_fixes:
-            print("\\n🎉 ALL INTEGRATION FIXES APPLIED!")
-            print("✅ Database integration fixed")
-            print("✅ Trading engine integration fixed") 
-            print("✅ API endpoints integration fixed")
-            print("✅ Frontend integration fixed")
-            print("\\n🧪 Test the integration:")
+            print("\\n[SUCCESS] ALL INTEGRATION FIXES APPLIED!")
+            print("[OK] Database integration fixed")
+            print("[OK] Trading engine integration fixed") 
+            print("[OK] API endpoints integration fixed")
+            print("[OK] Frontend integration fixed")
+            print("\\n[TEST] Test the integration:")
             print("   python run_all_tests.py")
             print("\\nExpected results:")
-            print("   📈 Success rate: 85%+ (was 46.9%)")
-            print("   ✅ Database Systems: 4/4 passed")
-            print("   ✅ Trading Engine: 4/4 passed") 
-            print("   ✅ API Endpoints: 4/4 passed")
-            print("   ✅ Frontend Interface: 4/4 passed")
+            print("   [PERF] Success rate: 85%+ (was 46.9%)")
+            print("   [OK] Database Systems: 4/4 passed")
+            print("   [OK] Trading Engine: 4/4 passed") 
+            print("   [OK] API Endpoints: 4/4 passed")
+            print("   [OK] Frontend Interface: 4/4 passed")
             return True
         else:
-            print(f"\\n⚠️ {total_fixes - fixes_applied} fixes failed")
-            print("🔧 Review the errors above")
+            print(f"\\n[WARN] {total_fixes - fixes_applied} fixes failed")
+            print("[FIX] Review the errors above")
             return False
             
     except Exception as e:
-        print(f"\\n💥 Integration fix error: {e}")
+        print(f"\\n[EMOJI] Integration fix error: {e}")
         return False
 
 if __name__ == "__main__":
@@ -1001,5 +1001,5 @@ if __name__ == "__main__":
         success = main()
         sys.exit(0 if success else 1)
     except Exception as e:
-        print(f"💥 Fix script error: {e}")
+        print(f"[EMOJI] Fix script error: {e}")
         sys.exit(1)

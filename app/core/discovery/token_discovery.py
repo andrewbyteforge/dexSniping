@@ -111,12 +111,12 @@ class TokenDiscovery:
             ]
         }
         
-        logger.info("✅ Token Discovery Service initialized")
+        logger.info("[OK] Token Discovery Service initialized")
     
     async def initialize(self) -> bool:
         """Initialize discovery service components."""
         try:
-            logger.info("🔍 Initializing token discovery service...")
+            logger.info("[SEARCH] Initializing token discovery service...")
             
             # Initialize AI components
             from app.core.ai.risk_assessor import AIRiskAssessor
@@ -128,17 +128,17 @@ class TokenDiscovery:
             await self.risk_assessor.initialize_models()
             await self.honeypot_detector.initialize()
             
-            logger.info("✅ Token discovery service initialized")
+            logger.info("[OK] Token discovery service initialized")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to initialize token discovery: {e}")
+            logger.error(f"[ERROR] Failed to initialize token discovery: {e}")
             return False
     
     async def start_monitoring(self, networks: List[str]) -> None:
         """Start monitoring specified networks for new tokens."""
         try:
-            logger.info(f"🚀 Starting token discovery monitoring for: {networks}")
+            logger.info(f"[START] Starting token discovery monitoring for: {networks}")
             
             self.monitoring_networks = set(networks)
             
@@ -158,12 +158,12 @@ class TokenDiscovery:
             await asyncio.gather(*tasks)
             
         except Exception as e:
-            logger.error(f"❌ Monitoring failed: {e}")
+            logger.error(f"[ERROR] Monitoring failed: {e}")
             raise TokenDiscoveryError(f"Failed to start monitoring: {e}")
     
     async def stop_monitoring(self) -> None:
         """Stop all monitoring activities."""
-        logger.info("🛑 Stopping token discovery monitoring...")
+        logger.info("[EMOJI] Stopping token discovery monitoring...")
         
         # Stop all monitors
         for network in self.active_monitors:
@@ -225,7 +225,7 @@ class TokenDiscovery:
             return recent_tokens
             
         except Exception as e:
-            logger.error(f"❌ Failed to get recent tokens: {e}")
+            logger.error(f"[ERROR] Failed to get recent tokens: {e}")
             return []
     
     async def get_top_opportunities(
@@ -256,12 +256,12 @@ class TokenDiscovery:
             return scored_opportunities[:limit]
             
         except Exception as e:
-            logger.error(f"❌ Failed to get top opportunities: {e}")
+            logger.error(f"[ERROR] Failed to get top opportunities: {e}")
             return []
     
     async def _monitor_network(self, network: str) -> None:
         """Monitor a specific network for new tokens."""
-        logger.info(f"🔍 Starting {network} token monitoring...")
+        logger.info(f"[SEARCH] Starting {network} token monitoring...")
         
         while self.active_monitors.get(network, False):
             try:
@@ -280,10 +280,10 @@ class TokenDiscovery:
                 await asyncio.sleep(self.discovery_interval)
                 
             except Exception as e:
-                logger.error(f"❌ Error monitoring {network}: {e}")
+                logger.error(f"[ERROR] Error monitoring {network}: {e}")
                 await asyncio.sleep(60)  # Wait longer on error
         
-        logger.info(f"🛑 Stopped monitoring {network}")
+        logger.info(f"[EMOJI] Stopped monitoring {network}")
     
     async def _scan_network_for_new_tokens(self, network: str) -> List[Dict[str, Any]]:
         """Scan network DEXs for new token pairs."""
@@ -319,7 +319,7 @@ class TokenDiscovery:
             return unique_tokens
             
         except Exception as e:
-            logger.error(f"❌ Network scan failed for {network}: {e}")
+            logger.error(f"[ERROR] Network scan failed for {network}: {e}")
             return []
     
     async def _scan_dex_for_new_pairs(self, dex_name: str, network: str) -> List[Dict[str, Any]]:
@@ -432,14 +432,14 @@ class TokenDiscovery:
             self.discovered_tokens[token_address] = discovered_token
             self.discovery_stats.total_discovered += 1
             
-            logger.info(f"🔍 New token discovered: {discovered_token.symbol} ({token_address})")
+            logger.info(f"[SEARCH] New token discovered: {discovered_token.symbol} ({token_address})")
             
         except Exception as e:
-            logger.error(f"❌ Failed to process discovered token: {e}")
+            logger.error(f"[ERROR] Failed to process discovered token: {e}")
     
     async def _analyze_discovered_tokens(self) -> None:
         """Continuously analyze discovered tokens with AI."""
-        logger.info("🤖 Starting AI analysis task...")
+        logger.info("[BOT] Starting AI analysis task...")
         
         while True:
             try:
@@ -464,7 +464,7 @@ class TokenDiscovery:
                 await asyncio.sleep(60)  # Check every minute
                 
             except Exception as e:
-                logger.error(f"❌ AI analysis task error: {e}")
+                logger.error(f"[ERROR] AI analysis task error: {e}")
                 await asyncio.sleep(60)
     
     async def _analyze_token_with_ai(self, token: DiscoveredToken) -> None:
@@ -474,7 +474,7 @@ class TokenDiscovery:
             if token.ai_analyzed:
                 return
             
-            logger.debug(f"🤖 Analyzing {token.symbol} with AI...")
+            logger.debug(f"[BOT] Analyzing {token.symbol} with AI...")
             
             # Honeypot detection
             if self.honeypot_detector:
@@ -484,7 +484,7 @@ class TokenDiscovery:
                 
                 if is_honeypot:
                     self.discovery_stats.honeypots_detected += 1
-                    logger.warning(f"🍯 Honeypot detected: {token.symbol}")
+                    logger.warning(f"[EMOJI] Honeypot detected: {token.symbol}")
             
             # Risk assessment
             if self.risk_assessor:
@@ -497,13 +497,13 @@ class TokenDiscovery:
             
             if token.trading_viable:
                 self.discovery_stats.viable_opportunities += 1
-                logger.info(f"✅ Viable opportunity: {token.symbol} (Risk: {token.risk_score})")
+                logger.info(f"[OK] Viable opportunity: {token.symbol} (Risk: {token.risk_score})")
             
             # Mark as analyzed
             token.ai_analyzed = True
             
         except Exception as e:
-            logger.error(f"❌ AI analysis failed for {token.symbol}: {e}")
+            logger.error(f"[ERROR] AI analysis failed for {token.symbol}: {e}")
     
     def _is_trading_viable(self, token: DiscoveredToken) -> bool:
         """Determine if a token is viable for trading."""
@@ -625,7 +625,7 @@ class TokenDiscovery:
             }
             
         except Exception as e:
-            logger.error(f"❌ Failed to get discovery statistics: {e}")
+            logger.error(f"[ERROR] Failed to get discovery statistics: {e}")
             return {}
     
     def _get_token_counts_by_network(self) -> Dict[str, int]:
@@ -654,7 +654,7 @@ class TokenDiscovery:
             return len(old_tokens)
             
         except Exception as e:
-            logger.error(f"❌ Token cleanup failed: {e}")
+            logger.error(f"[ERROR] Token cleanup failed: {e}")
             return 0
 
 
@@ -669,7 +669,7 @@ async def create_token_discovery() -> TokenDiscovery:
 # Utility function for testing
 async def test_token_discovery():
     """Test token discovery functionality."""
-    print("🧪 Testing Token Discovery Service...")
+    print("[TEST] Testing Token Discovery Service...")
     
     try:
         discovery = await create_token_discovery()
@@ -688,13 +688,13 @@ async def test_token_discovery():
         
         # Get statistics
         stats = await discovery.get_discovery_statistics()
-        print(f"📊 Discovery Statistics: {stats}")
+        print(f"[STATS] Discovery Statistics: {stats}")
         
-        print("✅ Token Discovery test completed")
+        print("[OK] Token Discovery test completed")
         return True
         
     except Exception as e:
-        print(f"❌ Token Discovery test failed: {e}")
+        print(f"[ERROR] Token Discovery test failed: {e}")
         return False
 
 

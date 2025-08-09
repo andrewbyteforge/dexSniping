@@ -469,7 +469,7 @@ class MempoolManager:
             network = liquidity_event.pending_tx.transaction_hash[:2]  # Simplified network detection
             
             logger.info(
-                f"🚀 NEW TOKEN DETECTED: {liquidity_event.token_address} "
+                f"[START] NEW TOKEN DETECTED: {liquidity_event.token_address} "
                 f"on {liquidity_event.dex} ({network})"
             )
             
@@ -576,7 +576,7 @@ class MempoolManager:
             priority = getattr(settings, 'auto_snipe_priority', 'normal')
             
             logger.info(
-                f"🎯 Executing auto-snipe for {liquidity_event.token_address} "
+                f"[TARGET] Executing auto-snipe for {liquidity_event.token_address} "
                 f"with {eth_amount} ETH"
             )
             

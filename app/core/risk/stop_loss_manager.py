@@ -151,7 +151,7 @@ class StopLossManager:
         self.default_trail_distance = Decimal('0.05')  # 5%
         self.max_orders_per_token = 5
         
-        logger.info("✅ StopLossManager initialized with professional automation")
+        logger.info("[OK] StopLossManager initialized with professional automation")
 
     async def set_stop_loss(
         self,
@@ -224,7 +224,7 @@ class StopLossManager:
             # Cache order
             await self._cache_stop_order(stop_order)
             
-            logger.info(f"✅ Stop-loss set: {order_id} for {token_address} "
+            logger.info(f"[OK] Stop-loss set: {order_id} for {token_address} "
                        f"@ ${stop_price} ({stop_type.value})")
             
             return order_id
@@ -285,7 +285,7 @@ class StopLossManager:
                     # Update cache
                     await self._cache_stop_order(stop_order)
                     
-                    logger.info(f"📈 Trailing stop adjusted: {order_id} "
+                    logger.info(f"[PERF] Trailing stop adjusted: {order_id} "
                                f"${old_stop:.6f} → ${new_stop_price:.6f} "
                                f"(High: ${old_highest:.6f} → ${current_price:.6f})")
                     
@@ -325,7 +325,7 @@ class StopLossManager:
                 logger.warning(f"Cannot execute stop-loss {order_id}: order not active")
                 return None
             
-            logger.info(f"⚡ Executing stop-loss: {order_id} @ ${trigger_price} ({execution_reason})")
+            logger.info(f"[TRADE] Executing stop-loss: {order_id} @ ${trigger_price} ({execution_reason})")
             
             # Update order status
             stop_order.status = StopLossStatus.TRIGGERED
@@ -352,7 +352,7 @@ class StopLossManager:
                 # Trigger callbacks
                 await self._trigger_execution_callbacks(stop_order, execution_result)
                 
-                logger.info(f"✅ Stop-loss executed: {order_id} "
+                logger.info(f"[OK] Stop-loss executed: {order_id} "
                            f"@ ${execution_result.executed_price} "
                            f"(PnL: ${stop_order.realized_pnl})")
                 
@@ -361,7 +361,7 @@ class StopLossManager:
                 stop_order.status = StopLossStatus.ACTIVE  # Revert to active
                 stop_order.triggered_at = None
                 
-                logger.error(f"❌ Stop-loss execution failed: {order_id}")
+                logger.error(f"[ERROR] Stop-loss execution failed: {order_id}")
             
             return execution_result
             
@@ -411,7 +411,7 @@ class StopLossManager:
                 
                 await self._cache_stop_order(stop_order)
                 
-                logger.info(f"🔄 Dynamic stop updated: {order_id} "
+                logger.info(f"[REFRESH] Dynamic stop updated: {order_id} "
                            f"${old_stop:.6f} → ${new_stop_price:.6f}")
                 
                 return True
@@ -441,7 +441,7 @@ class StopLossManager:
             # Update cache
             await self._cache_executed_order(stop_order)
             
-            logger.info(f"🚫 Stop-loss cancelled: {order_id} ({reason})")
+            logger.info(f"[EMOJI] Stop-loss cancelled: {order_id} ({reason})")
             
             return True
             
@@ -456,7 +456,7 @@ class StopLossManager:
         
         self.is_monitoring = True
         self.monitoring_task = asyncio.create_task(self._monitoring_loop())
-        logger.info("🔍 Stop-loss monitoring started")
+        logger.info("[SEARCH] Stop-loss monitoring started")
 
     async def stop_monitoring(self) -> None:
         """Stop monitoring active stop-loss orders."""
@@ -467,7 +467,7 @@ class StopLossManager:
                 await self.monitoring_task
             except asyncio.CancelledError:
                 pass
-        logger.info("⏹️ Stop-loss monitoring stopped")
+        logger.info("⏹[EMOJI] Stop-loss monitoring stopped")
 
     async def _monitoring_loop(self) -> None:
         """Main monitoring loop for stop-loss orders."""
@@ -871,7 +871,7 @@ class StopLossManager:
             self.active_orders.clear()
             self.executed_orders.clear()
             self.price_feeds.clear()
-            logger.info("✅ StopLossManager cleanup completed")
+            logger.info("[OK] StopLossManager cleanup completed")
             
         except Exception as e:
             logger.error(f"Error during StopLossManager cleanup: {e}")
@@ -893,7 +893,7 @@ if __name__ == "__main__":
                 trail_distance=Decimal('0.05')  # 5% trailing distance
             )
             
-            print(f"✅ Stop-loss order created: {order_id}")
+            print(f"[OK] Stop-loss order created: {order_id}")
             
             # Simulate price movement
             manager.update_price_feed(
@@ -903,18 +903,18 @@ if __name__ == "__main__":
             
             # Check adjustment
             adjusted = await manager.adjust_trailing_stop(order_id, Decimal('1.60'))
-            print(f"📈 Trailing stop adjusted: {adjusted}")
+            print(f"[PERF] Trailing stop adjusted: {adjusted}")
             
             # Get status
             status = manager.get_order_status(order_id)
-            print(f"📊 Order status: {status}")
+            print(f"[STATS] Order status: {status}")
             
             # Get performance summary
             summary = await manager.get_performance_summary()
-            print(f"📈 Performance summary: {summary}")
+            print(f"[PERF] Performance summary: {summary}")
             
         except Exception as e:
-            print(f"❌ Test failed: {e}")
+            print(f"[ERROR] Test failed: {e}")
         finally:
             await manager.cleanup()
     

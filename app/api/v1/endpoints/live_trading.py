@@ -92,7 +92,7 @@ class ManualTradeRequest(BaseModel):
 async def connect_wallet(request: WalletConnectionRequest) -> Dict[str, Any]:
     """Connect a user wallet for trading."""
     try:
-        logger.info(f"🔗 Connecting wallet: {request.wallet_address[:10]}...")
+        logger.info(f"[EMOJI] Connecting wallet: {request.wallet_address[:10]}...")
         
         engine = get_trading_engine()
         
@@ -108,7 +108,7 @@ async def connect_wallet(request: WalletConnectionRequest) -> Dict[str, Any]:
         }
         
     except Exception as e:
-        logger.error(f"❌ Wallet connection failed: {e}")
+        logger.error(f"[ERROR] Wallet connection failed: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
 
@@ -118,7 +118,7 @@ async def get_wallet_balance(
 ) -> Dict[str, Any]:
     """Get wallet balance information."""
     try:
-        logger.info(f"💰 Getting balance for: {wallet_address[:10]}...")
+        logger.info(f"[PROFIT] Getting balance for: {wallet_address[:10]}...")
         
         engine = get_trading_engine()
         balance = await engine.wallet_manager.get_wallet_balance(wallet_address)
@@ -136,7 +136,7 @@ async def get_wallet_balance(
         }
         
     except Exception as e:
-        logger.error(f"❌ Balance retrieval failed: {e}")
+        logger.error(f"[ERROR] Balance retrieval failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -157,7 +157,7 @@ async def get_connected_wallets() -> Dict[str, Any]:
         }
         
     except Exception as e:
-        logger.error(f"❌ Failed to get connected wallets: {e}")
+        logger.error(f"[ERROR] Failed to get connected wallets: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -167,7 +167,7 @@ async def get_connected_wallets() -> Dict[str, Any]:
 async def update_trading_config(config_request: TradingConfigRequest) -> Dict[str, Any]:
     """Update trading engine configuration."""
     try:
-        logger.info("⚙️ Updating trading configuration...")
+        logger.info("[CONFIG] Updating trading configuration...")
         
         engine = get_trading_engine()
         
@@ -194,7 +194,7 @@ async def update_trading_config(config_request: TradingConfigRequest) -> Dict[st
         }
         
     except Exception as e:
-        logger.error(f"❌ Configuration update failed: {e}")
+        logger.error(f"[ERROR] Configuration update failed: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
 
@@ -212,7 +212,7 @@ async def get_current_config() -> Dict[str, Any]:
         }
         
     except Exception as e:
-        logger.error(f"❌ Failed to get configuration: {e}")
+        logger.error(f"[ERROR] Failed to get configuration: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -224,7 +224,7 @@ async def start_trading(
 ) -> Dict[str, Any]:
     """Start automated trading."""
     try:
-        logger.info(f"🚀 Starting trading for wallet: {wallet_address[:10]}...")
+        logger.info(f"[START] Starting trading for wallet: {wallet_address[:10]}...")
         
         engine = get_trading_engine()
         result = await engine.start_trading(wallet_address)
@@ -236,7 +236,7 @@ async def start_trading(
         }
         
     except Exception as e:
-        logger.error(f"❌ Failed to start trading: {e}")
+        logger.error(f"[ERROR] Failed to start trading: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
 
@@ -244,7 +244,7 @@ async def start_trading(
 async def stop_trading() -> Dict[str, Any]:
     """Stop automated trading."""
     try:
-        logger.info("🛑 Stopping automated trading...")
+        logger.info("[EMOJI] Stopping automated trading...")
         
         engine = get_trading_engine()
         result = await engine.stop_trading()
@@ -256,7 +256,7 @@ async def stop_trading() -> Dict[str, Any]:
         }
         
     except Exception as e:
-        logger.error(f"❌ Failed to stop trading: {e}")
+        logger.error(f"[ERROR] Failed to stop trading: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
 
@@ -264,7 +264,7 @@ async def stop_trading() -> Dict[str, Any]:
 async def execute_manual_trade(request: ManualTradeRequest) -> Dict[str, Any]:
     """Execute a manual trade."""
     try:
-        logger.info(f"📊 Manual trade: {request.intent.value} {request.amount}")
+        logger.info(f"[STATS] Manual trade: {request.intent.value} {request.amount}")
         
         engine = get_trading_engine()
         result = await engine.execute_manual_trade(
@@ -293,7 +293,7 @@ async def execute_manual_trade(request: ManualTradeRequest) -> Dict[str, Any]:
         }
         
     except Exception as e:
-        logger.error(f"❌ Manual trade failed: {e}")
+        logger.error(f"[ERROR] Manual trade failed: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
 
@@ -308,7 +308,7 @@ async def get_swap_quotes(
 ) -> Dict[str, Any]:
     """Get swap quotes from multiple DEXes."""
     try:
-        logger.info(f"💱 Getting quotes: {amount} tokens")
+        logger.info(f"[EMOJI] Getting quotes: {amount} tokens")
         
         engine = get_trading_engine()
         quotes = await engine.dex_integration.get_swap_quote(
@@ -341,7 +341,7 @@ async def get_swap_quotes(
         }
         
     except Exception as e:
-        logger.error(f"❌ Failed to get quotes: {e}")
+        logger.error(f"[ERROR] Failed to get quotes: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -361,7 +361,7 @@ async def get_trading_status() -> Dict[str, Any]:
         }
         
     except Exception as e:
-        logger.error(f"❌ Failed to get trading status: {e}")
+        logger.error(f"[ERROR] Failed to get trading status: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -395,7 +395,7 @@ async def get_active_signals() -> Dict[str, Any]:
         }
         
     except Exception as e:
-        logger.error(f"❌ Failed to get active signals: {e}")
+        logger.error(f"[ERROR] Failed to get active signals: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -408,7 +408,7 @@ async def test_generate_signal(
 ) -> Dict[str, Any]:
     """Generate a test trading signal."""
     try:
-        logger.info(f"🧪 Generating test signal: {strategy.value}")
+        logger.info(f"[TEST] Generating test signal: {strategy.value}")
         
         engine = get_trading_engine()
         
@@ -449,5 +449,5 @@ async def test_generate_signal(
             }
         
     except Exception as e:
-        logger.error(f"❌ Failed to generate test signal: {e}")
+        logger.error(f"[ERROR] Failed to generate test signal: {e}")
         raise HTTPException(status_code=500, detail=str(e))

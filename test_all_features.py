@@ -49,56 +49,56 @@ class ComprehensiveTestSuite:
         Returns:
             Dict containing detailed test results and analysis
         """
-        print("🤖 DEX Sniper Pro - Comprehensive Feature Test Suite")
+        print("[BOT] DEX Sniper Pro - Comprehensive Feature Test Suite")
         print("=" * 70)
-        print(f"🕐 Started: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"[EMOJI] Started: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}")
         print("=" * 70)
         
         # Define test categories and methods
         test_categories = [
-            ("🏗️ Core Infrastructure", [
+            ("[BUILD] Core Infrastructure", [
                 self.test_project_structure,
                 self.test_core_imports,
                 self.test_logger_system,
                 self.test_exception_handling
             ]),
-            ("💾 Database Systems", [
+            ("[DB] Database Systems", [
                 self.test_persistence_manager,
                 self.test_database_operations,
                 self.test_data_models,
                 self.test_migration_system
             ]),
-            ("⚡ Trading Engine", [
+            ("[TRADE] Trading Engine", [
                 self.test_trading_engine_init,
                 self.test_order_execution,
                 self.test_portfolio_tracking,
                 self.test_risk_management
             ]),
-            ("🌐 API Endpoints", [
+            ("[API] API Endpoints", [
                 self.test_fastapi_application,
                 self.test_health_endpoints,
                 self.test_trading_api,
                 self.test_dashboard_api
             ]),
-            ("🎨 Frontend Interface", [
+            ("[UI] Frontend Interface", [
                 self.test_template_system,
                 self.test_dashboard_ui,
                 self.test_static_assets,
                 self.test_websocket_support
             ]),
-            ("⚙️ Configuration", [
+            ("[CONFIG] Configuration", [
                 self.test_settings_manager,
                 self.test_environment_config,
                 self.test_runtime_updates,
                 self.test_validation_system
             ]),
-            ("🛡️ Security & Compliance", [
+            ("[SEC] Security & Compliance", [
                 self.test_wallet_security,
                 self.test_api_authentication,
                 self.test_input_validation,
                 self.test_error_sanitization
             ]),
-            ("🧪 Integration Testing", [
+            ("[TEST] Integration Testing", [
                 self.test_end_to_end_workflow,
                 self.test_cross_component_communication,
                 self.test_performance_benchmarks,
@@ -124,16 +124,16 @@ class ComprehensiveTestSuite:
                 try:
                     result = test_method()
                     if result['passed']:
-                        print(f"  ✅ {test_name}")
+                        print(f"  [OK] {test_name}")
                         passed_tests += 1
                     else:
-                        print(f"  ❌ {test_name}: {result.get('error', 'Unknown error')}")
+                        print(f"  [ERROR] {test_name}: {result.get('error', 'Unknown error')}")
                         failed_tests += 1
                     
                     category_results.append(result)
                     
                 except Exception as e:
-                    print(f"  💥 {test_name}: Exception - {str(e)}")
+                    print(f"  [EMOJI] {test_name}: Exception - {str(e)}")
                     failed_tests += 1
                     category_results.append({
                         'test_name': test_name,
@@ -157,23 +157,23 @@ class ComprehensiveTestSuite:
         # Determine system status
         if success_rate >= 95:
             status = "EXCELLENT"
-            status_emoji = "🏆"
+            status_emoji = "[EMOJI]"
             readiness = "PRODUCTION_READY"
         elif success_rate >= 85:
             status = "GOOD"
-            status_emoji = "✅"
+            status_emoji = "[OK]"
             readiness = "NEAR_PRODUCTION"
         elif success_rate >= 70:
             status = "MODERATE"
-            status_emoji = "⚠️"
+            status_emoji = "[WARN]"
             readiness = "DEVELOPMENT_ACTIVE"
         elif success_rate >= 50:
             status = "NEEDS_WORK"
-            status_emoji = "🔧"
+            status_emoji = "[FIX]"
             readiness = "EARLY_DEVELOPMENT"
         else:
             status = "CRITICAL"
-            status_emoji = "🚨"
+            status_emoji = "[EMOJI]"
             readiness = "FOUNDATION_REQUIRED"
         
         # Analyze failed tests by category
@@ -221,45 +221,45 @@ class ComprehensiveTestSuite:
         
         if success_rate >= 95:
             steps.extend([
-                "🎉 System is production-ready!",
-                "✅ Deploy to production environment",
-                "📊 Set up monitoring and alerting",
-                "📈 Begin performance optimization"
+                "[SUCCESS] System is production-ready!",
+                "[OK] Deploy to production environment",
+                "[STATS] Set up monitoring and alerting",
+                "[PERF] Begin performance optimization"
             ])
         elif success_rate >= 85:
             steps.extend([
-                "🔧 Address remaining critical issues",
-                "🧪 Increase test coverage",
-                "🔒 Security audit before production",
-                "📝 Complete documentation"
+                "[FIX] Address remaining critical issues",
+                "[TEST] Increase test coverage",
+                "[EMOJI] Security audit before production",
+                "[NOTE] Complete documentation"
             ])
         elif success_rate >= 50:
             steps.extend([
-                "🏗️ Focus on core infrastructure fixes",
-                "💾 Stabilize database operations",
-                "🌐 Complete API endpoint implementation",
-                "🧪 Expand test coverage significantly"
+                "[BUILD] Focus on core infrastructure fixes",
+                "[DB] Stabilize database operations",
+                "[API] Complete API endpoint implementation",
+                "[TEST] Expand test coverage significantly"
             ])
         else:
             steps.extend([
-                "🚨 Critical system issues need immediate attention",
-                "🏗️ Rebuild core infrastructure components",
-                "💾 Fix database and persistence layers",
-                "⚡ Implement basic trading functionality"
+                "[EMOJI] Critical system issues need immediate attention",
+                "[BUILD] Rebuild core infrastructure components",
+                "[DB] Fix database and persistence layers",
+                "[TRADE] Implement basic trading functionality"
             ])
         
         # Add category-specific steps
-        if '💾 Database Systems' in failed_by_category:
-            steps.append("💾 Priority: Fix database persistence issues")
+        if '[DB] Database Systems' in failed_by_category:
+            steps.append("[DB] Priority: Fix database persistence issues")
         
-        if '⚡ Trading Engine' in failed_by_category:
-            steps.append("⚡ Priority: Complete trading engine implementation")
+        if '[TRADE] Trading Engine' in failed_by_category:
+            steps.append("[TRADE] Priority: Complete trading engine implementation")
         
-        if '🌐 API Endpoints' in failed_by_category:
-            steps.append("🌐 Priority: Fix API routing and endpoints")
+        if '[API] API Endpoints' in failed_by_category:
+            steps.append("[API] Priority: Fix API routing and endpoints")
         
-        if '🎨 Frontend Interface' in failed_by_category:
-            steps.append("🎨 Priority: Implement frontend dashboard")
+        if '[UI] Frontend Interface' in failed_by_category:
+            steps.append("[UI] Priority: Implement frontend dashboard")
         
         return steps
     
@@ -267,27 +267,27 @@ class ComprehensiveTestSuite:
         """Print beautifully formatted test summary."""
         
         print("\n" + "=" * 70)
-        print("📊 COMPREHENSIVE TEST SUMMARY")
+        print("[STATS] COMPREHENSIVE TEST SUMMARY")
         print("=" * 70)
         
         test_data = summary['test_summary']
         status_data = summary['system_status']
         
-        print(f"📋 Total Tests: {test_data['total_tests']}")
-        print(f"✅ Passed: {test_data['passed_tests']}")
-        print(f"❌ Failed: {test_data['failed_tests']}")
-        print(f"📈 Success Rate: {test_data['success_rate']}%")
-        print(f"⏱️ Duration: {test_data['duration_seconds']}s")
+        print(f"[LOG] Total Tests: {test_data['total_tests']}")
+        print(f"[OK] Passed: {test_data['passed_tests']}")
+        print(f"[ERROR] Failed: {test_data['failed_tests']}")
+        print(f"[PERF] Success Rate: {test_data['success_rate']}%")
+        print(f"⏱[EMOJI] Duration: {test_data['duration_seconds']}s")
         
         print(f"\n{status_data['status_emoji']} System Status: {status_data['overall_status']}")
-        print(f"🚀 Readiness: {status_data['readiness_level']}")
+        print(f"[START] Readiness: {status_data['readiness_level']}")
         
         if summary['failed_categories']:
-            print(f"\n⚠️ Issues by Category:")
+            print(f"\n[WARN] Issues by Category:")
             for category, failures in summary['failed_categories'].items():
                 print(f"  {category}: {len(failures)} issues")
         
-        print(f"\n📋 Next Steps:")
+        print(f"\n[LOG] Next Steps:")
         for i, step in enumerate(summary['next_steps'][:5], 1):
             print(f"  {i}. {step}")
         
@@ -310,14 +310,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Project Structure',
                     'passed': False,
                     'error': f"Missing directories: {', '.join(missing_dirs)}",
-                    'category': '🏗️ Core Infrastructure'
+                    'category': '[BUILD] Core Infrastructure'
                 }
             
             return {
                 'test_name': 'Project Structure',
                 'passed': True,
                 'message': 'All required directories exist',
-                'category': '🏗️ Core Infrastructure'
+                'category': '[BUILD] Core Infrastructure'
             }
             
         except Exception as e:
@@ -325,7 +325,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Project Structure',
                 'passed': False,
                 'error': str(e),
-                'category': '🏗️ Core Infrastructure'
+                'category': '[BUILD] Core Infrastructure'
             }
     
     def test_core_imports(self) -> Dict[str, Any]:
@@ -350,14 +350,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Core Imports',
                     'passed': False,
                     'error': f"Failed imports: {'; '.join(failed_imports)}",
-                    'category': '🏗️ Core Infrastructure'
+                    'category': '[BUILD] Core Infrastructure'
                 }
             
             return {
                 'test_name': 'Core Imports',
                 'passed': True,
                 'message': 'All core modules imported successfully',
-                'category': '🏗️ Core Infrastructure'
+                'category': '[BUILD] Core Infrastructure'
             }
             
         except Exception as e:
@@ -365,7 +365,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Core Imports',
                 'passed': False,
                 'error': str(e),
-                'category': '🏗️ Core Infrastructure'
+                'category': '[BUILD] Core Infrastructure'
             }
     
     def test_logger_system(self) -> Dict[str, Any]:
@@ -380,7 +380,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Logger System',
                 'passed': True,
                 'message': 'Logging system operational',
-                'category': '🏗️ Core Infrastructure'
+                'category': '[BUILD] Core Infrastructure'
             }
             
         except Exception as e:
@@ -388,7 +388,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Logger System',
                 'passed': False,
                 'error': str(e),
-                'category': '🏗️ Core Infrastructure'
+                'category': '[BUILD] Core Infrastructure'
             }
     
     def test_exception_handling(self) -> Dict[str, Any]:
@@ -401,14 +401,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Exception Handling',
                     'passed': True,
                     'message': 'Custom exceptions available',
-                    'category': '🏗️ Core Infrastructure'
+                    'category': '[BUILD] Core Infrastructure'
                 }
             except ImportError:
                 return {
                     'test_name': 'Exception Handling',
                     'passed': False,
                     'error': 'Custom exception classes not found',
-                    'category': '🏗️ Core Infrastructure'
+                    'category': '[BUILD] Core Infrastructure'
                 }
             
         except Exception as e:
@@ -416,7 +416,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Exception Handling',
                 'passed': False,
                 'error': str(e),
-                'category': '🏗️ Core Infrastructure'
+                'category': '[BUILD] Core Infrastructure'
             }
     
     # ==================== DATABASE SYSTEMS TESTS ====================
@@ -437,14 +437,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Persistence Manager',
                     'passed': False,
                     'error': 'get_database_status() should return dict',
-                    'category': '💾 Database Systems'
+                    'category': '[DB] Database Systems'
                 }
             
             return {
                 'test_name': 'Persistence Manager',
                 'passed': True,
                 'message': 'PersistenceManager operational',
-                'category': '💾 Database Systems'
+                'category': '[DB] Database Systems'
             }
             
         except Exception as e:
@@ -452,7 +452,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Persistence Manager',
                 'passed': False,
                 'error': str(e),
-                'category': '💾 Database Systems'
+                'category': '[DB] Database Systems'
             }
     
     def test_database_operations(self) -> Dict[str, Any]:
@@ -467,14 +467,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Database Operations',
                     'passed': True,
                     'message': 'Database functions available',
-                    'category': '💾 Database Systems'
+                    'category': '[DB] Database Systems'
                 }
             else:
                 return {
                     'test_name': 'Database Operations',
                     'passed': False,
                     'error': 'get_persistence_manager not callable',
-                    'category': '💾 Database Systems'
+                    'category': '[DB] Database Systems'
                 }
             
         except Exception as e:
@@ -482,7 +482,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Database Operations',
                 'passed': False,
                 'error': str(e),
-                'category': '💾 Database Systems'
+                'category': '[DB] Database Systems'
             }
     
     def test_data_models(self) -> Dict[str, Any]:
@@ -518,14 +518,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Data Models',
                     'passed': True,
                     'message': 'Data models working correctly',
-                    'category': '💾 Database Systems'
+                    'category': '[DB] Database Systems'
                 }
             else:
                 return {
                     'test_name': 'Data Models',
                     'passed': False,
                     'error': 'to_dict() should return dict',
-                    'category': '💾 Database Systems'
+                    'category': '[DB] Database Systems'
                 }
             
         except Exception as e:
@@ -533,7 +533,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Data Models',
                 'passed': False,
                 'error': str(e),
-                'category': '💾 Database Systems'
+                'category': '[DB] Database Systems'
             }
     
     def test_migration_system(self) -> Dict[str, Any]:
@@ -550,14 +550,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Migration System',
                     'passed': True,
                     'message': 'Table creation system available',
-                    'category': '💾 Database Systems'
+                    'category': '[DB] Database Systems'
                 }
             else:
                 return {
                     'test_name': 'Migration System',
                     'passed': False,
                     'error': '_create_tables method not found',
-                    'category': '💾 Database Systems'
+                    'category': '[DB] Database Systems'
                 }
             
         except Exception as e:
@@ -565,7 +565,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Migration System',
                 'passed': False,
                 'error': str(e),
-                'category': '💾 Database Systems'
+                'category': '[DB] Database Systems'
             }
     
     # ==================== TRADING ENGINE TESTS ====================
@@ -579,14 +579,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Trading Engine Init',
                     'passed': True,
                     'message': 'TradingEngine class available',
-                    'category': '⚡ Trading Engine'
+                    'category': '[TRADE] Trading Engine'
                 }
             except ImportError:
                 return {
                     'test_name': 'Trading Engine Init',
                     'passed': False,
                     'error': 'TradingEngine class not found - needs implementation',
-                    'category': '⚡ Trading Engine'
+                    'category': '[TRADE] Trading Engine'
                 }
             
         except Exception as e:
@@ -594,7 +594,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Trading Engine Init',
                 'passed': False,
                 'error': str(e),
-                'category': '⚡ Trading Engine'
+                'category': '[TRADE] Trading Engine'
             }
     
     def test_order_execution(self) -> Dict[str, Any]:
@@ -606,14 +606,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Order Execution',
                     'passed': True,
                     'message': 'OrderExecutor available',
-                    'category': '⚡ Trading Engine'
+                    'category': '[TRADE] Trading Engine'
                 }
             except ImportError:
                 return {
                     'test_name': 'Order Execution',
                     'passed': False,
                     'error': 'OrderExecutor not implemented',
-                    'category': '⚡ Trading Engine'
+                    'category': '[TRADE] Trading Engine'
                 }
             
         except Exception as e:
@@ -621,7 +621,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Order Execution',
                 'passed': False,
                 'error': str(e),
-                'category': '⚡ Trading Engine'
+                'category': '[TRADE] Trading Engine'
             }
     
     def test_portfolio_tracking(self) -> Dict[str, Any]:
@@ -633,14 +633,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Portfolio Tracking',
                     'passed': True,
                     'message': 'PortfolioAnalyzer available',
-                    'category': '⚡ Trading Engine'
+                    'category': '[TRADE] Trading Engine'
                 }
             except ImportError:
                 return {
                     'test_name': 'Portfolio Tracking',
                     'passed': False,
                     'error': 'PortfolioAnalyzer not implemented',
-                    'category': '⚡ Trading Engine'
+                    'category': '[TRADE] Trading Engine'
                 }
             
         except Exception as e:
@@ -648,7 +648,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Portfolio Tracking',
                 'passed': False,
                 'error': str(e),
-                'category': '⚡ Trading Engine'
+                'category': '[TRADE] Trading Engine'
             }
     
     def test_risk_management(self) -> Dict[str, Any]:
@@ -660,14 +660,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Risk Management',
                     'passed': True,
                     'message': 'RiskManager available',
-                    'category': '⚡ Trading Engine'
+                    'category': '[TRADE] Trading Engine'
                 }
             except ImportError:
                 return {
                     'test_name': 'Risk Management',
                     'passed': False,
                     'error': 'RiskManager not implemented',
-                    'category': '⚡ Trading Engine'
+                    'category': '[TRADE] Trading Engine'
                 }
             
         except Exception as e:
@@ -675,7 +675,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Risk Management',
                 'passed': False,
                 'error': str(e),
-                'category': '⚡ Trading Engine'
+                'category': '[TRADE] Trading Engine'
             }
     
     # ==================== API ENDPOINTS TESTS ====================
@@ -690,14 +690,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'FastAPI Application',
                     'passed': True,
                     'message': f'FastAPI app ready: {app.title}',
-                    'category': '🌐 API Endpoints'
+                    'category': '[API] API Endpoints'
                 }
             else:
                 return {
                     'test_name': 'FastAPI Application',
                     'passed': False,
                     'error': 'FastAPI app not properly configured',
-                    'category': '🌐 API Endpoints'
+                    'category': '[API] API Endpoints'
                 }
             
         except Exception as e:
@@ -705,7 +705,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'FastAPI Application',
                 'passed': False,
                 'error': str(e),
-                'category': '🌐 API Endpoints'
+                'category': '[API] API Endpoints'
             }
     
     def test_health_endpoints(self) -> Dict[str, Any]:
@@ -721,14 +721,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Health Endpoints',
                     'passed': True,
                     'message': 'Health endpoints configured',
-                    'category': '🌐 API Endpoints'
+                    'category': '[API] API Endpoints'
                 }
             else:
                 return {
                     'test_name': 'Health Endpoints',
                     'passed': False,
                     'error': '/health endpoint not found',
-                    'category': '🌐 API Endpoints'
+                    'category': '[API] API Endpoints'
                 }
             
         except Exception as e:
@@ -736,7 +736,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Health Endpoints',
                 'passed': False,
                 'error': str(e),
-                'category': '🌐 API Endpoints'
+                'category': '[API] API Endpoints'
             }
     
     def test_trading_api(self) -> Dict[str, Any]:
@@ -753,14 +753,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Trading API',
                     'passed': True,
                     'message': f'Trading routes found: {len(trading_routes)}',
-                    'category': '🌐 API Endpoints'
+                    'category': '[API] API Endpoints'
                 }
             else:
                 return {
                     'test_name': 'Trading API',
                     'passed': False,
                     'error': 'No trading API endpoints found',
-                    'category': '🌐 API Endpoints'
+                    'category': '[API] API Endpoints'
                 }
             
         except Exception as e:
@@ -768,7 +768,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Trading API',
                 'passed': False,
                 'error': str(e),
-                'category': '🌐 API Endpoints'
+                'category': '[API] API Endpoints'
             }
     
     def test_dashboard_api(self) -> Dict[str, Any]:
@@ -783,14 +783,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Dashboard API',
                     'passed': True,
                     'message': 'Dashboard endpoint available',
-                    'category': '🌐 API Endpoints'
+                    'category': '[API] API Endpoints'
                 }
             else:
                 return {
                     'test_name': 'Dashboard API',
                     'passed': False,
                     'error': '/dashboard endpoint not found',
-                    'category': '🌐 API Endpoints'
+                    'category': '[API] API Endpoints'
                 }
             
         except Exception as e:
@@ -798,7 +798,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Dashboard API',
                 'passed': False,
                 'error': str(e),
-                'category': '🌐 API Endpoints'
+                'category': '[API] API Endpoints'
             }
     
     # ==================== FRONTEND INTERFACE TESTS ====================
@@ -819,14 +819,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Template System',
                     'passed': True,
                     'message': 'Template directory found',
-                    'category': '🎨 Frontend Interface'
+                    'category': '[UI] Frontend Interface'
                 }
             else:
                 return {
                     'test_name': 'Template System',
                     'passed': False,
                     'error': 'No template directory found',
-                    'category': '🎨 Frontend Interface'
+                    'category': '[UI] Frontend Interface'
                 }
             
         except Exception as e:
@@ -834,7 +834,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Template System',
                 'passed': False,
                 'error': str(e),
-                'category': '🎨 Frontend Interface'
+                'category': '[UI] Frontend Interface'
             }
     
     def test_dashboard_ui(self) -> Dict[str, Any]:
@@ -859,14 +859,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Dashboard UI',
                     'passed': True,
                     'message': 'Dashboard template found',
-                    'category': '🎨 Frontend Interface'
+                    'category': '[UI] Frontend Interface'
                 }
             else:
                 return {
                     'test_name': 'Dashboard UI',
                     'passed': False,
                     'error': 'Dashboard template not found',
-                    'category': '🎨 Frontend Interface'
+                    'category': '[UI] Frontend Interface'
                 }
             
         except Exception as e:
@@ -874,7 +874,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Dashboard UI',
                 'passed': False,
                 'error': str(e),
-                'category': '🎨 Frontend Interface'
+                'category': '[UI] Frontend Interface'
             }
     
     def test_static_assets(self) -> Dict[str, Any]:
@@ -893,14 +893,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Static Assets',
                     'passed': True,
                     'message': 'Static directory found',
-                    'category': '🎨 Frontend Interface'
+                    'category': '[UI] Frontend Interface'
                 }
             else:
                 return {
                     'test_name': 'Static Assets',
                     'passed': False,
                     'error': 'No static directory found',
-                    'category': '🎨 Frontend Interface'
+                    'category': '[UI] Frontend Interface'
                 }
             
         except Exception as e:
@@ -908,7 +908,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Static Assets',
                 'passed': False,
                 'error': str(e),
-                'category': '🎨 Frontend Interface'
+                'category': '[UI] Frontend Interface'
             }
     
     def test_websocket_support(self) -> Dict[str, Any]:
@@ -920,14 +920,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'WebSocket Support',
                     'passed': True,
                     'message': 'WebSocket manager available',
-                    'category': '🎨 Frontend Interface'
+                    'category': '[UI] Frontend Interface'
                 }
             except ImportError:
                 return {
                     'test_name': 'WebSocket Support',
                     'passed': False,
                     'error': 'WebSocket manager not implemented',
-                    'category': '🎨 Frontend Interface'
+                    'category': '[UI] Frontend Interface'
                 }
             
         except Exception as e:
@@ -935,7 +935,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'WebSocket Support',
                 'passed': False,
                 'error': str(e),
-                'category': '🎨 Frontend Interface'
+                'category': '[UI] Frontend Interface'
             }
     
     # ==================== CONFIGURATION TESTS ====================
@@ -952,14 +952,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Settings Manager',
                     'passed': True,
                     'message': 'Settings manager operational',
-                    'category': '⚙️ Configuration'
+                    'category': '[CONFIG] Configuration'
                 }
             else:
                 return {
                     'test_name': 'Settings Manager',
                     'passed': False,
                     'error': 'validate_configuration method missing',
-                    'category': '⚙️ Configuration'
+                    'category': '[CONFIG] Configuration'
                 }
             
         except Exception as e:
@@ -967,7 +967,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Settings Manager',
                 'passed': False,
                 'error': str(e),
-                'category': '⚙️ Configuration'
+                'category': '[CONFIG] Configuration'
             }
     
     def test_environment_config(self) -> Dict[str, Any]:
@@ -986,14 +986,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Environment Config',
                     'passed': True,
                     'message': 'Environment configuration found',
-                    'category': '⚙️ Configuration'
+                    'category': '[CONFIG] Configuration'
                 }
             else:
                 return {
                     'test_name': 'Environment Config',
                     'passed': False,
                     'error': 'No environment configuration file found',
-                    'category': '⚙️ Configuration'
+                    'category': '[CONFIG] Configuration'
                 }
             
         except Exception as e:
@@ -1001,7 +1001,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Environment Config',
                 'passed': False,
                 'error': str(e),
-                'category': '⚙️ Configuration'
+                'category': '[CONFIG] Configuration'
             }
     
     def test_runtime_updates(self) -> Dict[str, Any]:
@@ -1016,14 +1016,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Runtime Updates',
                     'passed': True,
                     'message': 'Runtime update capability available',
-                    'category': '⚙️ Configuration'
+                    'category': '[CONFIG] Configuration'
                 }
             else:
                 return {
                     'test_name': 'Runtime Updates',
                     'passed': False,
                     'error': 'Runtime update methods not found',
-                    'category': '⚙️ Configuration'
+                    'category': '[CONFIG] Configuration'
                 }
             
         except Exception as e:
@@ -1031,7 +1031,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Runtime Updates',
                 'passed': False,
                 'error': str(e),
-                'category': '⚙️ Configuration'
+                'category': '[CONFIG] Configuration'
             }
     
     def test_validation_system(self) -> Dict[str, Any]:
@@ -1049,14 +1049,14 @@ class ComprehensiveTestSuite:
                     'test_name': 'Validation System',
                     'passed': True,
                     'message': 'Configuration validation working',
-                    'category': '⚙️ Configuration'
+                    'category': '[CONFIG] Configuration'
                 }
             else:
                 return {
                     'test_name': 'Validation System',
                     'passed': False,
                     'error': 'validate_configuration should return list',
-                    'category': '⚙️ Configuration'
+                    'category': '[CONFIG] Configuration'
                 }
             
         except Exception as e:
@@ -1064,7 +1064,7 @@ class ComprehensiveTestSuite:
                 'test_name': 'Validation System',
                 'passed': False,
                 'error': str(e),
-                'category': '⚙️ Configuration'
+                'category': '[CONFIG] Configuration'
             }
     
     # ==================== SECURITY & COMPLIANCE TESTS ====================
@@ -1075,7 +1075,7 @@ class ComprehensiveTestSuite:
             'test_name': 'Wallet Security',
             'passed': False,
             'error': 'Wallet security implementation needed',
-            'category': '🛡️ Security & Compliance'
+            'category': '[SEC] Security & Compliance'
         }
     
     def test_api_authentication(self) -> Dict[str, Any]:
@@ -1084,7 +1084,7 @@ class ComprehensiveTestSuite:
             'test_name': 'API Authentication',
             'passed': False,
             'error': 'API authentication not implemented',
-            'category': '🛡️ Security & Compliance'
+            'category': '[SEC] Security & Compliance'
         }
     
     def test_input_validation(self) -> Dict[str, Any]:
@@ -1093,7 +1093,7 @@ class ComprehensiveTestSuite:
             'test_name': 'Input Validation',
             'passed': False,
             'error': 'Input validation system needed',
-            'category': '🛡️ Security & Compliance'
+            'category': '[SEC] Security & Compliance'
         }
     
     def test_error_sanitization(self) -> Dict[str, Any]:
@@ -1102,7 +1102,7 @@ class ComprehensiveTestSuite:
             'test_name': 'Error Sanitization',
             'passed': False,
             'error': 'Error sanitization not implemented',
-            'category': '🛡️ Security & Compliance'
+            'category': '[SEC] Security & Compliance'
         }
     
     # ==================== INTEGRATION TESTING ====================
@@ -1113,7 +1113,7 @@ class ComprehensiveTestSuite:
             'test_name': 'End-to-End Workflow',
             'passed': False,
             'error': 'E2E workflow testing not implemented',
-            'category': '🧪 Integration Testing'
+            'category': '[TEST] Integration Testing'
         }
     
     def test_cross_component_communication(self) -> Dict[str, Any]:
@@ -1122,7 +1122,7 @@ class ComprehensiveTestSuite:
             'test_name': 'Cross-Component Communication',
             'passed': False,
             'error': 'Component communication testing needed',
-            'category': '🧪 Integration Testing'
+            'category': '[TEST] Integration Testing'
         }
     
     def test_performance_benchmarks(self) -> Dict[str, Any]:
@@ -1131,7 +1131,7 @@ class ComprehensiveTestSuite:
             'test_name': 'Performance Benchmarks',
             'passed': False,
             'error': 'Performance benchmarking not implemented',
-            'category': '🧪 Integration Testing'
+            'category': '[TEST] Integration Testing'
         }
     
     def test_scalability_metrics(self) -> Dict[str, Any]:
@@ -1140,7 +1140,7 @@ class ComprehensiveTestSuite:
             'test_name': 'Scalability Metrics',
             'passed': False,
             'error': 'Scalability testing not implemented',
-            'category': '🧪 Integration Testing'
+            'category': '[TEST] Integration Testing'
         }
 
 
@@ -1157,9 +1157,9 @@ def main():
         with open(results_file, 'w') as f:
             import json
             json.dump(results, f, indent=2, default=str)
-        print(f"\n📝 Detailed results saved to: {results_file}")
+        print(f"\n[NOTE] Detailed results saved to: {results_file}")
     except Exception as e:
-        print(f"⚠️ Could not save results file: {e}")
+        print(f"[WARN] Could not save results file: {e}")
     
     # Return exit code based on results
     success_rate = results['test_summary']['success_rate']

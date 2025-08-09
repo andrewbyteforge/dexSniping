@@ -17,11 +17,11 @@ def fix_logger_unicode_issues():
     
     File: app/utils/logger.py
     """
-    print("🔧 Fixing Windows Unicode issues in logger...")
+    print("[FIX] Fixing Windows Unicode issues in logger...")
     
     logger_file = Path("app/utils/logger.py")
     if not logger_file.exists():
-        print("❌ app/utils/logger.py not found")
+        print("[ERROR] app/utils/logger.py not found")
         return False
     
     try:
@@ -30,29 +30,29 @@ def fix_logger_unicode_issues():
         # Create backup
         backup_file = logger_file.with_suffix('.py.unicode_fix_backup')
         backup_file.write_text(content, encoding='utf-8')
-        print(f"✅ Created backup: {backup_file}")
+        print(f"[OK] Created backup: {backup_file}")
         
         # Replace Unicode emojis with ASCII-compatible symbols
         emoji_replacements = {
             # Console handler should use ASCII-safe symbols
-            "📝": "[LOG]",
-            "🎯": "[TARGET]", 
-            "💰": "[TRADE]",
-            "🛡️": "[RISK]",
-            "🔗": "[WALLET]",
-            "📊": "[TX]",
-            "⏱️": "[TIMER]",
-            "🔍": "[DEBUG]",
-            "ℹ️": "[INFO]",
-            "⚠️": "[WARN]",
-            "❌": "[ERROR]",
-            "🚀": "[START]",
-            "🛑": "[STOP]",
-            "📅": "[TIME]",
-            "📁": "[DIR]",
-            "🐍": "[PYTHON]",
-            "🔧": "[CONFIG]",
-            "👋": "[BYE]"
+            "[NOTE]": "[LOG]",
+            "[TARGET]": "[TARGET]", 
+            "[PROFIT]": "[TRADE]",
+            "[SEC]": "[RISK]",
+            "[EMOJI]": "[WALLET]",
+            "[STATS]": "[TX]",
+            "⏱[EMOJI]": "[TIMER]",
+            "[SEARCH]": "[DEBUG]",
+            "ℹ[EMOJI]": "[INFO]",
+            "[WARN]": "[WARN]",
+            "[ERROR]": "[ERROR]",
+            "[START]": "[START]",
+            "[EMOJI]": "[STOP]",
+            "[TIME]": "[TIME]",
+            "[DIR]": "[DIR]",
+            "[EMOJI]": "[PYTHON]",
+            "[FIX]": "[CONFIG]",
+            "[EMOJI]": "[BYE]"
         }
         
         # Update console formatter to use ASCII symbols
@@ -84,7 +84,7 @@ def fix_logger_unicode_issues():
         
         if old_console_handler in content:
             content = content.replace(old_console_handler, new_console_handler)
-            print("✅ Updated console handler")
+            print("[OK] Updated console handler")
         
         # Add the WindowsCompatibleHandler class
         handler_class = '''
@@ -96,24 +96,24 @@ class WindowsCompatibleHandler(logging.StreamHandler):
     """
     
     EMOJI_REPLACEMENTS = {
-        "📝": "[LOG]",
-        "🎯": "[TARGET]", 
-        "💰": "[TRADE]",
-        "🛡️": "[RISK]",
-        "🔗": "[WALLET]",
-        "📊": "[TX]",
-        "⏱️": "[TIMER]",
-        "🔍": "[DEBUG]",
-        "ℹ️": "[INFO]",
-        "⚠️": "[WARN]",
-        "❌": "[ERROR]",
-        "🚀": "[START]",
-        "🛑": "[STOP]",
-        "📅": "[TIME]",
-        "📁": "[DIR]",
-        "🐍": "[PYTHON]",
-        "🔧": "[CONFIG]",
-        "👋": "[BYE]"
+        "[NOTE]": "[LOG]",
+        "[TARGET]": "[TARGET]", 
+        "[PROFIT]": "[TRADE]",
+        "[SEC]": "[RISK]",
+        "[EMOJI]": "[WALLET]",
+        "[STATS]": "[TX]",
+        "⏱[EMOJI]": "[TIMER]",
+        "[SEARCH]": "[DEBUG]",
+        "ℹ[EMOJI]": "[INFO]",
+        "[WARN]": "[WARN]",
+        "[ERROR]": "[ERROR]",
+        "[START]": "[START]",
+        "[EMOJI]": "[STOP]",
+        "[TIME]": "[TIME]",
+        "[DIR]": "[DIR]",
+        "[EMOJI]": "[PYTHON]",
+        "[FIX]": "[CONFIG]",
+        "[EMOJI]": "[BYE]"
     }
     
     def emit(self, record):
@@ -151,16 +151,16 @@ class WindowsCompatibleHandler(logging.StreamHandler):
         dex_logger_class_pos = content.find("class DEXSniperLogger:")
         if dex_logger_class_pos != -1:
             content = content[:dex_logger_class_pos] + handler_class + content[dex_logger_class_pos:]
-            print("✅ Added WindowsCompatibleHandler class")
+            print("[OK] Added WindowsCompatibleHandler class")
         
         # Write the updated content
         logger_file.write_text(content, encoding='utf-8')
-        print("✅ Fixed Windows Unicode issues in logger")
+        print("[OK] Fixed Windows Unicode issues in logger")
         
         return True
         
     except Exception as error:
-        print(f"❌ Error fixing logger: {error}")
+        print(f"[ERROR] Error fixing logger: {error}")
         return False
 
 
@@ -168,24 +168,24 @@ def fix_console_encoding():
     """
     Set console encoding to UTF-8 for better Unicode support.
     """
-    print("🔧 Setting console encoding...")
+    print("[FIX] Setting console encoding...")
     
     try:
         # Set console to UTF-8 (Windows 10+ supports this)
         if os.name == 'nt':  # Windows
             os.system('chcp 65001 >nul 2>&1')
-            print("✅ Console encoding set to UTF-8")
+            print("[OK] Console encoding set to UTF-8")
         
         return True
         
     except Exception as error:
-        print(f"⚠️ Could not set console encoding: {error}")
+        print(f"[WARN] Could not set console encoding: {error}")
         return False
 
 
 def create_windows_test_script():
     """Create a Windows-compatible test script."""
-    print("📝 Creating Windows-compatible test script...")
+    print("[NOTE] Creating Windows-compatible test script...")
     
     test_script = '''#!/usr/bin/env python3
 """
@@ -260,14 +260,14 @@ if __name__ == "__main__":
     
     test_file = Path("test_windows_logging.py")
     test_file.write_text(test_script, encoding='utf-8')
-    print(f"✅ Created Windows test script: {test_file}")
+    print(f"[OK] Created Windows test script: {test_file}")
     
     return True
 
 
 def main():
     """Main function to fix Windows logging issues."""
-    print("🚀 Windows Logging Compatibility Fix")
+    print("[START] Windows Logging Compatibility Fix")
     print("=" * 50)
     
     steps = [
@@ -278,29 +278,29 @@ def main():
     
     success_count = 0
     for step_name, step_function in steps:
-        print(f"\\n🔄 {step_name}...")
+        print(f"\\n[REFRESH] {step_name}...")
         if step_function():
             success_count += 1
-            print(f"✅ {step_name} completed")
+            print(f"[OK] {step_name} completed")
         else:
-            print(f"❌ {step_name} failed")
+            print(f"[ERROR] {step_name} failed")
     
     print("\\n" + "=" * 50)
-    print(f"🎯 Results: {success_count}/{len(steps)} steps completed")
+    print(f"[TARGET] Results: {success_count}/{len(steps)} steps completed")
     
     if success_count == len(steps):
-        print("🎉 Windows logging compatibility fix completed!")
-        print("\\n📋 What was fixed:")
+        print("[SUCCESS] Windows logging compatibility fix completed!")
+        print("\\n[LOG] What was fixed:")
         print("   • Added WindowsCompatibleHandler for console output")
         print("   • Unicode emojis replaced with ASCII symbols for console")
         print("   • File logging still uses full Unicode (works fine)")
         print("   • Console encoding set to UTF-8")
-        print("\\n🔄 Next steps:")
+        print("\\n[REFRESH] Next steps:")
         print("   1. Run: python test_windows_logging.py")
         print("   2. Restart server: uvicorn app.main:app --reload")
         print("   3. No more Unicode errors in console!")
     else:
-        print("⚠️ Some fixes failed. Check errors above.")
+        print("[WARN] Some fixes failed. Check errors above.")
     
     return success_count == len(steps)
 

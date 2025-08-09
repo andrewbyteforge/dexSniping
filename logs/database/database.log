@@ -63,3 +63,6 @@
 2025-08-09 10:44:58 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
 2025-08-09 10:44:58 - app.models.database - INFO - logger.py:204 - [LOG] Logger initialized for app.models.database (component: database)
 2025-08-09 10:44:58 - app.models.database - INFO - database.py:33 - [OK] Database models initialized
+2025-08-09 10:52:52 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 10:52:52 - app.models.database - INFO - logger.py:204 - [LOG] Logger initialized for app.models.database (component: database)
+2025-08-09 10:52:52 - app.models.database - INFO - database.py:33 - [OK] Database models initialized

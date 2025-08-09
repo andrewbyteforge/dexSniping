@@ -187,7 +187,7 @@ class LiveDEXIntegration:
         # Load common token addresses
         self.common_tokens = self._get_common_token_addresses()
         
-        logger.info("📊 Live DEX Integration initialized")
+        logger.info("[STATS] Live DEX Integration initialized")
     
     def _get_dex_router_addresses(self) -> Dict[Tuple[NetworkType, DEXProtocol], str]:
         """Get DEX router contract addresses."""
@@ -238,7 +238,7 @@ class LiveDEXIntegration:
             bool: True if initialization successful
         """
         try:
-            logger.info("📋 Initializing DEX smart contracts...")
+            logger.info("[LOG] Initializing DEX smart contracts...")
             
             if networks is None:
                 networks = list(self.wallet_manager.web3_instances.keys())
@@ -247,7 +247,7 @@ class LiveDEXIntegration:
             
             for network in networks:
                 if network not in self.wallet_manager.web3_instances:
-                    logger.warning(f"⚠️ Network {network.value} not available")
+                    logger.warning(f"[WARN] Network {network.value} not available")
                     continue
                 
                 web3 = self.wallet_manager.web3_instances[network]
@@ -265,16 +265,16 @@ class LiveDEXIntegration:
                                     'factory': None  # Will be loaded when needed
                                 }
                                 initialized_count += 1
-                                logger.debug(f"✅ {network.value} {protocol.value} contract loaded")
+                                logger.debug(f"[OK] {network.value} {protocol.value} contract loaded")
                             
                         except Exception as e:
-                            logger.warning(f"⚠️ Failed to load {network.value} {protocol.value}: {e}")
+                            logger.warning(f"[WARN] Failed to load {network.value} {protocol.value}: {e}")
             
-            logger.info(f"🎯 DEX contracts initialized: {initialized_count} contracts ready")
+            logger.info(f"[TARGET] DEX contracts initialized: {initialized_count} contracts ready")
             return initialized_count > 0
             
         except Exception as e:
-            logger.error(f"❌ DEX contract initialization failed: {e}")
+            logger.error(f"[ERROR] DEX contract initialization failed: {e}")
             return False
     
     async def _load_dex_contract(self, web3: Web3, protocol: DEXProtocol, address: str) -> Optional[Contract]:
@@ -317,7 +317,7 @@ class LiveDEXIntegration:
             return contract
             
         except Exception as e:
-            logger.error(f"❌ Failed to load contract {address}: {e}")
+            logger.error(f"[ERROR] Failed to load contract {address}: {e}")
             return None
     
     async def get_live_price(
@@ -370,12 +370,12 @@ class LiveDEXIntegration:
             timestamp = datetime.utcnow()
             self.price_cache[cache_key] = (price, timestamp)
             
-            logger.debug(f"💰 Price fetched: {token_address[:10]}... = {price} on {network.value}")
+            logger.debug(f"[PROFIT] Price fetched: {token_address[:10]}... = {price} on {network.value}")
             
             return price, timestamp
             
         except Exception as e:
-            logger.error(f"❌ Failed to get live price: {e}")
+            logger.error(f"[ERROR] Failed to get live price: {e}")
             raise DEXError(f"Price retrieval failed: {e}")
     
     async def _fetch_price_from_dex(
@@ -414,17 +414,17 @@ class LiveDEXIntegration:
                     
                     if len(amounts_out) >= 2 and amounts_out[1] > 0:
                         price = Decimal(from_wei(amounts_out[1], 'ether'))
-                        logger.debug(f"💱 Price from {protocol.value}: {price}")
+                        logger.debug(f"[EMOJI] Price from {protocol.value}: {price}")
                         return price
                     
                 except Exception as e:
-                    logger.debug(f"⚠️ Failed to get price from {protocol.value}: {e}")
+                    logger.debug(f"[WARN] Failed to get price from {protocol.value}: {e}")
                     continue
             
             raise DEXError("All DEX price queries failed")
             
         except Exception as e:
-            logger.error(f"❌ DEX price fetch failed: {e}")
+            logger.error(f"[ERROR] DEX price fetch failed: {e}")
             raise DEXError(f"Price fetch failed: {e}")
     
     async def get_swap_quote(
@@ -454,7 +454,7 @@ class LiveDEXIntegration:
             DEXError: If quote generation fails
         """
         try:
-            logger.info(f"💹 Getting swap quote: {input_amount} {input_token[:10]}... → {output_token[:10]}...")
+            logger.info(f"[EMOJI] Getting swap quote: {input_amount} {input_token[:10]}... → {output_token[:10]}...")
             
             # Set defaults
             if slippage_percent is None:
@@ -514,14 +514,14 @@ class LiveDEXIntegration:
             self.active_quotes[quote.quote_id] = quote
             
             logger.info(
-                f"✅ Quote generated: {input_amount} → {output_amount} "
+                f"[OK] Quote generated: {input_amount} → {output_amount} "
                 f"(Impact: {price_impact}%, Gas: {estimated_gas})"
             )
             
             return quote
             
         except Exception as e:
-            logger.error(f"❌ Failed to get swap quote: {e}")
+            logger.error(f"[ERROR] Failed to get swap quote: {e}")
             raise DEXError(f"Quote generation failed: {e}")
     
     async def _get_token_info(self, token_address: str, network: NetworkType) -> TokenInfo:
@@ -562,7 +562,7 @@ class LiveDEXIntegration:
             return token_info
             
         except Exception as e:
-            logger.warning(f"⚠️ Failed to get token info for {token_address}: {e}")
+            logger.warning(f"[WARN] Failed to get token info for {token_address}: {e}")
             # Return minimal token info
             return TokenInfo(
                 address=token_address,
@@ -638,12 +638,12 @@ class LiveDEXIntegration:
             # Calculate price impact (simplified)
             price_impact = Decimal("0.5")  # Placeholder - would calculate actual impact
             
-            logger.debug(f"💱 DEX quote: {input_amount} → {output_amount} (Impact: {price_impact}%)")
+            logger.debug(f"[EMOJI] DEX quote: {input_amount} → {output_amount} (Impact: {price_impact}%)")
             
             return output_amount, price_impact, [addr.lower() for addr in path]
             
         except Exception as e:
-            logger.error(f"❌ Failed to get DEX quote: {e}")
+            logger.error(f"[ERROR] Failed to get DEX quote: {e}")
             raise DEXError(f"DEX quote failed: {e}")
     
     async def _estimate_swap_gas(
@@ -678,7 +678,7 @@ class LiveDEXIntegration:
             return gas_price_gwei
             
         except Exception as e:
-            logger.warning(f"⚠️ Failed to get gas price: {e}")
+            logger.warning(f"[WARN] Failed to get gas price: {e}")
             # Return network-specific defaults
             default_gas_prices = {
                 NetworkType.ETHEREUM: Decimal("20"),
@@ -709,7 +709,7 @@ class LiveDEXIntegration:
             DEXError: If execution fails
         """
         try:
-            logger.info(f"🔄 Executing swap transaction: {quote_id}")
+            logger.info(f"[REFRESH] Executing swap transaction: {quote_id}")
             
             # Get quote
             if quote_id not in self.active_quotes:
@@ -756,14 +756,14 @@ class LiveDEXIntegration:
             self.pending_transactions[transaction.transaction_hash] = transaction
             
             logger.info(
-                f"✅ Swap executed: {quote.input_amount} {quote.input_token.symbol} → "
+                f"[OK] Swap executed: {quote.input_amount} {quote.input_token.symbol} → "
                 f"{transaction.output_amount} {quote.output_token.symbol}"
             )
             
             return transaction
             
         except Exception as e:
-            logger.error(f"❌ Swap execution failed: {e}")
+            logger.error(f"[ERROR] Swap execution failed: {e}")
             raise DEXError(f"Swap execution failed: {e}")
     
     async def monitor_liquidity_events(
@@ -781,7 +781,7 @@ class LiveDEXIntegration:
             callback: Callback function for events
         """
         try:
-            logger.info(f"👀 Starting liquidity monitoring for {len(token_addresses)} tokens on {network.value}")
+            logger.info(f"[EMOJI] Starting liquidity monitoring for {len(token_addresses)} tokens on {network.value}")
             
             # This would implement actual blockchain event monitoring
             # For now, we'll simulate periodic checks
@@ -797,16 +797,16 @@ class LiveDEXIntegration:
                     # 3. Track volume and price changes
                     # 4. Detect flash loans and arbitrage opportunities
                     
-                    logger.debug(f"🔍 Liquidity monitoring active for {network.value}")
+                    logger.debug(f"[SEARCH] Liquidity monitoring active for {network.value}")
                     
                 except Exception as e:
-                    logger.error(f"❌ Liquidity monitoring error: {e}")
+                    logger.error(f"[ERROR] Liquidity monitoring error: {e}")
                     await asyncio.sleep(30)  # Wait before retrying
                     
         except asyncio.CancelledError:
-            logger.info(f"🛑 Liquidity monitoring stopped for {network.value}")
+            logger.info(f"[EMOJI] Liquidity monitoring stopped for {network.value}")
         except Exception as e:
-            logger.error(f"❌ Liquidity monitoring failed: {e}")
+            logger.error(f"[ERROR] Liquidity monitoring failed: {e}")
     
     def get_active_quotes(self) -> Dict[str, SwapQuote]:
         """Get all active quotes."""
@@ -855,5 +855,5 @@ async def initialize_dex_integration(networks: Optional[List[NetworkType]] = Non
         integration = get_live_dex_integration()
         return await integration.initialize_dex_contracts(networks)
     except Exception as e:
-        logger.error(f"❌ Failed to initialize DEX integration: {e}")
+        logger.error(f"[ERROR] Failed to initialize DEX integration: {e}")
         return False

@@ -216,7 +216,7 @@ class TransactionExecutor:
         if private_key and WEB3_AVAILABLE:
             try:
                 self.account = Account.from_key(private_key)
-                logger.info(f"🔑 Account initialized: {self.account.address[:10]}...")
+                logger.info(f"[EMOJI] Account initialized: {self.account.address[:10]}...")
             except Exception as e:
                 logger.error(f"[ERROR] Failed to initialize account: {e}")
         
@@ -241,7 +241,7 @@ class TransactionExecutor:
                 return True  # Continue with mock for development
             
             if not self.web3:
-                logger.info("ℹ️ No Web3 provider provided, using mock mode")
+                logger.info("ℹ[EMOJI] No Web3 provider provided, using mock mode")
                 return True  # Allow mock mode for testing
             
             # Test connection only if we have a provider
@@ -393,7 +393,7 @@ class TransactionExecutor:
             TransactionResult with final status
         """
         try:
-            logger.info(f"👀 Monitoring transaction: {transaction_hash[:10]}...")
+            logger.info(f"[EMOJI] Monitoring transaction: {transaction_hash[:10]}...")
             
             if not WEB3_AVAILABLE or not self.web3:
                 # Mock monitoring for development
@@ -551,7 +551,7 @@ class TransactionExecutor:
             # Store for monitoring
             self.pending_transactions[transaction_id] = result
             
-            logger.info(f"📤 Transaction submitted: {tx_hash_hex[:10]}...")
+            logger.info(f"[EMOJI] Transaction submitted: {tx_hash_hex[:10]}...")
             return result
             
         except Exception as e:
@@ -665,7 +665,7 @@ class TransactionExecutor:
     async def shutdown(self):
         """Shutdown transaction executor and cleanup."""
         try:
-            logger.info("🛑 Shutting down transaction executor")
+            logger.info("[EMOJI] Shutting down transaction executor")
             
             # Cancel monitoring task
             if self._monitoring_task:

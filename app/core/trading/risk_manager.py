@@ -117,7 +117,7 @@ class RiskManager:
             RiskAssessmentResult with comprehensive risk analysis
         """
         try:
-            self.logger.info(f"🔍 Assessing portfolio risk for {user_wallet[:10]}...")
+            self.logger.info(f"[SEARCH] Assessing portfolio risk for {user_wallet[:10]}...")
             
             if not session:
                 async with self.session_factory() as session:
@@ -126,7 +126,7 @@ class RiskManager:
                 return await self._assess_portfolio_risk_internal(user_wallet, session)
                 
         except Exception as e:
-            self.logger.error(f"❌ Portfolio risk assessment failed: {e}")
+            self.logger.error(f"[ERROR] Portfolio risk assessment failed: {e}")
             raise Exception(f"Risk assessment failed: {e}")
     
     async def _assess_portfolio_risk_internal(
@@ -205,7 +205,7 @@ class RiskManager:
             PositionSizeResult with optimal position size
         """
         try:
-            self.logger.info(f"📊 Calculating position size using {method.value}")
+            self.logger.info(f"[STATS] Calculating position size using {method.value}")
             
             if not session:
                 async with self.session_factory() as session:
@@ -220,7 +220,7 @@ class RiskManager:
                 )
                 
         except Exception as e:
-            self.logger.error(f"❌ Position size calculation failed: {e}")
+            self.logger.error(f"[ERROR] Position size calculation failed: {e}")
             raise Exception(f"Position size calculation failed: {e}")
     
     async def _calculate_position_size_internal(
@@ -319,7 +319,7 @@ class RiskManager:
             Tuple of (is_valid, warnings)
         """
         try:
-            self.logger.info(f"✅ Validating order risk for {user_wallet[:10]}...")
+            self.logger.info(f"[OK] Validating order risk for {user_wallet[:10]}...")
             
             if not session:
                 async with self.session_factory() as session:
@@ -332,7 +332,7 @@ class RiskManager:
                 )
                 
         except Exception as e:
-            self.logger.error(f"❌ Order risk validation failed: {e}")
+            self.logger.error(f"[ERROR] Order risk validation failed: {e}")
             return False, [f"Risk validation failed: {e}"]
     
     async def _validate_order_risk_internal(
@@ -434,7 +434,7 @@ class RiskManager:
             Dict with risk status and recommended actions
         """
         try:
-            self.logger.info(f"📊 Monitoring position risk: {position_id}")
+            self.logger.info(f"[STATS] Monitoring position risk: {position_id}")
             
             if not session:
                 async with self.session_factory() as session:
@@ -447,7 +447,7 @@ class RiskManager:
                 )
                 
         except Exception as e:
-            self.logger.error(f"❌ Position risk monitoring failed: {e}")
+            self.logger.error(f"[ERROR] Position risk monitoring failed: {e}")
             raise Exception(f"Position monitoring failed: {e}")
     
     async def _monitor_position_risk_internal(
@@ -870,7 +870,7 @@ class PortfolioRiskMonitor:
     async def start_monitoring(self, user_wallet: str):
         """Start real-time portfolio monitoring."""
         try:
-            self.logger.info(f"🔄 Starting portfolio monitoring for {user_wallet[:10]}...")
+            self.logger.info(f"[REFRESH] Starting portfolio monitoring for {user_wallet[:10]}...")
             self.monitoring_active = True
             
             while self.monitoring_active:
@@ -883,7 +883,7 @@ class PortfolioRiskMonitor:
                     
                     # Log status
                     self.logger.info(
-                        f"📊 Portfolio Risk: {assessment.risk_level.value.upper()} "
+                        f"[STATS] Portfolio Risk: {assessment.risk_level.value.upper()} "
                         f"(Score: {assessment.risk_score:.1f}/10)"
                     )
                     
@@ -891,16 +891,16 @@ class PortfolioRiskMonitor:
                     await asyncio.sleep(self.check_interval)
                     
                 except Exception as e:
-                    self.logger.error(f"❌ Error in monitoring loop: {e}")
+                    self.logger.error(f"[ERROR] Error in monitoring loop: {e}")
                     await asyncio.sleep(self.check_interval)
                     
         except Exception as e:
-            self.logger.error(f"❌ Portfolio monitoring failed: {e}")
+            self.logger.error(f"[ERROR] Portfolio monitoring failed: {e}")
             self.monitoring_active = False
     
     def stop_monitoring(self):
         """Stop portfolio monitoring."""
-        self.logger.info("⏹️ Stopping portfolio monitoring...")
+        self.logger.info("⏹[EMOJI] Stopping portfolio monitoring...")
         self.monitoring_active = False
     
     async def _check_critical_conditions(
@@ -920,11 +920,11 @@ class PortfolioRiskMonitor:
         assessment: RiskAssessmentResult
     ):
         """Trigger emergency risk management actions."""
-        self.logger.critical(f"🚨 CRITICAL RISK LEVEL - Emergency actions for {user_wallet[:10]}")
+        self.logger.critical(f"[EMOJI] CRITICAL RISK LEVEL - Emergency actions for {user_wallet[:10]}")
         
         # Log critical alerts
         for warning in assessment.warnings:
-            self.logger.critical(f"🚨 {warning}")
+            self.logger.critical(f"[EMOJI] {warning}")
         
         # Could implement:
         # - Automatic position closure
@@ -938,10 +938,10 @@ class PortfolioRiskMonitor:
         assessment: RiskAssessmentResult
     ):
         """Trigger warning-level risk management actions."""
-        self.logger.warning(f"⚠️ HIGH RISK LEVEL - Warning actions for {user_wallet[:10]}")
+        self.logger.warning(f"[WARN] HIGH RISK LEVEL - Warning actions for {user_wallet[:10]}")
         
         for warning in assessment.warnings:
-            self.logger.warning(f"⚠️ {warning}")
+            self.logger.warning(f"[WARN] {warning}")
 
 
 class RiskMetricsCalculator:

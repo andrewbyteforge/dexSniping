@@ -647,7 +647,7 @@ class EnhancedWalletManager:
     async def shutdown(self) -> None:
         """Shutdown the wallet manager and clean up resources."""
         try:
-            logger.info("🛑 Shutting down Enhanced Wallet Manager...")
+            logger.info("[EMOJI] Shutting down Enhanced Wallet Manager...")
             
             # Disconnect all wallets
             connection_ids = list(self.active_connections.keys())

@@ -22,7 +22,7 @@ try:
     import requests
     from fastapi.testclient import TestClient
 except ImportError:
-    print("⚠️ Installing required test dependencies...")
+    print("[WARN] Installing required test dependencies...")
     import subprocess
     subprocess.check_call([sys.executable, "-m", "pip", "install", "requests"])
     import requests
@@ -34,22 +34,22 @@ class TestServiceIntegration:
     
     def test_service_import(self):
         """Test that service layer can be imported."""
-        print("🧪 Testing service layer import...")
+        print("[TEST] Testing service layer import...")
         
         try:
             from app.services import TradingService, get_trading_service, initialize_trading_service
             from app.services.trading_service import ServiceError
             
-            print("✅ Service layer imported successfully")
+            print("[OK] Service layer imported successfully")
             return True
             
         except ImportError as e:
-            print(f"❌ Service import failed: {e}")
+            print(f"[ERROR] Service import failed: {e}")
             return False
     
     def test_service_creation(self):
         """Test service creation with mock trading engine."""
-        print("🧪 Testing service creation...")
+        print("[TEST] Testing service creation...")
         
         try:
             from app.services.trading_service import TradingService
@@ -65,16 +65,16 @@ class TestServiceIntegration:
             assert service is not None
             assert service.trading_engine == mock_engine
             
-            print("✅ Service created successfully")
+            print("[OK] Service created successfully")
             return True
             
         except Exception as e:
-            print(f"❌ Service creation failed: {e}")
+            print(f"[ERROR] Service creation failed: {e}")
             return False
     
     def test_updated_main_app_import(self):
         """Test that updated main app can be imported."""
-        print("🧪 Testing updated main app import...")
+        print("[TEST] Testing updated main app import...")
         
         try:
             from app.main import app, create_application
@@ -82,16 +82,16 @@ class TestServiceIntegration:
             # Check if app has trading service in startup
             assert app is not None
             
-            print("✅ Updated main app imported successfully")
+            print("[OK] Updated main app imported successfully")
             return True
             
         except ImportError as e:
-            print(f"❌ Updated main app import failed: {e}")
+            print(f"[ERROR] Updated main app import failed: {e}")
             return False
     
     def test_updated_dashboard_endpoints(self):
         """Test that updated dashboard endpoints can be imported."""
-        print("🧪 Testing updated dashboard endpoints...")
+        print("[TEST] Testing updated dashboard endpoints...")
         
         try:
             from app.api.v1.endpoints.dashboard import (
@@ -107,16 +107,16 @@ class TestServiceIntegration:
             assert callable(get_active_trades)
             assert callable(get_service)
             
-            print("✅ Updated dashboard endpoints imported successfully")
+            print("[OK] Updated dashboard endpoints imported successfully")
             return True
             
         except ImportError as e:
-            print(f"❌ Dashboard endpoints import failed: {e}")
+            print(f"[ERROR] Dashboard endpoints import failed: {e}")
             return False
     
     def test_service_methods_structure(self):
         """Test that service methods have correct structure."""
-        print("🧪 Testing service methods structure...")
+        print("[TEST] Testing service methods structure...")
         
         try:
             from app.services.trading_service import TradingService
@@ -142,18 +142,18 @@ class TestServiceIntegration:
                 method = getattr(service, method_name, None)
                 assert method is not None, f"Method {method_name} not found"
                 assert callable(method), f"Method {method_name} not callable"
-                print(f"  ✅ {method_name} method exists")
+                print(f"  [OK] {method_name} method exists")
             
-            print("✅ All service methods have correct structure")
+            print("[OK] All service methods have correct structure")
             return True
             
         except Exception as e:
-            print(f"❌ Service methods test failed: {e}")
+            print(f"[ERROR] Service methods test failed: {e}")
             return False
     
     def test_mock_portfolio_stats(self):
         """Test portfolio stats with mock data."""
-        print("🧪 Testing portfolio stats with mock data...")
+        print("[TEST] Testing portfolio stats with mock data...")
         
         try:
             from app.services.trading_service import TradingService
@@ -190,18 +190,18 @@ class TestServiceIntegration:
             # Run async test
             stats = asyncio.run(test_async())
             
-            print(f"  ✅ Portfolio value: ${stats['portfolio_value']}")
-            print(f"  ✅ Daily P&L: ${stats['daily_pnl']}")
-            print("✅ Portfolio stats test passed")
+            print(f"  [OK] Portfolio value: ${stats['portfolio_value']}")
+            print(f"  [OK] Daily P&L: ${stats['daily_pnl']}")
+            print("[OK] Portfolio stats test passed")
             return True
             
         except Exception as e:
-            print(f"❌ Portfolio stats test failed: {e}")
+            print(f"[ERROR] Portfolio stats test failed: {e}")
             return False
     
     def test_application_with_service_layer(self):
         """Test that application works with service layer."""
-        print("🧪 Testing application with service layer...")
+        print("[TEST] Testing application with service layer...")
         
         try:
             from app.main import app
@@ -221,11 +221,11 @@ class TestServiceIntegration:
             assert "version" in health_data
             assert health_data["version"] == "4.0.0"
             
-            print("✅ Application works with service layer")
+            print("[OK] Application works with service layer")
             return True
             
         except Exception as e:
-            print(f"❌ Application test failed: {e}")
+            print(f"[ERROR] Application test failed: {e}")
             print("  This might be expected if trading engine initialization fails")
             print("  Service layer structure should still be correct")
             return True  # Don't fail test for expected initialization issues
@@ -233,7 +233,7 @@ class TestServiceIntegration:
 
 def run_service_integration_tests():
     """Run all service integration tests."""
-    print("🚀 Starting Service Layer Integration Tests")
+    print("[START] Starting Service Layer Integration Tests")
     print("=" * 60)
     
     test_suite = TestServiceIntegration()
@@ -257,20 +257,20 @@ def run_service_integration_tests():
             else:
                 failed += 1
         except Exception as e:
-            print(f"❌ Test {test.__name__} raised exception: {e}")
+            print(f"[ERROR] Test {test.__name__} raised exception: {e}")
             failed += 1
         
         print("-" * 40)
     
-    print(f"📊 Service Integration Results: {passed} passed, {failed} failed")
+    print(f"[STATS] Service Integration Results: {passed} passed, {failed} failed")
     
     if failed == 0:
-        print("🎉 All service integration tests passed!")
-        print("✅ Service layer successfully integrated with API endpoints")
-        print("✅ Ready for live application testing")
+        print("[SUCCESS] All service integration tests passed!")
+        print("[OK] Service layer successfully integrated with API endpoints")
+        print("[OK] Ready for live application testing")
         return True
     else:
-        print(f"⚠️ {failed} tests failed - review service integration")
+        print(f"[WARN] {failed} tests failed - review service integration")
         return False
 
 
@@ -278,7 +278,7 @@ if __name__ == "__main__":
     success = run_service_integration_tests()
     
     if success:
-        print("\n🎯 Next Steps:")
+        print("\n[TARGET] Next Steps:")
         print("1. Start the application: uvicorn app.main:app --reload")
         print("2. Test endpoints: curl http://127.0.0.1:8000/api/v1/dashboard/stats")
         print("3. Verify real data is returned instead of mock data")

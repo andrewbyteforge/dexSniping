@@ -126,7 +126,7 @@ def test_trading_engine_sync():
 
 def run_all_tests():
     """Run all trading tests."""
-    print("🤖 DEX Sniper Pro - Trading Engine Test")
+    print("[BOT] DEX Sniper Pro - Trading Engine Test")
     print("=" * 50)
     
     tests = [
@@ -155,7 +155,7 @@ def run_all_tests():
     
     for test_name, success in results:
         status = "PASS" if success else "FAIL"
-        symbol = "✓" if success else "✗"
+        symbol = "[EMOJI]" if success else "[EMOJI]"
         print(f"  {symbol} {test_name}: {status}")
         if success:
             passed += 1
@@ -163,15 +163,15 @@ def run_all_tests():
     print(f"\nResults: {passed}/{total} tests passed")
     
     if passed == total:
-        print("\n🎉 All trading tests passed!")
-        print("\n📋 The trading engine is working correctly!")
+        print("\n[SUCCESS] All trading tests passed!")
+        print("\n[LOG] The trading engine is working correctly!")
         print("\nYou can now:")
         print("1. Start the API server: uvicorn app.main:app --reload")
         print("2. Connect wallets and start trading")
         print("3. Test automated strategies")
         return True
     else:
-        print(f"\n⚠️  {total - passed} tests failed.")
+        print(f"\n[WARN]  {total - passed} tests failed.")
         return False
 
 

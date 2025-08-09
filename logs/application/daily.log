@@ -476,3 +476,65 @@
 2025-08-09 10:44:59 - app.core.security.security_manager - INFO - security_manager.py:232 - API authentication initialized
 2025-08-09 10:44:59 - app.core.security.security_manager - INFO - security_manager.py:303 - Error sanitizer initialized
 2025-08-09 10:44:59 - app.core.security.security_manager - INFO - security_manager.py:342 - Security manager initialized
+2025-08-09 10:52:52 - app.core.security.security_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.security.security_manager (component: application)
+2025-08-09 10:52:52 - test - INFO - logger.py:204 - [LOG] Logger initialized for test (component: application)
+2025-08-09 10:52:52 - test - INFO - run_all_tests.py:105 - Test log message
+2025-08-09 10:52:52 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 10:52:52 - app.core.trading.trading_engine - INFO - logger.py:204 - [LOG] Logger initialized for app.core.trading.trading_engine (component: trading)
+2025-08-09 10:52:52 - app.core.trading.order_executor - INFO - logger.py:204 - [LOG] Logger initialized for app.core.trading.order_executor (component: trading)
+2025-08-09 10:52:52 - app.core.trading.order_executor - INFO - order_executor.py:41 - [LOG] OrderExecutor initialized
+2025-08-09 10:52:52 - app.core.portfolio.portfolio_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.portfolio.portfolio_manager (component: application)
+2025-08-09 10:52:52 - app.models.database - INFO - logger.py:204 - [LOG] Logger initialized for app.models.database (component: database)
+2025-08-09 10:52:52 - app.models.database - INFO - database.py:33 - [OK] Database models initialized
+2025-08-09 10:52:52 - app.core.trading.risk_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.trading.risk_manager (component: trading)
+2025-08-09 10:52:53 - app.main - INFO - logger.py:204 - [LOG] Logger initialized for app.main (component: application)
+2025-08-09 10:52:53 - app.main - WARNING - main.py:44 - [WARN] Dashboard router not available: No module named 'app.core.utils'
+2025-08-09 10:52:53 - app.api.v1.endpoints.trading - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.trading (component: trading)
+2025-08-09 10:52:53 - app.main - INFO - main.py:49 - [OK] Trading router included
+2025-08-09 10:52:53 - app.utils.websocket_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.utils.websocket_manager (component: application)
+2025-08-09 10:52:53 - app.utils.websocket_manager - INFO - websocket_manager.py:24 - [WS] WebSocketManager initialized
+2025-08-09 10:52:53 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 10:52:53 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
+2025-08-09 10:52:53 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
+2025-08-09 10:52:53 - app.core.config.settings_manager - INFO - settings_manager.py:394 - [OK] Configuration validation passed
+2025-08-09 10:52:53 - app.core.security.security_manager - INFO - security_manager.py:61 - Input validator initialized
+2025-08-09 10:52:53 - app.core.security.security_manager - INFO - security_manager.py:130 - Wallet security initialized
+2025-08-09 10:52:53 - app.core.security.security_manager - INFO - security_manager.py:232 - API authentication initialized
+2025-08-09 10:52:53 - app.core.security.security_manager - INFO - security_manager.py:303 - Error sanitizer initialized
+2025-08-09 10:52:53 - app.core.security.security_manager - INFO - security_manager.py:342 - Security manager initialized
+2025-08-09 10:53:30 - app.main - INFO - logger.py:204 - [LOG] Logger initialized for app.main (component: application)
+2025-08-09 10:53:30 - app.main - WARNING - main.py:44 - [WARN] Dashboard router not available: No module named 'app.core.utils'
+2025-08-09 10:53:30 - app.api.v1.endpoints.trading - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.trading (component: trading)
+2025-08-09 10:53:30 - app.main - INFO - main.py:49 - [OK] Trading router included
+2025-08-09 10:54:44 - app.main - INFO - logger.py:204 - [LOG] Logger initialized for app.main (component: application)
+2025-08-09 10:54:44 - app.main - WARNING - main.py:44 - [WARN] Dashboard router not available: No module named 'app.core.utils'
+2025-08-09 10:54:44 - app.api.v1.endpoints.trading - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.trading (component: trading)
+2025-08-09 10:54:44 - app.main - INFO - main.py:49 - [OK] Trading router included
+2025-08-09 10:56:33 - app.main - INFO - logger.py:204 - [LOG] Logger initialized for app.main (component: application)
+2025-08-09 10:56:33 - app.main - WARNING - main.py:44 - [WARN] Dashboard router not available: No module named 'app.core.utils'
+2025-08-09 10:56:33 - app.api.v1.endpoints.trading - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.trading (component: trading)
+2025-08-09 10:56:33 - app.main - INFO - main.py:49 - [OK] Trading router included
+2025-08-09 10:56:51 - app.main - INFO - logger.py:204 - [LOG] Logger initialized for app.main (component: application)
+2025-08-09 10:56:51 - app.main - INFO - main.py:42 - [OK] Dashboard router included
+2025-08-09 10:56:51 - app.api.v1.endpoints.trading - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.trading (component: trading)
+2025-08-09 10:56:51 - app.main - INFO - main.py:49 - [OK] Trading router included
+2025-08-09 10:58:07 - app.main - INFO - logger.py:204 - [LOG] Logger initialized for app.main (component: application)
+2025-08-09 10:58:07 - app.main - INFO - main.py:42 - [OK] Dashboard router included
+2025-08-09 10:58:07 - app.api.v1.endpoints.trading - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.trading (component: trading)
+2025-08-09 10:58:07 - app.main - INFO - main.py:49 - [OK] Trading router included
+2025-08-09 10:58:29 - app.main - INFO - logger.py:204 - [LOG] Logger initialized for app.main (component: application)
+2025-08-09 10:58:29 - app.main - INFO - main.py:42 - [OK] Dashboard router included
+2025-08-09 10:58:29 - app.api.v1.endpoints.trading - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.trading (component: trading)
+2025-08-09 10:58:29 - app.main - INFO - main.py:49 - [OK] Trading router included
+2025-08-09 10:59:28 - app.main - INFO - logger.py:204 - [LOG] Logger initialized for app.main (component: application)
+2025-08-09 10:59:28 - app.main - INFO - main.py:44 - [OK] Dashboard router included
+2025-08-09 10:59:28 - app.api.v1.endpoints.trading - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.trading (component: trading)
+2025-08-09 10:59:28 - app.main - INFO - main.py:51 - [OK] Trading router included
+2025-08-09 11:00:40 - app.main - INFO - logger.py:204 - [LOG] Logger initialized for app.main (component: application)
+2025-08-09 11:00:40 - app.main - INFO - main.py:44 - [OK] Dashboard router included
+2025-08-09 11:00:40 - app.api.v1.endpoints.trading - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.trading (component: trading)
+2025-08-09 11:00:40 - app.main - INFO - main.py:51 - [OK] Trading router included
+2025-08-09 11:02:56 - app.main - INFO - logger.py:204 - [LOG] Logger initialized for app.main (component: application)
+2025-08-09 11:02:56 - app.main - INFO - main.py:44 - [OK] Dashboard router included
+2025-08-09 11:02:56 - app.api.v1.endpoints.trading - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.trading (component: trading)
+2025-08-09 11:02:56 - app.main - INFO - main.py:51 - [OK] Trading router included

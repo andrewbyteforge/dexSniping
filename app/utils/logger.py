@@ -30,18 +30,18 @@ class WindowsCompatibleHandler(logging.StreamHandler):
         "[SECURE]": "[RISK]",
         "[LINK]": "[WALLET]",
         "[STATS]": "[TX]",
-        "⏱️": "[TIMER]",
+        "⏱[EMOJI]": "[TIMER]",
         "[SEARCH]": "[DEBUG]",
-        "ℹ️": "[INFO]",
+        "ℹ[EMOJI]": "[INFO]",
         "[WARN]": "[WARN]",
         "[ERROR]": "[ERROR]",
         "[START]": "[START]",
-        "🛑": "[STOP]",
-        "📅": "[TIME]",
-        "📁": "[DIR]",
-        "🐍": "[PYTHON]",
+        "[EMOJI]": "[STOP]",
+        "[TIME]": "[TIME]",
+        "[DIR]": "[DIR]",
+        "[EMOJI]": "[PYTHON]",
         "[FIX]": "[CONFIG]",
-        "👋": "[BYE]"
+        "[EMOJI]": "[BYE]"
     }
     
     def emit(self, record):
@@ -244,7 +244,7 @@ class PerformanceLogger:
         """Start timing an operation."""
         import time
         self.start_times[operation] = time.time()
-        self.logger.debug(f"⏱️ Started timing: {operation}")
+        self.logger.debug(f"⏱[EMOJI] Started timing: {operation}")
     
     def end_timer(self, operation: str, log_level: str = "info"):
         """End timing an operation and log the result."""
@@ -258,7 +258,7 @@ class PerformanceLogger:
         del self.start_times[operation]
         
         log_method = getattr(self.logger, log_level.lower())
-        log_method(f"⏱️ {operation} completed in {elapsed:.3f}s")
+        log_method(f"⏱[EMOJI] {operation} completed in {elapsed:.3f}s")
         
         return elapsed
     
@@ -314,9 +314,9 @@ def log_application_startup():
     logger = setup_logger("app.startup")
     
     logger.info("[START] DEX Sniper Pro - Application Starting")
-    logger.info(f"📅 Startup Time: {datetime.now().isoformat()}")
-    logger.info(f"📁 Working Directory: {Path.cwd()}")
-    logger.info(f"🐍 Python Version: {sys.version}")
+    logger.info(f"[TIME] Startup Time: {datetime.now().isoformat()}")
+    logger.info(f"[DIR] Working Directory: {Path.cwd()}")
+    logger.info(f"[EMOJI] Python Version: {sys.version}")
     logger.info(f"[LOG] Logs Directory: {Path('logs').absolute()}")
     
     # Log environment information
@@ -330,9 +330,9 @@ def log_application_shutdown():
     """Log application shutdown information."""
     logger = setup_logger("app.shutdown")
     
-    logger.info("🛑 DEX Sniper Pro - Application Shutting Down")
-    logger.info(f"📅 Shutdown Time: {datetime.now().isoformat()}")
-    logger.info("👋 Goodbye!")
+    logger.info("[EMOJI] DEX Sniper Pro - Application Shutting Down")
+    logger.info(f"[TIME] Shutdown Time: {datetime.now().isoformat()}")
+    logger.info("[EMOJI] Goodbye!")
 
 
 # Initialize logging on module import

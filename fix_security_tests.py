@@ -35,7 +35,7 @@ def update_comprehensive_test_suite():
             "test_name": "Wallet Security",
             "passed": False,
             "error": "Wallet security implementation needed",
-            "category": "🛡️ Security & Compliance"
+            "category": "[SEC] Security & Compliance"
         }'''
         
         new_wallet_test = '''def test_wallet_security(self) -> Dict[str, Any]:
@@ -52,14 +52,14 @@ def update_comprehensive_test_suite():
                     "test_name": "Wallet Security",
                     "passed": True,
                     "message": "WalletSecurityManager available with validation",
-                    "category": "🛡️ Security & Compliance"
+                    "category": "[SEC] Security & Compliance"
                 }
             else:
                 return {
                     "test_name": "Wallet Security",
                     "passed": False,
                     "error": "WalletSecurityManager missing validation methods",
-                    "category": "🛡️ Security & Compliance"
+                    "category": "[SEC] Security & Compliance"
                 }
             
         except ImportError:
@@ -67,14 +67,14 @@ def update_comprehensive_test_suite():
                 "test_name": "Wallet Security",
                 "passed": False,
                 "error": "WalletSecurityManager not found",
-                "category": "🛡️ Security & Compliance"
+                "category": "[SEC] Security & Compliance"
             }
         except Exception as e:
             return {
                 "test_name": "Wallet Security",
                 "passed": False,
                 "error": f"Wallet security test error: {e}",
-                "category": "🛡️ Security & Compliance"
+                "category": "[SEC] Security & Compliance"
             }'''
         
         # Update API authentication test
@@ -84,7 +84,7 @@ def update_comprehensive_test_suite():
             "test_name": "API Authentication",
             "passed": False,
             "error": "API authentication not implemented",
-            "category": "🛡️ Security & Compliance"
+            "category": "[SEC] Security & Compliance"
         }'''
         
         new_auth_test = '''def test_api_authentication(self) -> Dict[str, Any]:
@@ -101,14 +101,14 @@ def update_comprehensive_test_suite():
                     "test_name": "API Authentication",
                     "passed": True,
                     "message": "APIAuthManager available with token management",
-                    "category": "🛡️ Security & Compliance"
+                    "category": "[SEC] Security & Compliance"
                 }
             else:
                 return {
                     "test_name": "API Authentication",
                     "passed": False,
                     "error": "APIAuthManager missing token methods",
-                    "category": "🛡️ Security & Compliance"
+                    "category": "[SEC] Security & Compliance"
                 }
             
         except ImportError:
@@ -116,14 +116,14 @@ def update_comprehensive_test_suite():
                 "test_name": "API Authentication",
                 "passed": False,
                 "error": "APIAuthManager not found",
-                "category": "🛡️ Security & Compliance"
+                "category": "[SEC] Security & Compliance"
             }
         except Exception as e:
             return {
                 "test_name": "API Authentication",
                 "passed": False,
                 "error": f"API authentication test error: {e}",
-                "category": "🛡️ Security & Compliance"
+                "category": "[SEC] Security & Compliance"
             }'''
         
         # Update input validation test
@@ -133,7 +133,7 @@ def update_comprehensive_test_suite():
             "test_name": "Input Validation",
             "passed": False,
             "error": "Input validation system needed",
-            "category": "🛡️ Security & Compliance"
+            "category": "[SEC] Security & Compliance"
         }'''
         
         new_validation_test = '''def test_input_validation(self) -> Dict[str, Any]:
@@ -150,14 +150,14 @@ def update_comprehensive_test_suite():
                     "test_name": "Input Validation",
                     "passed": True,
                     "message": "InputValidator available with sanitization",
-                    "category": "🛡️ Security & Compliance"
+                    "category": "[SEC] Security & Compliance"
                 }
             else:
                 return {
                     "test_name": "Input Validation",
                     "passed": False,
                     "error": "InputValidator missing validation methods",
-                    "category": "🛡️ Security & Compliance"
+                    "category": "[SEC] Security & Compliance"
                 }
             
         except ImportError:
@@ -165,14 +165,14 @@ def update_comprehensive_test_suite():
                 "test_name": "Input Validation",
                 "passed": False,
                 "error": "InputValidator not found",
-                "category": "🛡️ Security & Compliance"
+                "category": "[SEC] Security & Compliance"
             }
         except Exception as e:
             return {
                 "test_name": "Input Validation",
                 "passed": False,
                 "error": f"Input validation test error: {e}",
-                "category": "🛡️ Security & Compliance"
+                "category": "[SEC] Security & Compliance"
             }'''
         
         # Update error sanitization test
@@ -182,7 +182,7 @@ def update_comprehensive_test_suite():
             "test_name": "Error Sanitization",
             "passed": False,
             "error": "Error sanitization not implemented",
-            "category": "🛡️ Security & Compliance"
+            "category": "[SEC] Security & Compliance"
         }'''
         
         new_sanitization_test = '''def test_error_sanitization(self) -> Dict[str, Any]:
@@ -199,14 +199,14 @@ def update_comprehensive_test_suite():
                     "test_name": "Error Sanitization",
                     "passed": True,
                     "message": "ErrorSanitizer available with sanitization methods",
-                    "category": "🛡️ Security & Compliance"
+                    "category": "[SEC] Security & Compliance"
                 }
             else:
                 return {
                     "test_name": "Error Sanitization",
                     "passed": False,
                     "error": "ErrorSanitizer missing sanitization methods",
-                    "category": "🛡️ Security & Compliance"
+                    "category": "[SEC] Security & Compliance"
                 }
             
         except ImportError:
@@ -214,14 +214,14 @@ def update_comprehensive_test_suite():
                 "test_name": "Error Sanitization",
                 "passed": False,
                 "error": "ErrorSanitizer not found",
-                "category": "🛡️ Security & Compliance"
+                "category": "[SEC] Security & Compliance"
             }
         except Exception as e:
             return {
                 "test_name": "Error Sanitization",
                 "passed": False,
                 "error": f"Error sanitization test error: {e}",
-                "category": "🛡️ Security & Compliance"
+                "category": "[SEC] Security & Compliance"
             }'''
         
         # Apply the updates
@@ -294,16 +294,16 @@ def test_security_imports():
         sys.path.insert(0, os.getcwd())
         
         from app.core.security.wallet_security import WalletSecurityManager
-        print("✓ WalletSecurityManager imported")
+        print("[EMOJI] WalletSecurityManager imported")
         
         from app.core.security.api_auth import APIAuthManager
-        print("✓ APIAuthManager imported")
+        print("[EMOJI] APIAuthManager imported")
         
         from app.core.security.input_validator import InputValidator
-        print("✓ InputValidator imported")
+        print("[EMOJI] InputValidator imported")
         
         from app.core.security.error_sanitizer import ErrorSanitizer
-        print("✓ ErrorSanitizer imported")
+        print("[EMOJI] ErrorSanitizer imported")
         
         print("SUCCESS: All security modules can be imported")
         return True

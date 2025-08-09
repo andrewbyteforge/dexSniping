@@ -123,7 +123,7 @@ class WebSocketManager:
             connection_cleaner_task
         ])
         
-        logger.info("🚀 WebSocket manager started")
+        logger.info("[START] WebSocket manager started")
     
     async def stop(self) -> None:
         """Stop WebSocket manager and cleanup."""
@@ -136,7 +136,7 @@ class WebSocketManager:
         # Close all connections
         await self._close_all_connections()
         
-        logger.info("🛑 WebSocket manager stopped")
+        logger.info("[EMOJI] WebSocket manager stopped")
     
     async def connect(self, websocket: WebSocket, client_id: str) -> None:
         """Connect a new WebSocket client."""

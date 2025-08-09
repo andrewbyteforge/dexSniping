@@ -92,7 +92,7 @@ class InputValidatorFallback:
             r'data:text/html',         # Data URLs
         ]
         
-        logger.info("🔒 Input validator (fallback) initialized")
+        logger.info("[EMOJI] Input validator (fallback) initialized")
 
     def validate_ethereum_address(self, address: str) -> bool:
         """Validate Ethereum address format."""
@@ -101,7 +101,7 @@ class InputValidatorFallback:
                 return False
             return self.patterns['ethereum_address'].match(address) is not None
         except Exception as e:
-            logger.warning(f"⚠️ Address validation error: {e}")
+            logger.warning(f"[WARN] Address validation error: {e}")
             return False
 
     def validate_amount(self, amount: Union[str, float, int], 
@@ -121,7 +121,7 @@ class InputValidatorFallback:
             return True, parsed_amount
             
         except (ValueError, TypeError) as e:
-            logger.warning(f"⚠️ Amount validation error: {e}")
+            logger.warning(f"[WARN] Amount validation error: {e}")
             return False, None
 
     def sanitize_string(self, input_str: str, max_length: Optional[int] = None) -> str:
@@ -196,7 +196,7 @@ class InputValidatorFallback:
             return len(errors) == 0, errors
             
         except Exception as e:
-            logger.error(f"❌ Input validation error: {e}")
+            logger.error(f"[ERROR] Input validation error: {e}")
             return False, [f"Validation error: {str(e)}"]
 
 
@@ -210,7 +210,7 @@ class WalletSecurityFallback:
         self.failed_attempts = {}
         self.locked_wallets = {}
         
-        logger.info("🔐 Wallet security (fallback) initialized")
+        logger.info("[AUTH] Wallet security (fallback) initialized")
 
     def encrypt_private_key(self, private_key: str, wallet_address: str) -> str:
         """Basic private key encoding (NOT secure - for testing only)."""
@@ -227,11 +227,11 @@ class WalletSecurityFallback:
             }
             
             encoded_data = base64.b64encode(json.dumps(payload).encode()).decode()
-            logger.warning("⚠️ Using fallback encryption (NOT SECURE)")
+            logger.warning("[WARN] Using fallback encryption (NOT SECURE)")
             return encoded_data
             
         except Exception as e:
-            logger.error(f"❌ Fallback encryption failed: {e}")
+            logger.error(f"[ERROR] Fallback encryption failed: {e}")
             raise SecurityError(f"Encryption failed: {e}")
 
     def decrypt_private_key(self, encrypted_key: str, wallet_address: str) -> str:
@@ -259,11 +259,11 @@ class WalletSecurityFallback:
                 raise SecurityError("Private key integrity check failed")
             
             self.reset_failed_attempts(wallet_address)
-            logger.warning("⚠️ Using fallback decryption (NOT SECURE)")
+            logger.warning("[WARN] Using fallback decryption (NOT SECURE)")
             return private_key
             
         except Exception as e:
-            logger.error(f"❌ Fallback decryption failed: {e}")
+            logger.error(f"[ERROR] Fallback decryption failed: {e}")
             self.record_failed_attempt(wallet_address)
             raise SecurityError(f"Decryption failed: {e}")
 
@@ -285,7 +285,7 @@ class WalletSecurityFallback:
         
         if len(self.failed_attempts[address]) >= self.max_failed_attempts:
             self.locked_wallets[address] = current_time + self.lockout_duration
-            logger.warning(f"🔒 Wallet {address[:8]}... locked due to failed attempts")
+            logger.warning(f"[EMOJI] Wallet {address[:8]}... locked due to failed attempts")
 
     def is_wallet_locked(self, wallet_address: str) -> bool:
         """Check if wallet is currently locked."""
@@ -326,7 +326,7 @@ class APIAuthenticationFallback:
             APIKeyType.WEBHOOK: 10
         }
         
-        logger.info("🔑 API authentication (fallback) initialized")
+        logger.info("[EMOJI] API authentication (fallback) initialized")
 
     def generate_api_key(self, user_id: str, key_type: APIKeyType, 
                         permissions: List[str]) -> str:
@@ -345,11 +345,11 @@ class APIAuthenticationFallback:
                 'rate_limit': self.default_rate_limits.get(key_type, 60)
             }
             
-            logger.info(f"🔑 API key generated for user {user_id}, type {key_type.value}")
+            logger.info(f"[EMOJI] API key generated for user {user_id}, type {key_type.value}")
             return api_key
             
         except Exception as e:
-            logger.error(f"❌ API key generation failed: {e}")
+            logger.error(f"[ERROR] API key generation failed: {e}")
             raise SecurityError(f"API key generation failed: {e}")
 
     def validate_api_key(self, api_key: str, required_permission: str = None) -> Dict[str, Any]:
@@ -375,7 +375,7 @@ class APIAuthenticationFallback:
         except (AuthenticationError, AuthorizationError):
             raise
         except Exception as e:
-            logger.error(f"❌ API key validation error: {e}")
+            logger.error(f"[ERROR] API key validation error: {e}")
             raise AuthenticationError(f"API key validation failed: {e}")
 
     def check_rate_limit(self, api_key: str) -> bool:
@@ -404,7 +404,7 @@ class APIAuthenticationFallback:
             return True
             
         except Exception as e:
-            logger.error(f"❌ Rate limit check error: {e}")
+            logger.error(f"[ERROR] Rate limit check error: {e}")
             return False
 
     def record_failed_auth(self, api_key: str):
@@ -470,7 +470,7 @@ class ErrorSanitizerFallback:
             return sanitized
             
         except Exception as e:
-            logger.error(f"❌ Error sanitization failed: {e}")
+            logger.error(f"[ERROR] Error sanitization failed: {e}")
             return self.error_templates.get(error_type, 'Error processing failed')
 
 
@@ -488,11 +488,11 @@ class SecurityManagerFallback:
             self.security_events = []
             self.max_security_events = 1000
             
-            logger.info("🛡️ Security manager (fallback) initialized")
-            logger.warning("⚠️ Using fallback security - install cryptography for full security")
+            logger.info("[SEC] Security manager (fallback) initialized")
+            logger.warning("[WARN] Using fallback security - install cryptography for full security")
             
         except Exception as e:
-            logger.error(f"❌ Fallback security manager initialization failed: {e}")
+            logger.error(f"[ERROR] Fallback security manager initialization failed: {e}")
             raise SecurityError(f"Security system initialization failed: {e}")
 
     def validate_api_request(self, api_key: str, endpoint: str, 
@@ -523,7 +523,7 @@ class SecurityManagerFallback:
         except ValidationError as e:
             return False, self.error_sanitizer.sanitize_error(str(e), 'validation_error')
         except Exception as e:
-            logger.error(f"❌ API request validation error: {e}")
+            logger.error(f"[ERROR] API request validation error: {e}")
             return False, self.error_sanitizer.sanitize_error(str(e), 'system_error')
 
     def get_required_permission(self, endpoint: str) -> str:
@@ -571,10 +571,10 @@ class SecurityManagerFallback:
             if len(self.security_events) > self.max_security_events:
                 self.security_events = self.security_events[-self.max_security_events:]
             
-            logger.info(f"🔍 Security event logged: {event_type}")
+            logger.info(f"[SEARCH] Security event logged: {event_type}")
             
         except Exception as e:
-            logger.error(f"❌ Failed to log security event: {e}")
+            logger.error(f"[ERROR] Failed to log security event: {e}")
 
     def get_security_metrics(self) -> Dict[str, Any]:
         """Get security system metrics."""
@@ -598,7 +598,7 @@ class SecurityManagerFallback:
             }
             
         except Exception as e:
-            logger.error(f"❌ Failed to get security metrics: {e}")
+            logger.error(f"[ERROR] Failed to get security metrics: {e}")
             return {'error': 'Failed to retrieve metrics'}
 
 

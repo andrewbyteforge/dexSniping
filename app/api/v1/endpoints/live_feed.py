@@ -103,7 +103,7 @@ async def get_live_opportunities(
         }
         
     except Exception as e:
-        logger.error(f"❌ Failed to get live opportunities: {e}")
+        logger.error(f"[ERROR] Failed to get live opportunities: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch opportunities")
 
 
@@ -155,7 +155,7 @@ async def stream_live_feed(
                 await asyncio.sleep(30)
                 
             except Exception as e:
-                logger.error(f"❌ Stream error: {e}")
+                logger.error(f"[ERROR] Stream error: {e}")
                 yield {
                     "event": "error",
                     "data": json.dumps({"error": str(e), "timestamp": datetime.utcnow().isoformat()})
@@ -229,7 +229,7 @@ async def control_auto_trader(
             raise HTTPException(status_code=400, detail=f"Invalid action: {action}")
         
     except Exception as e:
-        logger.error(f"❌ Auto-trader control failed: {e}")
+        logger.error(f"[ERROR] Auto-trader control failed: {e}")
         raise HTTPException(status_code=500, detail="Auto-trader control failed")
 
 
@@ -271,7 +271,7 @@ async def get_trading_status() -> Dict[str, Any]:
         }
         
     except Exception as e:
-        logger.error(f"❌ Failed to get trading status: {e}")
+        logger.error(f"[ERROR] Failed to get trading status: {e}")
         raise HTTPException(status_code=500, detail="Failed to get trading status")
 
 
@@ -287,7 +287,7 @@ async def get_system_health() -> Dict[str, Any]:
         }
         
     except Exception as e:
-        logger.error(f"❌ Health check failed: {e}")
+        logger.error(f"[ERROR] Health check failed: {e}")
         raise HTTPException(status_code=500, detail="Health check failed")
 
 
@@ -311,7 +311,7 @@ async def trigger_manual_scan(
         }
         
     except Exception as e:
-        logger.error(f"❌ Manual scan trigger failed: {e}")
+        logger.error(f"[ERROR] Manual scan trigger failed: {e}")
         raise HTTPException(status_code=500, detail="Failed to trigger scan")
 
 
@@ -381,7 +381,7 @@ async def _scan_for_opportunities(
         return opportunities
         
     except Exception as e:
-        logger.error(f"❌ Opportunity scanning failed: {e}")
+        logger.error(f"[ERROR] Opportunity scanning failed: {e}")
         return []
 
 
@@ -458,18 +458,18 @@ async def _perform_manual_scan(network: str):
     """Perform manual scan in background."""
     try:
         if token_scanner:
-            logger.info(f"🔍 Performing manual scan for {network}")
+            logger.info(f"[SEARCH] Performing manual scan for {network}")
             
             results = await token_scanner.scan_network(network, block_offset=20)
             
-            logger.info(f"✅ Manual scan complete: {len(results.tokens_found)} tokens found")
+            logger.info(f"[OK] Manual scan complete: {len(results.tokens_found)} tokens found")
             
             # Clear cache to force fresh data
             global last_cache_update
             last_cache_update = datetime.utcnow() - timedelta(minutes=5)
         
     except Exception as e:
-        logger.error(f"❌ Manual scan failed: {e}")
+        logger.error(f"[ERROR] Manual scan failed: {e}")
 
 
 # ============================================================================
@@ -481,7 +481,7 @@ async def initialize_live_feed_services():
     global token_scanner, risk_assessor, auto_trader
     
     try:
-        logger.info("🚀 Initializing live feed services...")
+        logger.info("[START] Initializing live feed services...")
         
         # Initialize services
         from app.core.discovery.token_scanner import TokenScanner
@@ -492,11 +492,11 @@ async def initialize_live_feed_services():
         risk_assessor = AIRiskAssessor()
         auto_trader = await create_auto_trader()
         
-        logger.info("✅ Live feed services initialized")
+        logger.info("[OK] Live feed services initialized")
         return True
         
     except Exception as e:
-        logger.error(f"❌ Failed to initialize live feed services: {e}")
+        logger.error(f"[ERROR] Failed to initialize live feed services: {e}")
         return False
 
 

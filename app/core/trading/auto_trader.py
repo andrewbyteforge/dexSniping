@@ -136,12 +136,12 @@ class AutoTrader:
         self.last_trade_time: Optional[datetime] = None
         self.running = False
         
-        logger.info(f"✅ AutoTrader initialized with ID: {self.trader_id}")
+        logger.info(f"[OK] AutoTrader initialized with ID: {self.trader_id}")
     
     async def initialize(self) -> bool:
         """Initialize auto-trader components."""
         try:
-            logger.info("🚀 Initializing auto-trader components...")
+            logger.info("[START] Initializing auto-trader components...")
             
             # Initialize AI components
             from app.core.ai.risk_assessor import AIRiskAssessor
@@ -155,11 +155,11 @@ class AutoTrader:
             self.position_sizer = PositionSizer()
             self.stop_loss_manager = StopLossManager()
             
-            logger.info("✅ Auto-trader components initialized")
+            logger.info("[OK] Auto-trader components initialized")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to initialize auto-trader: {e}")
+            logger.error(f"[ERROR] Failed to initialize auto-trader: {e}")
             self.status = TraderStatus.ERROR
             return False
     
@@ -176,10 +176,10 @@ class AutoTrader:
             self.max_slippage_percent = config.get('max_slippage_percent', 5.0)
             self.cooldown_minutes = config.get('cooldown_minutes', 5)
             
-            logger.info(f"✅ Auto-trader configured for networks: {self.enabled_networks}")
+            logger.info(f"[OK] Auto-trader configured for networks: {self.enabled_networks}")
             
         except Exception as e:
-            logger.error(f"❌ Failed to configure auto-trader: {e}")
+            logger.error(f"[ERROR] Failed to configure auto-trader: {e}")
             raise TradingError(f"Configuration failed: {e}")
     
     async def start_trading(self) -> None:
@@ -189,7 +189,7 @@ class AutoTrader:
                 logger.warning("Auto-trader is already running")
                 return
             
-            logger.info("🤖 Starting auto-trading bot...")
+            logger.info("[BOT] Starting auto-trading bot...")
             self.status = TraderStatus.STARTING
             self.start_time = datetime.utcnow()
             self.running = True
@@ -219,31 +219,31 @@ class AutoTrader:
                     await asyncio.sleep(30)  # 30-second cycles
                     
                 except Exception as e:
-                    logger.error(f"❌ Error in trading loop: {e}")
+                    logger.error(f"[ERROR] Error in trading loop: {e}")
                     await asyncio.sleep(60)  # Wait longer on error
             
             self.status = TraderStatus.STOPPED
-            logger.info("🛑 Auto-trading stopped")
+            logger.info("[EMOJI] Auto-trading stopped")
             
         except Exception as e:
-            logger.error(f"❌ Auto-trading failed: {e}")
+            logger.error(f"[ERROR] Auto-trading failed: {e}")
             self.status = TraderStatus.ERROR
             self.running = False
     
     async def stop_trading(self) -> None:
         """Stop the auto-trading bot."""
-        logger.info("🛑 Stopping auto-trading bot...")
+        logger.info("[EMOJI] Stopping auto-trading bot...")
         self.running = False
         self.status = TraderStatus.STOPPED
     
     async def pause_trading(self) -> None:
         """Pause auto-trading temporarily."""
-        logger.info("⏸️ Pausing auto-trading...")
+        logger.info("⏸[EMOJI] Pausing auto-trading...")
         self.status = TraderStatus.PAUSED
     
     async def resume_trading(self) -> None:
         """Resume auto-trading."""
-        logger.info("▶️ Resuming auto-trading...")
+        logger.info("[EMOJI] Resuming auto-trading...")
         self.status = TraderStatus.RUNNING
     
     async def execute_manual_trade(
@@ -256,7 +256,7 @@ class AutoTrader:
     ) -> Dict[str, Any]:
         """Execute a manual trade."""
         try:
-            logger.info(f"📈 Executing manual {action} for {token_address}")
+            logger.info(f"[PERF] Executing manual {action} for {token_address}")
             
             if not self.order_executor:
                 raise TradingError("Order executor not initialized")
@@ -299,7 +299,7 @@ class AutoTrader:
             }
             
         except Exception as e:
-            logger.error(f"❌ Manual trade execution failed: {e}")
+            logger.error(f"[ERROR] Manual trade execution failed: {e}")
             raise TradingError(f"Trade execution failed: {e}")
     
     async def _scan_for_opportunities(self) -> List[TradingOpportunity]:
@@ -342,11 +342,11 @@ class AutoTrader:
                             
                             opportunities.append(opportunity)
             
-            logger.info(f"🔍 Found {len(opportunities)} trading opportunities")
+            logger.info(f"[SEARCH] Found {len(opportunities)} trading opportunities")
             return opportunities
             
         except Exception as e:
-            logger.error(f"❌ Opportunity scanning failed: {e}")
+            logger.error(f"[ERROR] Opportunity scanning failed: {e}")
             return []
     
     async def _process_opportunity(self, opportunity: TradingOpportunity) -> None:
@@ -365,7 +365,7 @@ class AutoTrader:
             if position_size <= 0:
                 return
             
-            logger.info(f"💰 Trading opportunity: {opportunity.symbol} "
+            logger.info(f"[PROFIT] Trading opportunity: {opportunity.symbol} "
                        f"(Risk: {opportunity.risk_score:.2f}, Size: {position_size:.4f} ETH)")
             
             # Execute buy order
@@ -382,7 +382,7 @@ class AutoTrader:
                 await self._track_new_position(opportunity, execution_result, position_size)
             
         except Exception as e:
-            logger.error(f"❌ Failed to process opportunity {opportunity.symbol}: {e}")
+            logger.error(f"[ERROR] Failed to process opportunity {opportunity.symbol}: {e}")
     
     async def _manage_positions(self) -> None:
         """Manage existing trading positions."""
@@ -404,7 +404,7 @@ class AutoTrader:
                     await self._close_position(position_id, "time_exit")
             
         except Exception as e:
-            logger.error(f"❌ Position management failed: {e}")
+            logger.error(f"[ERROR] Position management failed: {e}")
     
     async def _should_trade_opportunity(self, opportunity: TradingOpportunity) -> bool:
         """Determine if we should trade an opportunity."""
@@ -433,7 +433,7 @@ class AutoTrader:
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to evaluate opportunity: {e}")
+            logger.error(f"[ERROR] Failed to evaluate opportunity: {e}")
             return False
     
     async def _calculate_position_size(self, opportunity: TradingOpportunity) -> float:
@@ -452,7 +452,7 @@ class AutoTrader:
                 return base_size * risk_multiplier
             
         except Exception as e:
-            logger.error(f"❌ Position sizing failed: {e}")
+            logger.error(f"[ERROR] Position sizing failed: {e}")
             return 0.0
     
     async def _track_new_position(
@@ -487,11 +487,11 @@ class AutoTrader:
             self.active_positions[position_id] = position
             self.last_trade_time = datetime.utcnow()
             
-            logger.info(f"📊 New position opened: {opportunity.symbol} "
+            logger.info(f"[STATS] New position opened: {opportunity.symbol} "
                        f"(Entry: ${entry_price:.6f}, Size: {position_size:.4f} ETH)")
             
         except Exception as e:
-            logger.error(f"❌ Failed to track position: {e}")
+            logger.error(f"[ERROR] Failed to track position: {e}")
     
     async def _close_position(self, position_id: str, reason: str) -> None:
         """Close a trading position."""
@@ -501,7 +501,7 @@ class AutoTrader:
             
             position = self.active_positions[position_id]
             
-            logger.info(f"🔒 Closing position {position['symbol']} - Reason: {reason}")
+            logger.info(f"[EMOJI] Closing position {position['symbol']} - Reason: {reason}")
             
             # Execute sell order
             execution_result = await self.execute_manual_trade(
@@ -535,14 +535,14 @@ class AutoTrader:
                 
                 self.statistics.total_profit_loss += pnl_percent
                 
-                logger.info(f"💹 Position closed: {position['symbol']} "
+                logger.info(f"[EMOJI] Position closed: {position['symbol']} "
                            f"(P&L: {pnl_percent:.2f}%, Exit: ${exit_price:.6f})")
             
             # Remove from active positions
             del self.active_positions[position_id]
             
         except Exception as e:
-            logger.error(f"❌ Failed to close position: {e}")
+            logger.error(f"[ERROR] Failed to close position: {e}")
     
     async def _calculate_position_pnl(self, position: Dict[str, Any]) -> float:
         """Calculate current P&L for a position."""
@@ -561,7 +561,7 @@ class AutoTrader:
             return 0.0
             
         except Exception as e:
-            logger.error(f"❌ P&L calculation failed: {e}")
+            logger.error(f"[ERROR] P&L calculation failed: {e}")
             return 0.0
     
     async def _is_in_cooldown(self) -> bool:
@@ -639,7 +639,7 @@ class AutoTrader:
             self.statistics.largest_loss = min(losses) if losses else 0.0
             
         except Exception as e:
-            logger.error(f"❌ Statistics update failed: {e}")
+            logger.error(f"[ERROR] Statistics update failed: {e}")
     
     async def get_status(self) -> Dict[str, Any]:
         """Get current auto-trader status."""
@@ -660,7 +660,7 @@ class AutoTrader:
             }
             
         except Exception as e:
-            logger.error(f"❌ Status retrieval failed: {e}")
+            logger.error(f"[ERROR] Status retrieval failed: {e}")
             return {"status": "error", "error": str(e)}
     
     async def get_statistics(self) -> Dict[str, Any]:
@@ -682,7 +682,7 @@ class AutoTrader:
             }
             
         except Exception as e:
-            logger.error(f"❌ Statistics retrieval failed: {e}")
+            logger.error(f"[ERROR] Statistics retrieval failed: {e}")
             return {}
     
     async def get_active_positions(self) -> List[Dict[str, Any]]:
@@ -713,7 +713,7 @@ class AutoTrader:
             return positions
             
         except Exception as e:
-            logger.error(f"❌ Failed to get active positions: {e}")
+            logger.error(f"[ERROR] Failed to get active positions: {e}")
             return []
     
     async def get_trade_history(self, limit: int = 50) -> List[Dict[str, Any]]:
@@ -744,7 +744,7 @@ class AutoTrader:
             return history
             
         except Exception as e:
-            logger.error(f"❌ Failed to get trade history: {e}")
+            logger.error(f"[ERROR] Failed to get trade history: {e}")
             return []
 
 

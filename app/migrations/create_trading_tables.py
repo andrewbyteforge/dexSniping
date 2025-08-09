@@ -505,23 +505,23 @@ def verify_migration():
         if not result.fetchone()[0]:
             raise Exception(f"Table {table_name} was not created successfully")
     
-    print("✅ All trading tables created successfully!")
+    print("[OK] All trading tables created successfully!")
 
 
 if __name__ == "__main__":
     """Run migration when script is executed directly."""
-    print("🚀 Running trading database migration...")
+    print("[START] Running trading database migration...")
     
     try:
         upgrade()
         verify_migration()
-        print("🎉 Trading database migration completed successfully!")
+        print("[SUCCESS] Trading database migration completed successfully!")
         
     except Exception as e:
-        print(f"❌ Migration failed: {e}")
-        print("🔄 Attempting rollback...")
+        print(f"[ERROR] Migration failed: {e}")
+        print("[REFRESH] Attempting rollback...")
         try:
             downgrade()
-            print("✅ Rollback completed")
+            print("[OK] Rollback completed")
         except Exception as rollback_error:
-            print(f"❌ Rollback failed: {rollback_error}")
+            print(f"[ERROR] Rollback failed: {rollback_error}")

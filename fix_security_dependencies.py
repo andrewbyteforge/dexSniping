@@ -12,7 +12,7 @@ from pathlib import Path
 
 def install_cryptography():
     """Try to install cryptography library."""
-    print("🔧 Attempting to install cryptography library...")
+    print("[FIX] Attempting to install cryptography library...")
     
     try:
         # Try installing cryptography
@@ -21,17 +21,17 @@ def install_cryptography():
         ], capture_output=True, text=True, timeout=120)
         
         if result.returncode == 0:
-            print("✅ Cryptography installed successfully!")
+            print("[OK] Cryptography installed successfully!")
             return True
         else:
-            print(f"❌ Cryptography installation failed: {result.stderr}")
+            print(f"[ERROR] Cryptography installation failed: {result.stderr}")
             return False
             
     except subprocess.TimeoutExpired:
-        print("❌ Installation timed out")
+        print("[ERROR] Installation timed out")
         return False
     except Exception as e:
-        print(f"❌ Installation error: {e}")
+        print(f"[ERROR] Installation error: {e}")
         return False
 
 def test_cryptography():
@@ -44,24 +44,24 @@ def test_cryptography():
         encrypted = f.encrypt(test_data)
         decrypted = f.decrypt(encrypted)
         assert decrypted == test_data
-        print("✅ Cryptography library is working correctly")
+        print("[OK] Cryptography library is working correctly")
         return True
     except ImportError:
-        print("❌ Cryptography library not available")
+        print("[ERROR] Cryptography library not available")
         return False
     except Exception as e:
-        print(f"❌ Cryptography test failed: {e}")
+        print(f"[ERROR] Cryptography test failed: {e}")
         return False
 
 def update_security_manager_import():
     """Update security manager to use fallback if cryptography fails."""
-    print("🔧 Updating security manager to handle missing cryptography...")
+    print("[FIX] Updating security manager to handle missing cryptography...")
     
     try:
         security_file = Path("app/core/security/security_manager.py")
         
         if not security_file.exists():
-            print(f"❌ Security manager file not found: {security_file}")
+            print(f"[ERROR] Security manager file not found: {security_file}")
             return False
         
         # Read current content
@@ -76,7 +76,7 @@ try:
     from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
     CRYPTOGRAPHY_AVAILABLE = True
 except ImportError:
-    print("⚠️ Cryptography not available - using fallback security")
+    print("[WARN] Cryptography not available - using fallback security")
     CRYPTOGRAPHY_AVAILABLE = False
     # Mock classes for fallback
     class Fernet:
@@ -116,22 +116,22 @@ except ImportError:
                 
                 # Write back
                 security_file.write_text(content, encoding='utf-8')
-                print("✅ Security manager updated with fallback handling")
+                print("[OK] Security manager updated with fallback handling")
                 return True
             else:
-                print("⚠️ Could not find import section")
+                print("[WARN] Could not find import section")
                 return False
         else:
-            print("✅ Security manager already has fallback handling")
+            print("[OK] Security manager already has fallback handling")
             return True
             
     except Exception as e:
-        print(f"❌ Failed to update security manager: {e}")
+        print(f"[ERROR] Failed to update security manager: {e}")
         return False
 
 def create_security_test_fallback():
     """Create a test script that uses fallback security."""
-    print("🔧 Creating fallback security test...")
+    print("[FIX] Creating fallback security test...")
     
     test_content = '''"""
 Security Test with Fallback Support
@@ -149,7 +149,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def test_security_with_fallback():
     """Test security implementation with fallback support."""
-    print("🛡️ Testing Security Implementation (with fallback support)")
+    print("[SEC] Testing Security Implementation (with fallback support)")
     print("=" * 60)
     
     try:
@@ -157,26 +157,26 @@ def test_security_with_fallback():
         try:
             from app.core.security.security_manager import get_security_manager
             security_manager = get_security_manager()
-            print("✅ Using full security manager with cryptography")
+            print("[OK] Using full security manager with cryptography")
             security_mode = "full"
         except ImportError as e:
-            print(f"⚠️ Cryptography not available: {e}")
-            print("🔄 Falling back to basic security...")
+            print(f"[WARN] Cryptography not available: {e}")
+            print("[REFRESH] Falling back to basic security...")
             
             # Use fallback security manager
             from app.core.security.security_manager_fallback import get_security_manager_fallback
             security_manager = get_security_manager_fallback()
-            print("✅ Using fallback security manager")
+            print("[OK] Using fallback security manager")
             security_mode = "fallback"
         
         # Test basic security functions
-        print("\\n🧪 Testing basic security functions...")
+        print("\\n[TEST] Testing basic security functions...")
         
         # Test 1: Input validation
         validator = security_manager.input_validator
         test_address = "0x" + "a" * 40
         is_valid = validator.validate_ethereum_address(test_address)
-        print(f"  Address validation: {'✅ PASS' if is_valid else '❌ FAIL'}")
+        print(f"  Address validation: {'[OK] PASS' if is_valid else '[ERROR] FAIL'}")
         
         # Test 2: API key generation
         api_key = security_manager.api_auth.generate_api_key(
@@ -184,30 +184,30 @@ def test_security_with_fallback():
             key_type=security_manager.api_auth.APIKeyType.READ_ONLY,
             permissions=["read_access"]
         )
-        print(f"  API key generation: {'✅ PASS' if api_key else '❌ FAIL'}")
+        print(f"  API key generation: {'[OK] PASS' if api_key else '[ERROR] FAIL'}")
         
         # Test 3: Error sanitization
         test_error = "Error with address 0x1234567890abcdef1234567890abcdef12345678"
         sanitized = security_manager.error_sanitizer.sanitize_error(test_error)
         contains_redacted = "[REDACTED]" in sanitized
-        print(f"  Error sanitization: {'✅ PASS' if contains_redacted else '❌ FAIL'}")
+        print(f"  Error sanitization: {'[OK] PASS' if contains_redacted else '[ERROR] FAIL'}")
         
         # Test 4: Security metrics
         metrics = security_manager.get_security_metrics()
         has_status = 'system_status' in metrics
-        print(f"  Security metrics: {'✅ PASS' if has_status else '❌ FAIL'}")
+        print(f"  Security metrics: {'[OK] PASS' if has_status else '[ERROR] FAIL'}")
         
-        print(f"\\n📊 Security Mode: {security_mode.upper()}")
-        print("✅ Basic security tests completed successfully!")
+        print(f"\\n[STATS] Security Mode: {security_mode.upper()}")
+        print("[OK] Basic security tests completed successfully!")
         
         if security_mode == "fallback":
-            print("\\n⚠️ IMPORTANT: Using fallback security mode")
-            print("🔧 Install cryptography for full security: pip install cryptography")
+            print("\\n[WARN] IMPORTANT: Using fallback security mode")
+            print("[FIX] Install cryptography for full security: pip install cryptography")
         
         return True
         
     except Exception as e:
-        print(f"❌ Security test failed: {e}")
+        print(f"[ERROR] Security test failed: {e}")
         import traceback
         traceback.print_exc()
         return False
@@ -216,10 +216,10 @@ if __name__ == "__main__":
     success = test_security_with_fallback()
     
     if success:
-        print("\\n🎉 Security implementation working!")
-        print("✅ Ready to run full security tests")
+        print("\\n[SUCCESS] Security implementation working!")
+        print("[OK] Ready to run full security tests")
     else:
-        print("\\n❌ Security implementation needs attention")
+        print("\\n[ERROR] Security implementation needs attention")
     
     sys.exit(0 if success else 1)
 '''
@@ -227,15 +227,15 @@ if __name__ == "__main__":
     try:
         test_file = Path("test_security_fallback.py")
         test_file.write_text(test_content, encoding='utf-8')
-        print(f"✅ Fallback security test created: {test_file}")
+        print(f"[OK] Fallback security test created: {test_file}")
         return True
     except Exception as e:
-        print(f"❌ Failed to create test file: {e}")
+        print(f"[ERROR] Failed to create test file: {e}")
         return False
 
 def main():
     """Main fix function."""
-    print("🛡️ DEX Sniper Pro - Security Dependencies Fix")
+    print("[SEC] DEX Sniper Pro - Security Dependencies Fix")
     print("=" * 50)
     
     success_count = 0
@@ -247,22 +247,22 @@ def main():
         
         # Test if it works
         if test_cryptography():
-            print("🎉 Cryptography is working! Full security available.")
+            print("[SUCCESS] Cryptography is working! Full security available.")
             
             # Run the original security test
-            print("\\n🧪 Running original security tests...")
+            print("\\n[TEST] Running original security tests...")
             try:
                 result = subprocess.run([
                     sys.executable, "tests/test_security_implementation.py"
                 ], timeout=60)
                 
                 if result.returncode == 0:
-                    print("✅ All security tests passed!")
+                    print("[OK] All security tests passed!")
                     return True
                 else:
-                    print("⚠️ Some security tests failed - but cryptography is working")
+                    print("[WARN] Some security tests failed - but cryptography is working")
             except Exception as e:
-                print(f"⚠️ Could not run security tests: {e}")
+                print(f"[WARN] Could not run security tests: {e}")
     
     # Step 2: Set up fallback
     print("\\nStep 2: Setting up fallback security...")
@@ -272,7 +272,7 @@ def main():
     if create_security_test_fallback():
         success_count += 1
     
-    print(f"\\n📊 Fix Results: {success_count}/3 steps completed")
+    print(f"\\n[STATS] Fix Results: {success_count}/3 steps completed")
     
     # Step 3: Test fallback security
     print("\\nStep 3: Testing fallback security...")
@@ -282,19 +282,19 @@ def main():
         ], timeout=30)
         
         if result.returncode == 0:
-            print("\\n🎉 Fallback security is working!")
-            print("✅ You can now proceed with security testing")
-            print("\\n💡 Next steps:")
+            print("\\n[SUCCESS] Fallback security is working!")
+            print("[OK] You can now proceed with security testing")
+            print("\\n[TIP] Next steps:")
             print("1. Run: python test_security_fallback.py")
             print("2. If successful, run: python tests/test_security_implementation.py")
             print("3. For full security, install: pip install cryptography")
             return True
         else:
-            print("❌ Fallback security test failed")
+            print("[ERROR] Fallback security test failed")
     except Exception as e:
-        print(f"❌ Could not test fallback security: {e}")
+        print(f"[ERROR] Could not test fallback security: {e}")
     
-    print("\\n⚠️ Manual steps required:")
+    print("\\n[WARN] Manual steps required:")
     print("1. Install cryptography: pip install cryptography")
     print("2. Or use fallback: python test_security_fallback.py")
     
@@ -305,8 +305,8 @@ if __name__ == "__main__":
         success = main()
         sys.exit(0 if success else 1)
     except KeyboardInterrupt:
-        print("\\n⏹️ Fix interrupted by user")
+        print("\\n⏹[EMOJI] Fix interrupted by user")
         sys.exit(1)
     except Exception as e:
-        print(f"\\n💥 Fix script error: {e}")
+        print(f"\\n[EMOJI] Fix script error: {e}")
         sys.exit(1)

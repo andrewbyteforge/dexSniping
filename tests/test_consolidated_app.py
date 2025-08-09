@@ -24,7 +24,7 @@ class TestConsolidatedApplication:
     
     def test_import_consolidated_app(self):
         """Test that the consolidated app can be imported successfully."""
-        print("🧪 Testing consolidated app import...")
+        print("[TEST] Testing consolidated app import...")
         
         try:
             from app.main import app, create_application, get_trading_engine
@@ -33,19 +33,19 @@ class TestConsolidatedApplication:
             assert callable(create_application), "create_application should be callable"
             assert callable(get_trading_engine), "get_trading_engine should be callable"
             
-            print("✅ Consolidated app imported successfully")
+            print("[OK] Consolidated app imported successfully")
             return True
             
         except ImportError as e:
-            print(f"❌ Import failed: {e}")
+            print(f"[ERROR] Import failed: {e}")
             return False
         except Exception as e:
-            print(f"❌ Unexpected error: {e}")
+            print(f"[ERROR] Unexpected error: {e}")
             return False
     
     def test_application_configuration(self):
         """Test application is properly configured."""
-        print("🧪 Testing application configuration...")
+        print("[TEST] Testing application configuration...")
         
         try:
             from app.main import app
@@ -56,16 +56,16 @@ class TestConsolidatedApplication:
             assert app.docs_url == "/docs"
             assert app.redoc_url == "/redoc"
             
-            print("✅ Application configuration is correct")
+            print("[OK] Application configuration is correct")
             return True
             
         except Exception as e:
-            print(f"❌ Configuration test failed: {e}")
+            print(f"[ERROR] Configuration test failed: {e}")
             return False
     
     def test_middleware_setup(self):
         """Test that middleware is properly configured."""
-        print("🧪 Testing middleware setup...")
+        print("[TEST] Testing middleware setup...")
         
         try:
             from app.main import app
@@ -82,33 +82,33 @@ class TestConsolidatedApplication:
                 
                 if 'CORS' in middleware_class_name:
                     middleware_found['CORS'] = True
-                    print(f"✅ CORSMiddleware configured")
+                    print(f"[OK] CORSMiddleware configured")
                 
                 if 'TrustedHost' in middleware_class_name:
                     middleware_found['TrustedHost'] = True
-                    print(f"✅ TrustedHostMiddleware configured")
+                    print(f"[OK] TrustedHostMiddleware configured")
             
             # Report results
             if middleware_found['CORS']:
-                print("✅ CORS middleware properly configured")
+                print("[OK] CORS middleware properly configured")
             else:
-                print("⚠️ CORS middleware not detected")
+                print("[WARN] CORS middleware not detected")
                 
             if middleware_found['TrustedHost']:
-                print("✅ TrustedHost middleware properly configured")
+                print("[OK] TrustedHost middleware properly configured")
             else:
-                print("⚠️ TrustedHost middleware not detected")
+                print("[WARN] TrustedHost middleware not detected")
             
-            print("✅ Middleware setup verified")
+            print("[OK] Middleware setup verified")
             return True
             
         except Exception as e:
-            print(f"❌ Middleware test failed: {e}")
+            print(f"[ERROR] Middleware test failed: {e}")
             return False
     
     def test_routes_configuration(self):
         """Test that routes are properly configured."""
-        print("🧪 Testing routes configuration...")
+        print("[TEST] Testing routes configuration...")
         
         try:
             from app.main import app
@@ -132,20 +132,20 @@ class TestConsolidatedApplication:
             
             for expected_route in expected_routes:
                 if expected_route in routes:
-                    print(f"✅ Route {expected_route} configured")
+                    print(f"[OK] Route {expected_route} configured")
                 else:
-                    print(f"⚠️ Route {expected_route} not found")
+                    print(f"[WARN] Route {expected_route} not found")
             
-            print(f"✅ Found {len(routes)} total routes configured")
+            print(f"[OK] Found {len(routes)} total routes configured")
             return True
             
         except Exception as e:
-            print(f"❌ Routes test failed: {e}")
+            print(f"[ERROR] Routes test failed: {e}")
             return False
     
     def test_static_files_mount(self):
         """Test that static files are properly mounted."""
-        print("🧪 Testing static files mount...")
+        print("[TEST] Testing static files mount...")
         
         try:
             from app.main import app
@@ -158,24 +158,24 @@ class TestConsolidatedApplication:
                     break
             
             if static_mounted:
-                print("✅ Static files properly mounted at /static")
+                print("[OK] Static files properly mounted at /static")
             else:
                 # Check if static directory exists
                 static_path = Path("frontend/static")
                 if static_path.exists():
-                    print("⚠️ Static directory exists but not mounted")
+                    print("[WARN] Static directory exists but not mounted")
                 else:
-                    print("ℹ️ Static directory doesn't exist (expected in some environments)")
+                    print("ℹ[EMOJI] Static directory doesn't exist (expected in some environments)")
             
             return True
             
         except Exception as e:
-            print(f"❌ Static files test failed: {e}")
+            print(f"[ERROR] Static files test failed: {e}")
             return False
     
     def test_api_routers_inclusion(self):
         """Test that API routers are properly included."""
-        print("🧪 Testing API routers inclusion...")
+        print("[TEST] Testing API routers inclusion...")
         
         try:
             from app.main import app
@@ -193,24 +193,24 @@ class TestConsolidatedApplication:
             for route_path in api_routes:
                 for expected in expected_api_routes:
                     if expected in route_path:
-                        print(f"✅ API route found: {route_path}")
+                        print(f"[OK] API route found: {route_path}")
                         found_routes += 1
                         break
             
             if found_routes > 0:
-                print(f"✅ Found {found_routes} API routes")
+                print(f"[OK] Found {found_routes} API routes")
             else:
-                print("⚠️ No API routes found")
+                print("[WARN] No API routes found")
             
             return True
             
         except Exception as e:
-            print(f"❌ API routers test failed: {e}")
+            print(f"[ERROR] API routers test failed: {e}")
             return False
     
     def test_lifespan_context_manager(self):
         """Test that lifespan context manager is properly configured."""
-        print("🧪 Testing lifespan context manager...")
+        print("[TEST] Testing lifespan context manager...")
         
         try:
             from app.main import lifespan
@@ -231,16 +231,16 @@ class TestConsolidatedApplication:
                 has_context_attrs = hasattr(lifespan, '__aenter__') or hasattr(lifespan, '__aexit__')
                 assert is_async_gen or has_context_attrs, "Lifespan should be async context manager"
             
-            print("✅ Lifespan context manager properly configured")
+            print("[OK] Lifespan context manager properly configured")
             return True
             
         except Exception as e:
-            print(f"❌ Lifespan test failed: {e}")
+            print(f"[ERROR] Lifespan test failed: {e}")
             return False
     
     def test_trading_engine_integration(self):
         """Test trading engine integration points."""
-        print("🧪 Testing trading engine integration...")
+        print("[TEST] Testing trading engine integration...")
         
         try:
             from app.main import get_trading_engine
@@ -251,23 +251,23 @@ class TestConsolidatedApplication:
             # Test error handling when engine not initialized
             try:
                 engine = get_trading_engine()
-                print("⚠️ Trading engine unexpectedly available")
+                print("[WARN] Trading engine unexpectedly available")
             except RuntimeError as e:
                 if "not initialized" in str(e):
-                    print("✅ Proper error handling when engine not initialized")
+                    print("[OK] Proper error handling when engine not initialized")
                 else:
-                    print(f"⚠️ Unexpected error: {e}")
+                    print(f"[WARN] Unexpected error: {e}")
             
             return True
             
         except Exception as e:
-            print(f"❌ Trading engine integration test failed: {e}")
+            print(f"[ERROR] Trading engine integration test failed: {e}")
             return False
 
 
 def run_all_tests():
     """Run all consolidation tests."""
-    print("🚀 Starting Consolidated Application Test Suite")
+    print("[START] Starting Consolidated Application Test Suite")
     print("=" * 60)
     
     test_suite = TestConsolidatedApplication()
@@ -292,19 +292,19 @@ def run_all_tests():
             else:
                 failed += 1
         except Exception as e:
-            print(f"❌ Test {test.__name__} raised exception: {e}")
+            print(f"[ERROR] Test {test.__name__} raised exception: {e}")
             failed += 1
         
         print("-" * 40)
     
-    print(f"📊 Test Results: {passed} passed, {failed} failed")
+    print(f"[STATS] Test Results: {passed} passed, {failed} failed")
     
     if failed == 0:
-        print("🎉 All consolidation tests passed!")
-        print("✅ Application structure successfully consolidated")
+        print("[SUCCESS] All consolidation tests passed!")
+        print("[OK] Application structure successfully consolidated")
         return True
     else:
-        print(f"⚠️ {failed} tests failed - review consolidation")
+        print(f"[WARN] {failed} tests failed - review consolidation")
         return False
 
 

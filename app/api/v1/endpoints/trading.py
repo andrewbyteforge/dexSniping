@@ -25,7 +25,7 @@ async def get_trading_status() -> Dict[str, Any]:
             "last_updated": datetime.utcnow().isoformat()
         }
     except Exception as e:
-        logger.error(f"❌ Trading status error: {e}")
+        logger.error(f"[ERROR] Trading status error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/execute")
@@ -39,11 +39,11 @@ async def execute_trade(trade_data: Dict[str, Any]) -> Dict[str, Any]:
             "timestamp": datetime.utcnow().isoformat()
         }
         
-        logger.info(f"✅ Trade executed: {result['trade_id']}")
+        logger.info(f"[OK] Trade executed: {result['trade_id']}")
         return result
         
     except Exception as e:
-        logger.error(f"❌ Trade execution error: {e}")
+        logger.error(f"[ERROR] Trade execution error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # Export

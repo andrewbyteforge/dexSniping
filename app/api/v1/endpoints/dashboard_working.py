@@ -26,7 +26,7 @@ async def get_dashboard_stats() -> Dict[str, Any]:
     Function: get_dashboard_stats
     """
     try:
-        logger.info("📊 Fetching dashboard statistics")
+        logger.info("[STATS] Fetching dashboard statistics")
         
         # Generate realistic sample data
         stats = {
@@ -50,11 +50,11 @@ async def get_dashboard_stats() -> Dict[str, Any]:
             "last_updated": datetime.utcnow().isoformat()
         }
         
-        logger.info("✅ Dashboard statistics generated successfully")
+        logger.info("[OK] Dashboard statistics generated successfully")
         return stats
         
     except Exception as e:
-        logger.error(f"❌ Error generating dashboard stats: {e}")
+        logger.error(f"[ERROR] Error generating dashboard stats: {e}")
         raise HTTPException(
             status_code=500, 
             detail="Failed to retrieve dashboard statistics"
@@ -130,11 +130,11 @@ async def get_live_tokens(limit: int = Query(20, ge=1, le=100)) -> Dict[str, Any
             "updated_at": datetime.utcnow().isoformat()
         }
         
-        logger.info(f"✅ Generated {len(tokens)} live tokens successfully")
+        logger.info(f"[OK] Generated {len(tokens)} live tokens successfully")
         return response
         
     except Exception as e:
-        logger.error(f"❌ Error generating live tokens: {e}")
+        logger.error(f"[ERROR] Error generating live tokens: {e}")
         raise HTTPException(
             status_code=500,
             detail="Failed to retrieve live token data"
@@ -149,7 +149,7 @@ async def get_recent_alerts(limit: int = Query(10, ge=1, le=50)) -> Dict[str, An
     Function: get_recent_alerts
     """
     try:
-        logger.info(f"🚨 Fetching {limit} recent alerts")
+        logger.info(f"[EMOJI] Fetching {limit} recent alerts")
         
         alert_types = [
             ("price_alert", "Price Alert", "warning"),
@@ -190,11 +190,11 @@ async def get_recent_alerts(limit: int = Query(10, ge=1, le=50)) -> Dict[str, An
             "updated_at": datetime.utcnow().isoformat()
         }
         
-        logger.info(f"✅ Generated {len(alerts)} alerts successfully")
+        logger.info(f"[OK] Generated {len(alerts)} alerts successfully")
         return response
         
     except Exception as e:
-        logger.error(f"❌ Error generating alerts: {e}")
+        logger.error(f"[ERROR] Error generating alerts: {e}")
         raise HTTPException(
             status_code=500,
             detail="Failed to retrieve alerts"
@@ -209,7 +209,7 @@ async def get_performance_metrics() -> Dict[str, Any]:
     Function: get_performance_metrics
     """
     try:
-        logger.info("⚡ Fetching performance metrics")
+        logger.info("[TRADE] Fetching performance metrics")
         
         metrics = {
             "api_response_time": random.randint(8, 45),
@@ -226,11 +226,11 @@ async def get_performance_metrics() -> Dict[str, Any]:
             "last_updated": datetime.utcnow().isoformat()
         }
         
-        logger.info("✅ Performance metrics generated successfully")
+        logger.info("[OK] Performance metrics generated successfully")
         return metrics
         
     except Exception as e:
-        logger.error(f"❌ Error generating performance metrics: {e}")
+        logger.error(f"[ERROR] Error generating performance metrics: {e}")
         raise HTTPException(
             status_code=500,
             detail="Failed to retrieve performance metrics"

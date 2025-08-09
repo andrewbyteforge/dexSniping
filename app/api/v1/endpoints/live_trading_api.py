@@ -189,7 +189,7 @@ async def connect_wallet(
     and verifies access across requested networks.
     """
     try:
-        logger.info(f"🔗 Connecting wallet: {request.wallet_address[:10]}...")
+        logger.info(f"[EMOJI] Connecting wallet: {request.wallet_address[:10]}...")
         
         # Connect wallet based on type
         if request.wallet_type == WalletType.METAMASK:
@@ -233,10 +233,10 @@ async def connect_wallet(
         )
         
     except WalletError as e:
-        logger.error(f"❌ Wallet connection failed: {e}")
+        logger.error(f"[ERROR] Wallet connection failed: {e}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logger.error(f"❌ Unexpected wallet connection error: {e}")
+        logger.error(f"[ERROR] Unexpected wallet connection error: {e}")
         raise HTTPException(status_code=500, detail="Wallet connection failed")
 
 
@@ -276,7 +276,7 @@ async def get_wallet_connections(
         return response
         
     except Exception as e:
-        logger.error(f"❌ Failed to get wallet connections: {e}")
+        logger.error(f"[ERROR] Failed to get wallet connections: {e}")
         raise HTTPException(status_code=500, detail="Failed to retrieve connections")
 
 
@@ -300,7 +300,7 @@ async def disconnect_wallet(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Failed to disconnect wallet: {e}")
+        logger.error(f"[ERROR] Failed to disconnect wallet: {e}")
         raise HTTPException(status_code=500, detail="Wallet disconnection failed")
 
 
@@ -319,7 +319,7 @@ async def start_trading_session(
     and begins monitoring for opportunities.
     """
     try:
-        logger.info(f"🎯 Starting trading session for wallet: {wallet_connection_id}")
+        logger.info(f"[TARGET] Starting trading session for wallet: {wallet_connection_id}")
         
         # Convert request to configuration
         configuration = None
@@ -373,10 +373,10 @@ async def start_trading_session(
         )
         
     except TradingError as e:
-        logger.error(f"❌ Trading session start failed: {e}")
+        logger.error(f"[ERROR] Trading session start failed: {e}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logger.error(f"❌ Unexpected session start error: {e}")
+        logger.error(f"[ERROR] Unexpected session start error: {e}")
         raise HTTPException(status_code=500, detail="Session start failed")
 
 
@@ -411,7 +411,7 @@ async def get_active_sessions(
         return response
         
     except Exception as e:
-        logger.error(f"❌ Failed to get active sessions: {e}")
+        logger.error(f"[ERROR] Failed to get active sessions: {e}")
         raise HTTPException(status_code=500, detail="Failed to retrieve sessions")
 
 
@@ -435,7 +435,7 @@ async def stop_trading_session(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Failed to stop session: {e}")
+        logger.error(f"[ERROR] Failed to stop session: {e}")
         raise HTTPException(status_code=500, detail="Session stop failed")
 
 
@@ -521,7 +521,7 @@ async def get_trading_opportunities(
         return response
         
     except Exception as e:
-        logger.error(f"❌ Failed to get opportunities: {e}")
+        logger.error(f"[ERROR] Failed to get opportunities: {e}")
         raise HTTPException(status_code=500, detail="Failed to retrieve opportunities")
 
 
@@ -585,7 +585,7 @@ async def stream_opportunities(
                 await asyncio.sleep(5)
                 
             except Exception as e:
-                logger.error(f"❌ Opportunity stream error: {e}")
+                logger.error(f"[ERROR] Opportunity stream error: {e}")
                 yield {
                     "event": "error",
                     "data": json.dumps({"error": str(e)})
@@ -614,7 +614,7 @@ async def get_swap_quote(
     and minimum output amount with slippage protection.
     """
     try:
-        logger.info(f"💹 Getting swap quote: {input_amount} {input_token[:10]}... → {output_token[:10]}...")
+        logger.info(f"[EMOJI] Getting swap quote: {input_amount} {input_token[:10]}... → {output_token[:10]}...")
         
         quote = await dex_integration.get_swap_quote(
             input_token=input_token,
@@ -640,10 +640,10 @@ async def get_swap_quote(
         )
         
     except DEXError as e:
-        logger.error(f"❌ Quote generation failed: {e}")
+        logger.error(f"[ERROR] Quote generation failed: {e}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logger.error(f"❌ Unexpected quote error: {e}")
+        logger.error(f"[ERROR] Unexpected quote error: {e}")
         raise HTTPException(status_code=500, detail="Quote generation failed")
 
 
@@ -661,7 +661,7 @@ async def execute_trade(
     using the specified trading session configuration.
     """
     try:
-        logger.info(f"⚡ Executing trade: {opportunity_id}")
+        logger.info(f"[TRADE] Executing trade: {opportunity_id}")
         
         transaction = await trading_engine.execute_live_trade(
             opportunity_id=opportunity_id,
@@ -679,10 +679,10 @@ async def execute_trade(
         }
         
     except TradingError as e:
-        logger.error(f"❌ Trade execution failed: {e}")
+        logger.error(f"[ERROR] Trade execution failed: {e}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logger.error(f"❌ Unexpected execution error: {e}")
+        logger.error(f"[ERROR] Unexpected execution error: {e}")
         raise HTTPException(status_code=500, detail="Trade execution failed")
 
 
@@ -700,7 +700,7 @@ async def execute_manual_trade(
     with full control over parameters and execution.
     """
     try:
-        logger.info(f"🔧 Executing manual trade: {request.input_amount} {request.input_token[:10]}...")
+        logger.info(f"[FIX] Executing manual trade: {request.input_amount} {request.input_token[:10]}...")
         
         # Get quote first
         quote = await dex_integration.get_swap_quote(
@@ -738,10 +738,10 @@ async def execute_manual_trade(
         }
         
     except DEXError as e:
-        logger.error(f"❌ Manual trade failed: {e}")
+        logger.error(f"[ERROR] Manual trade failed: {e}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logger.error(f"❌ Unexpected manual trade error: {e}")
+        logger.error(f"[ERROR] Unexpected manual trade error: {e}")
         raise HTTPException(status_code=500, detail="Manual trade failed")
 
 
@@ -796,7 +796,7 @@ async def get_system_status(
         }
         
     except Exception as e:
-        logger.error(f"❌ Failed to get system status: {e}")
+        logger.error(f"[ERROR] Failed to get system status: {e}")
         raise HTTPException(status_code=500, detail="Failed to retrieve system status")
 
 
@@ -816,7 +816,7 @@ async def initialize_system(
     for the specified networks.
     """
     try:
-        logger.info(f"🚀 Initializing system for networks: {[n.value for n in networks]}")
+        logger.info(f"[START] Initializing system for networks: {[n.value for n in networks]}")
         
         # Initialize in background
         success = await trading_engine.initialize_live_systems(networks)
@@ -842,7 +842,7 @@ async def initialize_system(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ System initialization failed: {e}")
+        logger.error(f"[ERROR] System initialization failed: {e}")
         raise HTTPException(status_code=500, detail="System initialization failed")
 
 
@@ -880,10 +880,10 @@ async def get_token_price(
         }
         
     except DEXError as e:
-        logger.error(f"❌ Price retrieval failed: {e}")
+        logger.error(f"[ERROR] Price retrieval failed: {e}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logger.error(f"❌ Unexpected price error: {e}")
+        logger.error(f"[ERROR] Unexpected price error: {e}")
         raise HTTPException(status_code=500, detail="Price retrieval failed")
 
 
@@ -924,7 +924,7 @@ async def get_token_liquidity(
         }
         
     except Exception as e:
-        logger.error(f"❌ Liquidity data error: {e}")
+        logger.error(f"[ERROR] Liquidity data error: {e}")
         raise HTTPException(status_code=500, detail="Liquidity data retrieval failed")
 
 
@@ -978,7 +978,7 @@ async def get_portfolio_summary(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Portfolio summary error: {e}")
+        logger.error(f"[ERROR] Portfolio summary error: {e}")
         raise HTTPException(status_code=500, detail="Portfolio summary failed")
 
 
@@ -1042,7 +1042,7 @@ async def get_session_performance(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Performance metrics error: {e}")
+        logger.error(f"[ERROR] Performance metrics error: {e}")
         raise HTTPException(status_code=500, detail="Performance metrics failed")
 
 
@@ -1086,7 +1086,7 @@ async def get_transaction_status(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Transaction status error: {e}")
+        logger.error(f"[ERROR] Transaction status error: {e}")
         raise HTTPException(status_code=500, detail="Transaction status failed")
 
 
@@ -1141,7 +1141,7 @@ async def get_session_transactions(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Session transactions error: {e}")
+        logger.error(f"[ERROR] Session transactions error: {e}")
         raise HTTPException(status_code=500, detail="Session transactions failed")
 
 
@@ -1204,7 +1204,7 @@ async def get_risk_assessment(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Risk assessment error: {e}")
+        logger.error(f"[ERROR] Risk assessment error: {e}")
         raise HTTPException(status_code=500, detail="Risk assessment failed")
 
 
@@ -1258,7 +1258,7 @@ async def update_risk_limits(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"❌ Risk limits update error: {e}")
+        logger.error(f"[ERROR] Risk limits update error: {e}")
         raise HTTPException(status_code=500, detail="Risk limits update failed")
 
 

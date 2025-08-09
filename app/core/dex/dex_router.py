@@ -183,7 +183,7 @@ class DEXRouter:
             'mev_risk': 0.05       # 5%
         }
         
-        logger.info("✅ DEXRouter initialized with professional routing capabilities")
+        logger.info("[OK] DEXRouter initialized with professional routing capabilities")
 
     async def find_optimal_route(
         self, 
@@ -220,14 +220,14 @@ class DEXRouter:
             if input_token == output_token:
                 raise DexRouterException("Input and output tokens must be different")
             
-            logger.info(f"🔍 Finding optimal route: {amount_in} {input_token} → {output_token}")
+            logger.info(f"[SEARCH] Finding optimal route: {amount_in} {input_token} → {output_token}")
             
             # Check cache first
             cache_key = f"route_{input_token}_{output_token}_{amount_in}_{chain}"
             cached_route = await cache_manager.get(cache_key, namespace='dex_routes')
             
             if cached_route and self._is_route_fresh(cached_route):
-                logger.info("📦 Using cached route")
+                logger.info("[EMOJI] Using cached route")
                 return RouteQuote(**cached_route)
             
             # Find all possible routes
@@ -236,14 +236,14 @@ class DEXRouter:
             )
             
             if not routes:
-                logger.warning("❌ No routes found")
+                logger.warning("[ERROR] No routes found")
                 return None
             
             # Evaluate and rank routes
             evaluated_routes = await self._evaluate_routes(routes, max_slippage)
             
             if not evaluated_routes:
-                logger.warning("❌ No viable routes after evaluation")
+                logger.warning("[ERROR] No viable routes after evaluation")
                 return None
             
             # Select optimal route
@@ -261,7 +261,7 @@ class DEXRouter:
                 ttl=self.route_cache_ttl, namespace='dex_routes'
             )
             
-            logger.info(f"✅ Optimal route found: {quote.output_amount} {output_token} "
+            logger.info(f"[OK] Optimal route found: {quote.output_amount} {output_token} "
                        f"(Price impact: {quote.price_impact_percentage:.2f}%)")
             
             return quote
@@ -299,7 +299,7 @@ class DEXRouter:
             if not await self._validate_route_freshness(route_quote):
                 raise DexRouterException("Route is stale, please refresh")
             
-            logger.info(f"⚡ Executing multi-hop trade: "
+            logger.info(f"[TRADE] Executing multi-hop trade: "
                        f"{route_quote.input_amount} → {route_quote.output_amount}")
             
             # Prepare execution plan
@@ -314,7 +314,7 @@ class DEXRouter:
             # Monitor execution
             await self._monitor_execution(result['transaction_hash'])
             
-            logger.info(f"✅ Multi-hop trade executed: {result['transaction_hash']}")
+            logger.info(f"[OK] Multi-hop trade executed: {result['transaction_hash']}")
             
             return result
             
@@ -352,7 +352,7 @@ class DEXRouter:
             )
             routes.extend(arbitrage_routes)
             
-            logger.info(f"📊 Found {len(routes)} possible routes")
+            logger.info(f"[STATS] Found {len(routes)} possible routes")
             return routes
             
         except Exception as e:
@@ -913,7 +913,7 @@ class DEXRouter:
             total_cost_eth = (execution_plan['total_gas_estimate'] * gas_price_gwei) / Decimal('1e9')
             simulation_result['estimated_cost_usd'] = float(total_cost_eth * eth_price)
             
-            logger.info(f"✅ Trade simulation completed: {simulation_result}")
+            logger.info(f"[OK] Trade simulation completed: {simulation_result}")
             return simulation_result
             
         except Exception as e:
@@ -957,7 +957,7 @@ class DEXRouter:
                 'steps_completed': len(execution_plan['execution_steps'])
             })
             
-            logger.info(f"✅ Trade executed successfully: {execution_result['transaction_hash']}")
+            logger.info(f"[OK] Trade executed successfully: {execution_result['transaction_hash']}")
             return execution_result
             
         except Exception as e:
@@ -979,7 +979,7 @@ class DEXRouter:
             # 3. Update execution status
             # 4. Handle MEV protection
             
-            logger.info(f"📊 Monitoring transaction: {transaction_hash}")
+            logger.info(f"[STATS] Monitoring transaction: {transaction_hash}")
             
         except Exception as e:
             logger.error(f"Error monitoring execution: {e}")
@@ -1165,7 +1165,7 @@ class DEXRouter:
                 cache_key, status, ttl=300, namespace='dex_routes'
             )
             
-            logger.info(f"✅ Route {route_id} cancelled")
+            logger.info(f"[OK] Route {route_id} cancelled")
             return True
             
         except Exception as e:
@@ -1195,7 +1195,7 @@ class DEXRouter:
             if hasattr(self.multi_chain_manager, 'cleanup'):
                 await self.multi_chain_manager.cleanup()
             
-            logger.info("✅ DEXRouter cleanup completed")
+            logger.info("[OK] DEXRouter cleanup completed")
             
         except Exception as e:
             logger.error(f"Error during DEXRouter cleanup: {e}")
@@ -1217,7 +1217,7 @@ if __name__ == "__main__":
             )
             
             if quote:
-                print(f"✅ Optimal route found:")
+                print(f"[OK] Optimal route found:")
                 print(f"   Input: {quote.input_amount} WETH")
                 print(f"   Output: {quote.output_amount} USDC")
                 print(f"   Price Impact: {quote.price_impact_percentage:.2f}%")
@@ -1225,10 +1225,10 @@ if __name__ == "__main__":
                 print(f"   Route Type: {quote.route.route_type.value}")
                 print(f"   Steps: {len(quote.route.steps)}")
             else:
-                print("❌ No route found")
+                print("[ERROR] No route found")
                 
         except Exception as e:
-            print(f"❌ Test failed: {e}")
+            print(f"[ERROR] Test failed: {e}")
         finally:
             await router.cleanup()
     

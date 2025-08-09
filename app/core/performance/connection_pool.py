@@ -39,7 +39,7 @@ class MockConnectionPool:
             self.stats["connections_active"] = 2
             self.stats["last_activity"] = datetime.utcnow().isoformat()
             
-            logger.info("✅ Mock connection pool initialized successfully")
+            logger.info("[OK] Mock connection pool initialized successfully")
             return True
             
         except Exception as e:

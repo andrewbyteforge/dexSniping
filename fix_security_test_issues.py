@@ -11,12 +11,12 @@ from pathlib import Path
 
 def fix_exceptions_file():
     """Add missing exceptions to the exceptions file."""
-    print("🔧 Adding missing exceptions...")
+    print("[FIX] Adding missing exceptions...")
     
     exceptions_file = Path("app/core/exceptions.py")
     
     if not exceptions_file.exists():
-        print("❌ Exceptions file not found")
+        print("[ERROR] Exceptions file not found")
         return False
     
     try:
@@ -56,30 +56,30 @@ class APIError(DEXSniperError):
                 new_all = "'FormatError',\n    'RateLimitError', 'TimeoutError', 'APIError'"
                 content = content.replace(old_all, new_all)
                 
-                print("  ✅ Added missing exceptions: RateLimitError, TimeoutError, APIError")
+                print("  [OK] Added missing exceptions: RateLimitError, TimeoutError, APIError")
             else:
                 # Just append the exceptions
                 content += missing_exceptions
-                print("  ✅ Added missing exceptions at end of file")
+                print("  [OK] Added missing exceptions at end of file")
         else:
-            print("  ✅ All required exceptions already exist")
+            print("  [OK] All required exceptions already exist")
         
         # Write back the updated content
         exceptions_file.write_text(content, encoding='utf-8')
         return True
         
     except Exception as e:
-        print(f"❌ Failed to update exceptions: {e}")
+        print(f"[ERROR] Failed to update exceptions: {e}")
         return False
 
 def fix_security_manager():
     """Fix security manager attribute issues."""
-    print("🔧 Fixing security manager attributes...")
+    print("[FIX] Fixing security manager attributes...")
     
     security_file = Path("app/core/security/security_manager.py")
     
     if not security_file.exists():
-        print("❌ Security manager file not found")
+        print("[ERROR] Security manager file not found")
         return False
     
     try:
@@ -102,7 +102,7 @@ def fix_security_manager():
                                 # Add APIKeyType reference after the method definition
                                 lines.insert(j + 1, '        self.APIKeyType = APIKeyType')
                                 content = '\n'.join(lines)
-                                print("  ✅ Added APIKeyType reference to APIAuthentication")
+                                print("  [OK] Added APIKeyType reference to APIAuthentication")
                                 break
                         break
         
@@ -110,24 +110,24 @@ def fix_security_manager():
         # The regex patterns in the class have double escaping issues
         if '\\\\d+\\\\.?\\\\d*' in content:
             content = content.replace('\\\\d+\\\\.?\\\\d*', '\\d+\\.?\\d*')
-            print("  ✅ Fixed regex pattern escaping")
+            print("  [OK] Fixed regex pattern escaping")
         
         # Write back the updated content
         security_file.write_text(content, encoding='utf-8')
         return True
         
     except Exception as e:
-        print(f"❌ Failed to fix security manager: {e}")
+        print(f"[ERROR] Failed to fix security manager: {e}")
         return False
 
 def fix_security_test_file():
     """Fix the security test file to handle missing components."""
-    print("🔧 Fixing security test file...")
+    print("[FIX] Fixing security test file...")
     
     test_file = Path("tests/test_security_implementation.py")
     
     if not test_file.exists():
-        print("❌ Security test file not found")
+        print("[ERROR] Security test file not found")
         return False
     
     try:
@@ -150,11 +150,11 @@ def fix_security_test_file():
             invalid_amount, _ = validator.validate_amount("-10", 0, 1000)
             assert not invalid_amount
         except Exception as e:
-            print(f"    ⚠️ Amount validation test adjusted: {e}")'''
+            print(f"    [WARN] Amount validation test adjusted: {e}")'''
         
         if old_validation_test in content:
             content = content.replace(old_validation_test, new_validation_test)
-            print("  ✅ Fixed input validation test")
+            print("  [OK] Fixed input validation test")
         
         # Fix the error sanitization test
         old_sanitizer_test = '''# Test 3: Private key sanitization
@@ -173,7 +173,7 @@ def fix_security_test_file():
         
         if old_sanitizer_test in content:
             content = content.replace(old_sanitizer_test, new_sanitizer_test)
-            print("  ✅ Fixed error sanitization test")
+            print("  [OK] Fixed error sanitization test")
         
         # Fix the performance test
         old_performance_test = '''# Test 2: API key validation speed
@@ -193,19 +193,19 @@ def fix_security_test_file():
         
         if old_performance_test in content:
             content = content.replace(old_performance_test, new_performance_test)
-            print("  ✅ Fixed performance test")
+            print("  [OK] Fixed performance test")
         
         # Write back the updated content
         test_file.write_text(content, encoding='utf-8')
         return True
         
     except Exception as e:
-        print(f"❌ Failed to fix test file: {e}")
+        print(f"[ERROR] Failed to fix test file: {e}")
         return False
 
 def create_comprehensive_fix():
     """Create a comprehensive fix for all remaining issues."""
-    print("🔧 Creating comprehensive security fix...")
+    print("[FIX] Creating comprehensive security fix...")
     
     # Create a new, working security manager
     security_content = '''"""
@@ -666,13 +666,13 @@ __all__ = [
     
     security_file = Path("app/core/security/security_manager.py")
     security_file.write_text(security_content, encoding='utf-8')
-    print("✅ Created fixed security manager")
+    print("[OK] Created fixed security manager")
     
     return True
 
 def main():
     """Main fix function."""
-    print("🛡️ Fix Security Test Issues")
+    print("[SEC] Fix Security Test Issues")
     print("=" * 40)
     
     success_count = 0
@@ -680,23 +680,23 @@ def main():
     # Fix 1: Add missing exceptions
     if fix_exceptions_file():
         success_count += 1
-        print("✅ Fixed exceptions file")
+        print("[OK] Fixed exceptions file")
     
     # Fix 2: Create comprehensive security manager
     if create_comprehensive_fix():
         success_count += 1
-        print("✅ Created fixed security manager")
+        print("[OK] Created fixed security manager")
     
-    print(f"\n📊 Applied {success_count}/2 fixes")
+    print(f"\n[STATS] Applied {success_count}/2 fixes")
     
     if success_count == 2:
-        print("\n🎯 All security fixes applied!")
-        print("\n🧪 Test the security implementation:")
+        print("\n[TARGET] All security fixes applied!")
+        print("\n[TEST] Test the security implementation:")
         print("   python test_security_working.py")
         print("   python tests/test_security_implementation.py")
         return True
     else:
-        print("\n⚠️ Some fixes failed")
+        print("\n[WARN] Some fixes failed")
         return False
 
 if __name__ == "__main__":
@@ -704,5 +704,5 @@ if __name__ == "__main__":
         success = main()
         sys.exit(0 if success else 1)
     except Exception as e:
-        print(f"💥 Fix script error: {e}")
+        print(f"[EMOJI] Fix script error: {e}")
         sys.exit(1)

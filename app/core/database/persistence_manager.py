@@ -100,7 +100,7 @@ class PersistenceManager:
         self._connection = None
         self._initialized = False
         
-        logger.info(f"💾 PersistenceManager initialized with path: {self.db_path}")
+        logger.info(f"[DB] PersistenceManager initialized with path: {self.db_path}")
     
     async def initialize(self) -> bool:
         """Initialize database connection and tables."""
@@ -111,25 +111,25 @@ class PersistenceManager:
                 self._connection = await aiosqlite.connect(str(self.db_path))
                 await self._create_tables()
                 self._initialized = True
-                logger.info("✅ Database initialized with aiosqlite")
+                logger.info("[OK] Database initialized with aiosqlite")
                 return True
                 
             except ImportError:
                 # Fallback to synchronous sqlite3
-                logger.warning("⚠️ aiosqlite not available, using fallback mode")
+                logger.warning("[WARN] aiosqlite not available, using fallback mode")
                 self._connection = sqlite3.connect(str(self.db_path))
                 self._connection.row_factory = sqlite3.Row
                 self._create_tables_sync()
                 self._initialized = True
-                logger.info("✅ Database initialized with sqlite3 fallback")
+                logger.info("[OK] Database initialized with sqlite3 fallback")
                 return True
                 
         except Exception as e:
-            logger.error(f"❌ Database initialization failed: {e}")
+            logger.error(f"[ERROR] Database initialization failed: {e}")
             # Create mock mode for testing
             self._connection = None
             self._initialized = True  # Allow testing without database
-            logger.warning("⚠️ Database running in mock mode")
+            logger.warning("[WARN] Database running in mock mode")
             return True
     
     async def _create_tables(self):
@@ -196,11 +196,11 @@ class PersistenceManager:
         """Save trade record."""
         try:
             if not self._initialized:
-                logger.warning("⚠️ Database not initialized")
+                logger.warning("[WARN] Database not initialized")
                 return False
             
             if self._connection is None:
-                logger.info("📝 Mock mode: Trade would be saved")
+                logger.info("[NOTE] Mock mode: Trade would be saved")
                 return True
             
             trade_data = trade.to_dict()
@@ -228,11 +228,11 @@ class PersistenceManager:
                 """, tuple(trade_data.values()))
                 self._connection.commit()
             
-            logger.info(f"💾 Trade saved: {trade.trade_id}")
+            logger.info(f"[DB] Trade saved: {trade.trade_id}")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to save trade: {e}")
+            logger.error(f"[ERROR] Failed to save trade: {e}")
             return False
     
     async def get_trade_history(self, wallet_address: str, limit: int = 100) -> List[Dict[str, Any]]:
@@ -274,7 +274,7 @@ class PersistenceManager:
             return [dict(row) for row in rows]
             
         except Exception as e:
-            logger.error(f"❌ Failed to get trade history: {e}")
+            logger.error(f"[ERROR] Failed to get trade history: {e}")
             return []
     
     def get_database_status(self) -> Dict[str, Any]:
@@ -295,9 +295,9 @@ class PersistenceManager:
                     await self._connection.close()
                 else:
                     self._connection.close()
-            logger.info("✅ Database connection closed")
+            logger.info("[OK] Database connection closed")
         except Exception as e:
-            logger.error(f"❌ Error closing database: {e}")
+            logger.error(f"[ERROR] Error closing database: {e}")
     
     async def shutdown(self):
         """Shutdown persistence manager."""

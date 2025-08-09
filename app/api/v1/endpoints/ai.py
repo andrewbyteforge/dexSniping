@@ -85,7 +85,7 @@ async def get_live_opportunities(
     This endpoint provides real-time opportunities for the dashboard feed.
     """
     try:
-        logger.info(f"🔍 Fetching live opportunities for {request.network}")
+        logger.info(f"[SEARCH] Fetching live opportunities for {request.network}")
         
         if not token_discovery:
             raise HTTPException(status_code=503, detail="Token discovery service not available")
@@ -158,7 +158,7 @@ async def get_live_opportunities(
         }
         
     except Exception as e:
-        logger.error(f"❌ Failed to get live opportunities: {e}")
+        logger.error(f"[ERROR] Failed to get live opportunities: {e}")
         raise HTTPException(status_code=500, detail="Failed to fetch opportunities")
 
 
@@ -219,7 +219,7 @@ async def start_auto_trader(
     Start the auto-trading bot with specified configuration.
     """
     try:
-        logger.info("🤖 Starting auto-trader with configuration")
+        logger.info("[BOT] Starting auto-trader with configuration")
         
         if not auto_trader:
             raise HTTPException(status_code=503, detail="Auto-trader service not available")
@@ -246,7 +246,7 @@ async def start_auto_trader(
         }
         
     except Exception as e:
-        logger.error(f"❌ Failed to start auto-trader: {e}")
+        logger.error(f"[ERROR] Failed to start auto-trader: {e}")
         raise HTTPException(status_code=500, detail="Failed to start auto-trader")
 
 
@@ -254,7 +254,7 @@ async def start_auto_trader(
 async def stop_auto_trader(db=Depends(get_db_session)) -> Dict[str, Any]:
     """Stop the auto-trading bot."""
     try:
-        logger.info("🛑 Stopping auto-trader")
+        logger.info("[EMOJI] Stopping auto-trader")
         
         if not auto_trader:
             raise HTTPException(status_code=503, detail="Auto-trader service not available")
@@ -269,7 +269,7 @@ async def stop_auto_trader(db=Depends(get_db_session)) -> Dict[str, Any]:
         }
         
     except Exception as e:
-        logger.error(f"❌ Failed to stop auto-trader: {e}")
+        logger.error(f"[ERROR] Failed to stop auto-trader: {e}")
         raise HTTPException(status_code=500, detail="Failed to stop auto-trader")
 
 
@@ -296,7 +296,7 @@ async def get_auto_trader_status(db=Depends(get_db_session)) -> Dict[str, Any]:
         }
         
     except Exception as e:
-        logger.error(f"❌ Failed to get auto-trader status: {e}")
+        logger.error(f"[ERROR] Failed to get auto-trader status: {e}")
         raise HTTPException(status_code=500, detail="Failed to get status")
 
 
@@ -313,7 +313,7 @@ async def execute_trade(
     Execute a manual trade with AI risk assessment.
     """
     try:
-        logger.info(f"📈 Executing {trade_request.action} trade for {trade_request.token_address}")
+        logger.info(f"[PERF] Executing {trade_request.action} trade for {trade_request.token_address}")
         
         # Perform AI risk assessment first
         if risk_assessor and not trade_request.force_execute:
@@ -353,7 +353,7 @@ async def execute_trade(
         }
         
     except Exception as e:
-        logger.error(f"❌ Trade execution failed: {e}")
+        logger.error(f"[ERROR] Trade execution failed: {e}")
         raise HTTPException(status_code=500, detail="Trade execution failed")
 
 
@@ -372,7 +372,7 @@ async def analyze_contract(
     Perform comprehensive AI contract analysis.
     """
     try:
-        logger.info(f"🔍 Analyzing contract {token_address} on {network}")
+        logger.info(f"[SEARCH] Analyzing contract {token_address} on {network}")
         
         if not contract_analyzer:
             raise HTTPException(status_code=503, detail="Contract analyzer not available")
@@ -429,7 +429,7 @@ async def analyze_contract(
         }
         
     except Exception as e:
-        logger.error(f"❌ Contract analysis failed: {e}")
+        logger.error(f"[ERROR] Contract analysis failed: {e}")
         raise HTTPException(status_code=500, detail="Contract analysis failed")
 
 
@@ -443,7 +443,7 @@ async def detect_honeypot(
     Detect honeypot contracts with high accuracy.
     """
     try:
-        logger.info(f"🍯 Detecting honeypot for {token_address}")
+        logger.info(f"[EMOJI] Detecting honeypot for {token_address}")
         
         if not honeypot_detector:
             raise HTTPException(status_code=503, detail="Honeypot detector not available")
@@ -470,7 +470,7 @@ async def detect_honeypot(
         }
         
     except Exception as e:
-        logger.error(f"❌ Honeypot detection failed: {e}")
+        logger.error(f"[ERROR] Honeypot detection failed: {e}")
         raise HTTPException(status_code=500, detail="Honeypot detection failed")
 
 
@@ -496,7 +496,7 @@ async def get_ai_system_status() -> Dict[str, Any]:
         }
         
     except Exception as e:
-        logger.error(f"❌ Failed to get AI system status: {e}")
+        logger.error(f"[ERROR] Failed to get AI system status: {e}")
         raise HTTPException(status_code=500, detail="Failed to get system status")
 
 
@@ -509,7 +509,7 @@ async def initialize_ai_services():
     global risk_assessor, honeypot_detector, contract_analyzer, auto_trader, token_discovery
     
     try:
-        logger.info("🤖 Initializing AI services...")
+        logger.info("[BOT] Initializing AI services...")
         
         # Initialize AI components
         from app.core.ai.risk_assessor import AIRiskAssessor
@@ -530,11 +530,11 @@ async def initialize_ai_services():
         await auto_trader.initialize()
         await token_discovery.initialize()
         
-        logger.info("✅ AI services initialized successfully")
+        logger.info("[OK] AI services initialized successfully")
         return True
         
     except Exception as e:
-        logger.error(f"❌ Failed to initialize AI services: {e}")
+        logger.error(f"[ERROR] Failed to initialize AI services: {e}")
         return False
 
 
