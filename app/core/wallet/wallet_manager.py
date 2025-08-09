@@ -29,7 +29,7 @@ except ImportError:
     Web3 = None
     Account = None
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_trading_logger, get_performance_logger, get_trading_logger, get_performance_logger
 from app.core.exceptions import (
     WalletError, 
     InsufficientFundsError,
@@ -38,7 +38,7 @@ from app.core.exceptions import (
     SecurityError
 )
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "trading")
 
 
 class WalletType(str, Enum):

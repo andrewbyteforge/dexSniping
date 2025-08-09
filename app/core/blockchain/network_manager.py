@@ -31,7 +31,7 @@ from app.core.exceptions import (
     InsufficientFundsError
 )
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "application")
 
 
 class NetworkType(str, Enum):

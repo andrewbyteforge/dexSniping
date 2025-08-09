@@ -51,7 +51,7 @@ except ImportError:
     def to_wei(amount, unit): return int(amount * 10**18)
     def from_wei(amount, unit): return float(amount / 10**18)
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_trading_logger, get_performance_logger, get_trading_logger, get_performance_logger
 from app.core.exceptions import (
     WalletError, 
     NetworkError, 
@@ -59,7 +59,7 @@ from app.core.exceptions import (
     ValidationError
 )
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "trading")
 
 
 class WalletType(str, Enum):

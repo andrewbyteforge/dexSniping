@@ -41,7 +41,7 @@ except ImportError:
     def to_wei(amount, unit): return int(amount * 10**18)
     def from_wei(amount, unit): return float(amount / 10**18)
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_trading_logger, get_performance_logger, get_trading_logger, get_performance_logger
 from app.core.exceptions import (
     TransactionError,
     InsufficientFundsError,
@@ -54,7 +54,7 @@ from app.core.database.persistence_manager import (
     TradeStatus
 )
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "trading")
 
 
 class TransactionType(Enum):

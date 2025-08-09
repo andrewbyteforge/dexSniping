@@ -36,7 +36,7 @@ from app.core.blockchain.base_chain import BaseChain
 from app.core.cache.cache_manager import CacheManager
 from app.core.performance.circuit_breaker import CircuitBreakerManager
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "application")
 
 
 class HoneypotType(Enum):

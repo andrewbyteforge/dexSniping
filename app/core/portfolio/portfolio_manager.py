@@ -16,7 +16,7 @@ from enum import Enum
 from app.utils.logger import setup_logger
 from app.core.exceptions import PortfolioError, InsufficientFundsError
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "application")
 
 
 class PositionType(Enum):

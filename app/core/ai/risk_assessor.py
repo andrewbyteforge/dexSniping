@@ -40,7 +40,7 @@ from app.core.risk.risk_calculator import RiskFactors, TokenRiskAssessment
 from app.models.token import Token
 from app.schemas.token import TokenInfo
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "application")
 
 
 class HoneypotRisk(Enum):

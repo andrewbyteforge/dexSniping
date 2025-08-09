@@ -54,7 +54,7 @@ from app.core.wallet.wallet_connection_manager import (
     NetworkType, 
     get_wallet_connection_manager
 )
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_trading_logger, get_performance_logger, get_trading_logger, get_performance_logger
 from app.core.exceptions import (
     DEXError, 
     NetworkError, 
@@ -63,7 +63,7 @@ from app.core.exceptions import (
     TransactionError
 )
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "trading")
 
 
 class DEXProtocol(str, Enum):

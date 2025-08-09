@@ -6,7 +6,7 @@ from app.core.blockchain.base_chain import BaseChain, ChainType, TokenInfo, Liqu
 from app.utils.exceptions import ChainNotSupportedException, ChainConnectionException
 from app.utils.logger import setup_logger
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "application")
 
 class SimpleEVMChain(BaseChain):
     @property

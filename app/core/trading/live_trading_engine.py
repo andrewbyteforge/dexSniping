@@ -24,9 +24,9 @@ from app.core.trading.trading_engine import (
     TradingSignal, ExecutionResult, TradingConfiguration
 )
 from app.core.exceptions import TradingError, NetworkError, InsufficientFundsError
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_trading_logger, get_performance_logger, get_trading_logger, get_performance_logger
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "trading")
 
 
 @dataclass

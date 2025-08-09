@@ -26,11 +26,11 @@ from app.core.dex.uniswap_integration import (
 from app.core.blockchain.multi_chain_manager import MultiChainManager
 from app.core.performance.cache_manager import cache_manager
 from app.core.performance.circuit_breaker import CircuitBreakerManager
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_trading_logger, get_performance_logger, get_trading_logger, get_performance_logger
 from app.utils.exceptions import DexSnipingException
 from app.config import settings
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "trading")
 
 
 class DEXManagerError(DexSnipingException):

@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from app.utils.logger import setup_logger
 from app.utils.exceptions import DexSnipingException
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "application")
 
 
 class CacheError(DexSnipingException):

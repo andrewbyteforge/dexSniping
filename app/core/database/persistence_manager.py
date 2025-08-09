@@ -53,7 +53,7 @@ except ImportError:
 from app.utils.logger import setup_logger
 from app.core.exceptions import DatabaseError, ValidationError
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "database")
 
 
 class TableName(Enum):

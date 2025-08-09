@@ -19,7 +19,7 @@ from app.core.portfolio.portfolio_manager import PortfolioManager
 from app.utils.logger import setup_logger
 from app.utils.exceptions import DexSnipingException
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "application")
 
 
 class LiveDashboardServiceError(DexSnipingException):

@@ -24,7 +24,7 @@ except ImportError:
     Web3 = None
     Contract = None
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_trading_logger, get_performance_logger, get_trading_logger, get_performance_logger
 from app.core.exceptions import (
     DEXError,
     InsufficientLiquidityError,
@@ -32,7 +32,7 @@ from app.core.exceptions import (
     TransactionError
 )
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "trading")
 
 
 class DEXProtocol(str, Enum):

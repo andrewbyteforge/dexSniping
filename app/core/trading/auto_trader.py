@@ -15,14 +15,14 @@ from dataclasses import dataclass, field
 from enum import Enum
 import json
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_trading_logger, get_performance_logger, get_trading_logger, get_performance_logger
 from app.core.exceptions import TradingError, InsufficientFundsError
 from app.core.ai.risk_assessor import AIRiskAssessor
 from app.core.trading.order_executor import OrderExecutor, Order, OrderSide, OrderType
 from app.core.risk.position_sizer import PositionSizer
 from app.core.risk.stop_loss_manager import StopLossManager
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "trading")
 
 
 class TraderStatus(Enum):

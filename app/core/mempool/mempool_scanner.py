@@ -26,7 +26,7 @@ from app.utils.logger import setup_logger
 from app.utils.exceptions import DexSnipingException
 from app.config import settings
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "application")
 
 
 class MempoolScannerError(DexSnipingException):

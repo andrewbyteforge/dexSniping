@@ -14,7 +14,7 @@ from app.core.blockchain.network_config import NetworkConfig
 from app.utils.exceptions import ChainConnectionException
 from app.utils.logger import setup_logger
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "application")
 
 
 class ChainStatus(Enum):

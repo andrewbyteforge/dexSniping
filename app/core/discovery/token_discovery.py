@@ -20,7 +20,7 @@ from app.core.ai.risk_assessor import AIRiskAssessor
 from app.core.ai.honeypot_detector import HoneypotDetector
 from app.core.database import get_db_session
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "application")
 
 
 @dataclass

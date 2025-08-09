@@ -14,13 +14,13 @@ from dataclasses import dataclass
 from enum import Enum
 import logging
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_trading_logger, get_performance_logger, get_trading_logger, get_performance_logger
 from app.models.dex.trading_models import (
     TradingPosition, TradingOrder, RiskLimit, PortfolioTransaction,
     OrderSide, OrderType, OrderStatus, PositionStatus, TransactionType
 )
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "trading")
 
 
 class RiskLevel(str, Enum):

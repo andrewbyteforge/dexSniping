@@ -14,7 +14,7 @@ from collections import deque
 from app.utils.logger import setup_logger
 from app.utils.exceptions import DexSnipingException
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "application")
 
 
 class CircuitBreakerError(DexSnipingException):

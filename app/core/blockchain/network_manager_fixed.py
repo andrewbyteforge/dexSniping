@@ -28,7 +28,7 @@ except ImportError:
 from app.utils.logger import setup_logger
 from app.core.exceptions import NetworkError, ConnectionError, RPCError
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "application")
 
 
 class NetworkType(str, Enum):

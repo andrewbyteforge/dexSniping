@@ -16,7 +16,7 @@ from app.core.performance.cache_manager import cache_manager
 from app.utils.logger import setup_logger
 from app.config import settings
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "application")
 
 
 class Phase3AManager:

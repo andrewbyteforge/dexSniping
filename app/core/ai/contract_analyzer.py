@@ -19,7 +19,7 @@ from app.utils.logger import setup_logger
 from app.core.exceptions import ContractAnalysisError, ValidationError
 from app.core.blockchain.base_chain import BaseChain
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "application")
 
 
 class ContractType(Enum):

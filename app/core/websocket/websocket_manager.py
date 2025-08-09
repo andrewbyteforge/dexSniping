@@ -18,7 +18,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from app.utils.logger import setup_logger
 from app.utils.exceptions import DexSnipingException
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "application")
 
 
 class WebSocketManagerError(DexSnipingException):

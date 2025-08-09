@@ -16,12 +16,12 @@ from dataclasses import dataclass, field
 from enum import Enum
 import uuid
 
-from app.utils.logger import setup_logger
+from app.utils.logger import setup_logger, get_trading_logger, get_performance_logger, get_trading_logger, get_performance_logger
 from app.core.wallet.wallet_manager import WalletManager, NetworkType
 from app.core.dex.dex_integration import DEXIntegration, DEXProtocol, SwapQuote
 from app.core.exceptions import TradingError
 
-logger = setup_logger(__name__)
+logger = setup_logger(__name__, "trading")
 
 
 class TradingMode(str, Enum):
