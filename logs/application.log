@@ -2161,3 +2161,43 @@ pi.v1.endpoints.activity'
 20:12:28 - INFO - app.main - CLEANUP: Starting component cleanup...
 20:12:28 - INFO - app.main - CLEANUP: Component cleanup completed
 20:12:28 - INFO - app.main - ================================================================================
+20:13:27 - INFO - app.main - LOGGER: Enhanced logging system initialized
+20:13:27 - WARNING - app.main - EXCEPTIONS: Using fallback exception classes
+20:13:27 - WARNING - app.main - COMPONENT: Snipe trading controller not available: cannot import name 'RiskManagementError' from 'app.core.exceptions' (D:\dex_sniping\dex_sniping_project\app\core\exceptions.py)
+20:13:27 - WARNING - app.main - COMPONENT: AI risk assessment engine not available: cannot import name 'AIError' from 'app.core.exceptions' (D:\dex_sniping\dex_sniping_project\app\core\exceptions.py)
+20:13:27 - WARNING - app.main - COMPONENT: Enhanced wallet manager not available: cannot import name 'get_trading_logger' from 'app.utils.logger' (D:\dex_sniping\dex_sniping_project\app\utils\logger.py)
+20:13:27 - WARNING - app.main - COMPONENT: Database system not available: cannot import name 'initialize_persistence_system' from 'app.core.database.persistence_manager' (D:\dex_sniping\dex_sniping_project\app\core\database\persistence_manager.py)
+20:13:28 - WARNING - app.main - COMPONENT: Live trading engine not available: cannot import name 'get_trading_logger' from 'app.utils.logger' (D:\dex_sniping\dex_sniping_project\app\utils\logger.py)
+20:13:28 - INFO - app.main - FASTAPI: Application instance created
+20:13:28 - INFO - app.main - MIDDLEWARE: All middleware configured successfully
+20:13:28 - INFO - app.main - HANDLERS: Exception handlers configured
+20:13:28 - INFO - app.main - TEMPLATES: Templates configured from frontend\templates
+20:13:28 - INFO - app.main - STATIC: Static files mounted from frontend\static
+20:13:28 - WARNING - app.main - ROUTES: Live trading API not available: cannot import name 'get_trading_logger' from 'app.utils.logger' (D:\dex_sniping\dex_sniping_project\app\utils\logger.py)
+20:13:28 - INFO - app.main - ROUTES: Mock live trading routes included
+20:13:28 - WARNING - app.main - ROUTES: dashboard router not available: module 'app.api.v1.endpoints.dashboard' has no attribute 'dashboard_router'
+20:13:28 - WARNING - app.main - ROUTES: tokens router not available: module 'app.api.v1.endpoints.tokens' has no attribute 'tokens_router'
+20:13:28 - WARNING - app.main - ROUTES: trading router not available: module 'app.api.v1.endpoints.trading' has no attribute 'trading_router'
+20:13:28 - WARNING - app.main - ROUTES: activity router not available: No module named 'app.api.v1.endpoints.activity'
+20:13:28 - INFO - app.main - ROUTES: API routes loaded: 0, failed: 5
+20:13:28 - WARNING - app.main - ROUTES: Failed: live-trading-api(cannot import name 'get_trading_logger' from 'app.utils.logger' (D:\dex_sniping\dex_sniping_project\app\utils\logger.py)), dashboard(module 'app.api.v1.endpoints.dashboard' has no attribute 'dashboard_router'), tokens(module 'app.api.v1.endpoints.tokens' has no attribute 'tokens_router'), trading(module 'app.api.v1.endpoints.trading' has no attribute 'trading_router'), activity(No module named 'app.api.v1.endpoints.activity')
+20:13:28 - INFO - app.main - ROUTES: Frontend routes configured
+20:13:28 - INFO - app.main - ROUTES: System routes configured
+20:13:28 - INFO - app.main - APPLICATION: DEX Sniper Pro Phase 4D Enhanced application created successfully
+20:13:28 - INFO - app.main - ================================================================================
+20:13:28 - INFO - app.main - ================================================================================
+20:13:28 - INFO - app.main - STARTUP: Application version 4.0.0
+20:13:28 - INFO - app.main - STARTUP: Startup time: 2025-08-09T19:13:28.623731+00:00
+20:13:28 - INFO - app.main - STARTUP: Python version: 3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]
+20:13:28 - INFO - app.main - STARTUP: Working directory: D:\dex_sniping\dex_sniping_project
+20:13:28 - INFO - app.main - DETECTION: Found 0/5 components available
+20:13:28 - INFO - app.main - DETECTION: Unavailable: snipe_trading, ai_risk, wallet_manager, database, trading_engine
+20:13:28 - INFO - app.main - INIT: Starting component initialization phase...
+20:13:28 - INFO - app.main - INIT: Skipping database - not available
+20:13:28 - INFO - app.main - INIT: Skipping wallet_manager - not available
+20:13:28 - INFO - app.main - INIT: Skipping trading_engine - not available
+20:13:28 - INFO - app.main - INIT: Skipping ai_risk - not available
+20:13:28 - INFO - app.main - INIT: Skipping snipe_trading - not available
+20:13:28 - INFO - app.main - INIT: Component initialization complete: 0/5 successful
+20:13:28 - WARNING - app.main - INIT: Running in compatibility mode - no Phase 4D components available
+20:13:28 - INFO - app.main - ================================================================================
