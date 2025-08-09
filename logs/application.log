@@ -28,3 +28,15 @@
 11:02:15 - INFO - app.api.v1.endpoints.dashboard - [OK] Dashboard statistics retrieved successfully
 11:02:37 - INFO - app.api.v1.endpoints.dashboard - [OK] Fetching dashboard statistics
 11:02:37 - INFO - app.api.v1.endpoints.dashboard - [OK] Dashboard statistics retrieved successfully
+11:09:55 - INFO - app.main - [OK] Templates configured
+11:09:55 - INFO - app.main - [OK] Static files mounted
+11:09:55 - INFO - app.main - [OK] Dashboard router included
+11:09:55 - INFO - app.main - [OK] Trading router included
+11:10:03 - INFO - app.api.v1.endpoints.dashboard - [OK] Fetching dashboard statistics
+11:10:03 - INFO - app.api.v1.endpoints.dashboard - [OK] Dashboard statistics retrieved successfully
+11:10:33 - INFO - app.api.v1.endpoints.dashboard - [OK] Fetching dashboard statistics
+11:10:33 - INFO - app.api.v1.endpoints.dashboard - [OK] Dashboard statistics retrieved successfully
+11:11:06 - INFO - app.api.v1.endpoints.dashboard - [OK] Fetching dashboard statistics
+11:11:06 - INFO - app.api.v1.endpoints.dashboard - [OK] Dashboard statistics retrieved successfully
+11:11:36 - INFO - app.api.v1.endpoints.dashboard - [OK] Fetching dashboard statistics
+11:11:36 - INFO - app.api.v1.endpoints.dashboard - [OK] Dashboard statistics retrieved successfully
