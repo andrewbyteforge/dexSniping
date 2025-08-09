@@ -67,3 +67,69 @@
 2025-08-09 09:00:47 - app.core.performance.circuit_breaker - INFO - circuit_breaker.py:133 - [OK] Circuit breaker manager initialized
 2025-08-09 09:00:47 - app.core.ai.predictive_analytics - INFO - predictive_analytics.py:240 - [GROWTH] Predictive Analytics Engine initialized
 2025-08-09 09:00:47 - app.core.websocket.websocket_manager - INFO - websocket_manager.py:95 - [OK] WebSocket Manager initialized
+2025-08-09 09:13:35 - __main__ - INFO - logger.py:204 - [LOG] Logger initialized for __main__ (component: application)
+2025-08-09 09:13:35 - test_module - INFO - logger.py:204 - [LOG] Logger initialized for test_module (component: application)
+2025-08-09 09:13:35 - test_module - INFO - test_all_features.py:377 - Test log message
+2025-08-09 09:13:37 - app.core.websocket.websocket_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.websocket.websocket_manager (component: application)
+2025-08-09 09:13:37 - app.core.websocket.websocket_manager - INFO - websocket_manager.py:95 - [OK] WebSocket Manager initialized
+2025-08-09 09:13:37 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 09:13:37 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
+2025-08-09 09:13:37 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
+2025-08-09 09:13:37 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
+2025-08-09 09:13:37 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
+2025-08-09 09:13:37 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
+2025-08-09 09:13:37 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
+2025-08-09 09:13:37 - app.core.config.settings_manager - INFO - settings_manager.py:394 - [OK] Configuration validation passed
+2025-08-09 09:15:00 - __main__ - INFO - logger.py:204 - [LOG] Logger initialized for __main__ (component: application)
+2025-08-09 09:15:00 - app.main - INFO - logger.py:204 - [LOG] Logger initialized for app.main (component: application)
+2025-08-09 09:15:00 - app.core.portfolio.portfolio_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.portfolio.portfolio_manager (component: application)
+2025-08-09 09:15:02 - test_module - INFO - logger.py:204 - [LOG] Logger initialized for test_module (component: application)
+2025-08-09 09:15:02 - test_module - INFO - test_all_features.py:377 - Test log message
+2025-08-09 09:15:02 - app.core.websocket.websocket_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.websocket.websocket_manager (component: application)
+2025-08-09 09:15:02 - app.core.websocket.websocket_manager - INFO - websocket_manager.py:95 - [OK] WebSocket Manager initialized
+2025-08-09 09:15:02 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 09:15:02 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
+2025-08-09 09:15:02 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
+2025-08-09 09:15:02 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
+2025-08-09 09:15:02 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
+2025-08-09 09:15:02 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
+2025-08-09 09:15:02 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
+2025-08-09 09:15:02 - app.core.config.settings_manager - INFO - settings_manager.py:394 - [OK] Configuration validation passed
+2025-08-09 09:24:25 - __main__ - INFO - logger.py:204 - [LOG] Logger initialized for __main__ (component: application)
+2025-08-09 09:24:25 - app.main - INFO - logger.py:204 - [LOG] Logger initialized for app.main (component: application)
+2025-08-09 09:24:26 - app.core.portfolio.portfolio_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.portfolio.portfolio_manager (component: application)
+2025-08-09 09:24:27 - test_module - INFO - logger.py:204 - [LOG] Logger initialized for test_module (component: application)
+2025-08-09 09:24:27 - test_module - INFO - test_all_features.py:377 - Test log message
+2025-08-09 09:24:27 - app.core.analytics.portfolio_analyzer - INFO - logger.py:204 - [LOG] Logger initialized for app.core.analytics.portfolio_analyzer (component: application)
+2025-08-09 09:24:27 - app.core.analytics.portfolio_analyzer - INFO - portfolio_analyzer.py:85 - [ANALYTICS] PortfolioAnalyzer initialized
+2025-08-09 09:24:27 - app.core.risk.risk_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.risk.risk_manager (component: application)
+2025-08-09 09:24:27 - app.core.risk.risk_manager - INFO - risk_manager.py:128 - [RISK] RiskManager initialized
+2025-08-09 09:24:27 - app.core.websocket.websocket_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.websocket.websocket_manager (component: application)
+2025-08-09 09:24:27 - app.core.websocket.websocket_manager - INFO - websocket_manager.py:95 - [OK] WebSocket Manager initialized
+2025-08-09 09:24:27 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 09:24:27 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
+2025-08-09 09:24:27 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
+2025-08-09 09:24:27 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
+2025-08-09 09:24:27 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
+2025-08-09 09:24:27 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
+2025-08-09 09:24:27 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
+2025-08-09 09:24:27 - app.core.config.settings_manager - INFO - settings_manager.py:394 - [OK] Configuration validation passed
+2025-08-09 09:26:04 - __main__ - INFO - logger.py:204 - [LOG] Logger initialized for __main__ (component: application)
+2025-08-09 09:26:04 - app.main - INFO - logger.py:204 - [LOG] Logger initialized for app.main (component: application)
+2025-08-09 09:26:04 - app.core.portfolio.portfolio_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.portfolio.portfolio_manager (component: application)
+2025-08-09 09:26:05 - test_module - INFO - logger.py:204 - [LOG] Logger initialized for test_module (component: application)
+2025-08-09 09:26:05 - test_module - INFO - test_all_features.py:377 - Test log message
+2025-08-09 09:26:05 - app.core.analytics.portfolio_analyzer - INFO - logger.py:204 - [LOG] Logger initialized for app.core.analytics.portfolio_analyzer (component: application)
+2025-08-09 09:26:05 - app.core.analytics.portfolio_analyzer - INFO - portfolio_analyzer.py:85 - [ANALYTICS] PortfolioAnalyzer initialized
+2025-08-09 09:26:05 - app.core.risk.risk_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.risk.risk_manager (component: application)
+2025-08-09 09:26:05 - app.core.risk.risk_manager - INFO - risk_manager.py:128 - [RISK] RiskManager initialized
+2025-08-09 09:26:05 - app.core.websocket.websocket_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.websocket.websocket_manager (component: application)
+2025-08-09 09:26:05 - app.core.websocket.websocket_manager - INFO - websocket_manager.py:95 - [OK] WebSocket Manager initialized
+2025-08-09 09:26:05 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 09:26:05 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
+2025-08-09 09:26:05 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
+2025-08-09 09:26:05 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
+2025-08-09 09:26:05 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
+2025-08-09 09:26:05 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
+2025-08-09 09:26:05 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
+2025-08-09 09:26:05 - app.core.config.settings_manager - INFO - settings_manager.py:394 - [OK] Configuration validation passed

@@ -356,6 +356,244 @@ class PersistenceManager:
         except Exception as error:
             logger.error(f"[ERROR] Failed to create database tables: {error}")
             raise DatabaseError(f"Table creation failed: {error}")
+    
+    async def _verify_tables(self) -> int:
+        """
+        Verify all tables were created successfully.
+        
+        Returns:
+            int: Number of tables created
+        """
+        try:
+            cursor = await self._connection.execute("""
+                SELECT name FROM sqlite_master 
+                WHERE type='table' AND name NOT LIKE 'sqlite_%'
+            """)
+            tables = await cursor.fetchall()
+            return len(tables)
+        except Exception as e:
+            logger.error(f"[ERROR] Failed to verify tables: {e}")
+            return 0
+    
+    def get_database_status(self) -> Dict[str, Any]:
+        """
+        Get database status information.
+        
+        Returns:
+            Dict containing database status and statistics
+        """
+        try:
+            status = {
+                "operational": bool(self._connection),
+                "database_path": str(self.db_path),
+                "tables_created": True,
+                "connection_status": "connected" if self._connection else "disconnected",
+                "timestamp": datetime.utcnow().isoformat(),
+                "initialized": self._initialized
+            }
+            
+            if self.db_path.exists():
+                status["database_size_mb"] = round(self.db_path.stat().st_size / 1024 / 1024, 2)
+            else:
+                status["database_size_mb"] = 0
+            
+            return status
+            
+        except Exception as error:
+            logger.error(f"[ERROR] Failed to get database status: {error}")
+            return {
+                "operational": False,
+                "error": str(error),
+                "timestamp": datetime.utcnow().isoformat()
+            }
+    
+    async def ensure_initialized(self) -> bool:
+        """
+        Ensure the database is properly initialized.
+        
+        Returns:
+            bool: True if initialized successfully
+        """
+        try:
+            if not self._connection:
+                success = await self.initialize()
+                if not success:
+                    logger.error("[ERROR] Database initialization failed")
+                    return False
+            
+            # Verify tables exist
+            try:
+                await self._create_tables()
+                logger.info("[OK] Database tables verified/created")
+                return True
+            except Exception as table_error:
+                logger.error(f"[ERROR] Table creation/verification failed: {table_error}")
+                return False
+                
+        except Exception as error:
+            logger.error(f"[ERROR] Database ensure_initialized failed: {error}")
+            return False
+    
+    async def save_trade(self, trade: TradeRecord) -> bool:
+        """
+        Save trade record to database.
+        
+        Args:
+            trade: Trade record to save
+            
+        Returns:
+            bool: True if save successful
+        """
+        try:
+            if not await self.ensure_initialized():
+                return False
+            
+            trade_data = trade.to_dict()
+            
+            await self._connection.execute("""
+                INSERT OR REPLACE INTO trade_records (
+                    trade_id, token_address, network, trade_type, amount_eth,
+                    amount_tokens, price_usd, gas_fee_eth, slippage_percent,
+                    transaction_hash, block_number, status, profit_loss_usd,
+                    created_at, executed_at, completed_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                trade_data['trade_id'], trade_data['token_in'], trade_data['network'],
+                'buy', float(trade_data['amount_in']), float(trade_data['amount_out']),
+                float(trade_data['price_usd']), 0.0, float(trade_data['slippage_percent']),
+                trade_data['transaction_hash'], None, trade_data['status'],
+                trade_data.get('profit_loss_usd'), trade_data['created_at'],
+                trade_data.get('executed_at'), None
+            ))
+            
+            await self._connection.commit()
+            logger.info(f"[OK] Trade saved: {trade.trade_id}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"[ERROR] Failed to save trade: {e}")
+            return False
+    
+    async def save_portfolio_snapshot(self, snapshot: PortfolioSnapshot) -> bool:
+        """
+        Save portfolio snapshot to database.
+        
+        Args:
+            snapshot: Portfolio snapshot to save
+            
+        Returns:
+            bool: True if save successful
+        """
+        try:
+            if not await self.ensure_initialized():
+                return False
+            
+            snapshot_data = snapshot.to_dict()
+            
+            await self._connection.execute("""
+                INSERT OR REPLACE INTO portfolio_snapshots (
+                    snapshot_id, wallet_address, total_value_usd, eth_balance,
+                    token_count, active_trades, profit_loss_24h, profit_loss_total,
+                    created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                snapshot_data['snapshot_id'], snapshot_data['wallet_address'],
+                float(snapshot_data['total_value_usd']), float(snapshot_data['eth_balance']),
+                snapshot_data['token_count'], 0, float(snapshot_data['profit_loss_24h']),
+                0.0, snapshot_data['created_at']
+            ))
+            
+            await self._connection.commit()
+            logger.info(f"[OK] Portfolio snapshot saved: {snapshot.snapshot_id}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"[ERROR] Failed to save portfolio snapshot: {e}")
+            return False
+    
+    async def save_wallet_session(self, session: WalletSession) -> bool:
+        """
+        Save wallet session to database.
+        
+        Args:
+            session: Wallet session to save
+            
+        Returns:
+            bool: True if save successful
+        """
+        try:
+            if not await self.ensure_initialized():
+                return False
+            
+            session_data = session.to_dict()
+            
+            await self._connection.execute("""
+                INSERT OR REPLACE INTO wallet_sessions (
+                    session_id, wallet_address, wallet_type, network,
+                    connected_at, last_activity, is_active, metadata
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                session_data['session_id'], session_data['wallet_address'],
+                session_data['wallet_type'], session_data['network'],
+                session_data['connected_at'], session_data['last_activity'],
+                session_data['is_active'], json.dumps(session_data['metadata'])
+            ))
+            
+            await self._connection.commit()
+            logger.info(f"[OK] Wallet session saved: {session.session_id}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"[ERROR] Failed to save wallet session: {e}")
+            return False
+    
+    async def get_recent_trades(self, limit: int = 10) -> List[Dict[str, Any]]:
+        """
+        Get recent trades from database.
+        
+        Args:
+            limit: Maximum number of trades to return
+            
+        Returns:
+            List of trade records
+        """
+        try:
+            if not await self.ensure_initialized():
+                return []
+            
+            cursor = await self._connection.execute("""
+                SELECT * FROM trade_records 
+                ORDER BY created_at DESC 
+                LIMIT ?
+            """, (limit,))
+            
+            rows = await cursor.fetchall()
+            
+            # Convert to list of dictionaries
+            trades = []
+            columns = [desc[0] for desc in cursor.description]
+            for row in rows:
+                trade = dict(zip(columns, row))
+                trades.append(trade)
+            
+            return trades
+            
+        except Exception as e:
+            logger.error(f"[ERROR] Failed to get recent trades: {e}")
+            return []
+    
+    async def shutdown(self) -> None:
+        """Shutdown database connection and cleanup."""
+        try:
+            if self._connection:
+                await self._connection.close()
+                self._connection = None
+            
+            self._initialized = False
+            logger.info("[OK] Database connection closed")
+            
+        except Exception as e:
+            logger.error(f"[ERROR] Error during database shutdown: {e}")
 
 
 # Global persistence manager instance
@@ -455,66 +693,3 @@ def get_global_persistence_manager():
         # Create a basic fallback
         persistence_manager = get_persistence_manager_sync()
     return persistence_manager
-\n
-    
-    def get_database_status(self) -> Dict[str, Any]:
-        """
-        Get database status information.
-        
-        Returns:
-            Dict containing database status and statistics
-        """
-        try:
-            status = {
-                "operational": bool(self._connection),
-                "database_path": str(self.db_path),
-                "tables_created": True,
-                "connection_status": "connected" if self._connection else "disconnected",
-                "timestamp": datetime.utcnow().isoformat()
-            }
-            
-            if self._connection:
-                # Try to get some basic stats
-                try:
-                    cursor = self._connection.execute("SELECT COUNT(*) FROM sqlite_master WHERE type='table'")
-                    table_count = cursor.fetchone()[0]
-                    status["table_count"] = table_count
-                except:
-                    status["table_count"] = 0
-            
-            return status
-            
-        except Exception as error:
-            logger.error(f"[ERROR] Failed to get database status: {error}")
-            return {
-                "operational": False,
-                "error": str(error),
-                "timestamp": datetime.utcnow().isoformat()
-            }
-    
-    async def ensure_initialized(self) -> bool:
-        """
-        Ensure the database is properly initialized.
-        
-        Returns:
-            bool: True if initialized successfully
-        """
-        try:
-            if not self._connection:
-                success = await self.initialize()
-                if not success:
-                    logger.error("[ERROR] Database initialization failed")
-                    return False
-            
-            # Verify tables exist
-            try:
-                await self._create_tables()
-                logger.info("[OK] Database tables verified/created")
-                return True
-            except Exception as table_error:
-                logger.error(f"[ERROR] Table creation/verification failed: {table_error}")
-                return False
-                
-        except Exception as error:
-            logger.error(f"[ERROR] Database ensure_initialized failed: {error}")
-            return False

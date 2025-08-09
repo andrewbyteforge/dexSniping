@@ -1,0 +1,247 @@
+{% extends "base/layout.html" %}
+
+{% block title %}Trading Dashboard{% endblock %}
+
+{% block page_title %}Professional Trading Dashboard{% endblock %}
+{% block page_subtitle %}Real-time DEX monitoring and AI-powered analysis{% endblock %}
+
+{% block content %}
+<!-- Dashboard Status Banner -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="alert alert-success d-flex align-items-center">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <strong>System Status:</strong>
+            <span class="ms-2">All systems operational</span>
+            <div class="ms-auto">
+                <small>Last update: <span id="lastUpdateTime">--:--:--</span></small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards Row -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card stats-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-white-50">Portfolio Value</h6>
+                        <h3 class="mb-0" id="portfolioValue">Loading...</h3>
+                        <small class="text-white-50">
+                            <i class="bi bi-graph-up"></i> 
+                            <span id="portfolioChange">+0.00%</span>
+                        </small>
+                    </div>
+                    <i class="bi bi-wallet2 fs-1 text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card stats-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-white-50">Daily P&L</h6>
+                        <h3 class="mb-0" id="dailyPnL">Loading...</h3>
+                        <small class="text-white-50">
+                            <span id="dailyPnLPercent">0.00%</span> return
+                        </small>
+                    </div>
+                    <i class="bi bi-graph-up-arrow fs-1 text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card stats-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-white-50">Active Trades</h6>
+                        <h3 class="mb-0" id="activeTrades">0</h3>
+                        <small class="text-white-50">
+                            <span id="successRate">0%</span> success
+                        </small>
+                    </div>
+                    <i class="bi bi-activity fs-1 text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card stats-card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="text-white-50">Discovered</h6>
+                        <h3 class="mb-0" id="tokensDiscovered">0</h3>
+                        <small class="text-white-50">
+                            <span id="discovered24h">0</span> today
+                        </small>
+                    </div>
+                    <i class="bi bi-search fs-1 text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Area -->
+<div class="row">
+    <!-- Live Tokens Section -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-lightning-charge text-warning"></i> 
+                    Live Token Discovery
+                </h5>
+            </div>
+            <div class="card-body" style="height: 400px; overflow-y: auto;">
+                <div id="tokensContainer">
+                    <div class="text-center py-5 text-muted">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3">Scanning for new tokens...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Side Panel -->
+    <div class="col-lg-4 mb-4">
+        <!-- Performance Chart -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-graph-up text-primary"></i> 
+                    Performance
+                </h5>
+            </div>
+            <div class="card-body">
+                <canvas id="performanceChart" height="200"></canvas>
+            </div>
+        </div>
+        
+        <!-- Recent Alerts -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-bell text-danger"></i> 
+                    Alerts
+                </h5>
+            </div>
+            <div class="card-body" style="height: 250px; overflow-y: auto;">
+                <div id="alertsContainer">
+                    <small class="text-muted">No recent alerts</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Dashboard initialization
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Dashboard with sidebar initialized');
+        initializeDashboard();
+    });
+    
+    async function initializeDashboard() {
+        await loadDashboardStats();
+        await loadLiveTokens();
+        setupAutoRefresh();
+    }
+    
+    async function loadDashboardStats() {
+        try {
+            const response = await fetch('/api/v1/dashboard/stats');
+            const data = await response.json();
+            
+            // Update stats display
+            updateElement('portfolioValue', formatCurrency(data.portfolio_value || 0));
+            updateElement('dailyPnL', formatCurrency(data.daily_pnl || 0));
+            updateElement('activeTrades', data.trades_today || 0);
+            updateElement('tokensDiscovered', data.total_discovered || 0);
+            
+        } catch (error) {
+            console.error('Error loading stats:', error);
+        }
+    }
+    
+    async function loadLiveTokens() {
+        try {
+            const response = await fetch('/api/v1/tokens/live');
+            const data = await response.json();
+            
+            if (data.tokens && data.tokens.length > 0) {
+                displayTokens(data.tokens);
+            }
+            
+        } catch (error) {
+            console.error('Error loading tokens:', error);
+        }
+    }
+    
+    function displayTokens(tokens) {
+        const container = document.getElementById('tokensContainer');
+        let html = '';
+        
+        tokens.forEach(token => {
+            html += `
+                <div class="token-card mb-2 p-3 border rounded">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong>${token.symbol || 'Unknown'}</strong>
+                            <br>
+                            <small class="text-muted">$${token.price || '0.00'}</small>
+                        </div>
+                        <div class="text-end">
+                            <span class="${token.price_change >= 0 ? 'text-success' : 'text-danger'}">
+                                ${token.price_change >= 0 ? '+' : ''}${token.price_change || 0}%
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html || '<p class="text-muted">No tokens found</p>';
+    }
+    
+    function setupAutoRefresh() {
+        setInterval(loadDashboardStats, 30000);
+        setInterval(loadLiveTokens, 10000);
+        setInterval(updateTimestamp, 1000);
+    }
+    
+    function updateTimestamp() {
+        const element = document.getElementById('lastUpdateTime');
+        if (element) {
+            element.textContent = new Date().toLocaleTimeString();
+        }
+    }
+    
+    function updateElement(id, value) {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+    }
+    
+    function formatCurrency(value) {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD'
+        }).format(value || 0);
+    }
+</script>
+{% endblock %}

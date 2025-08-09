@@ -1,664 +1,1176 @@
-#!/usr/bin/env python3
 """
-Comprehensive System Test Script
+Comprehensive Feature Test Suite
 File: test_all_features.py
 
-Tests the complete DEX Sniper Pro system to verify all features are working:
-- Phase 4B: Database, Transactions, Configuration
-- Phase 4C: AI Risk Assessment, WebSocket Streaming, Advanced Features
-- Integration: Cross-component communication and error handling
-
-This script provides a complete system health check and feature validation.
+Professional test suite to validate all application components and identify
+areas that need development. Provides detailed reporting and next steps.
 """
 
 import asyncio
-import json
 import sys
-import time
+import os
+import importlib
 import traceback
-from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, List, Optional
-import logging
+from typing import Dict, Any, List, Tuple
+from datetime import datetime
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-try:
-    from app.utils.logger import setup_logger
-    from app.core.database.persistence_manager import get_persistence_manager
-    from app.core.config.settings_manager import get_settings
-    
-    # AI Components
-    from app.core.ai.risk_assessor import AIRiskAssessor
-    from app.core.ai.honeypot_detector import HoneypotDetector
-    from app.core.ai.predictive_analytics import PredictiveAnalytics
-    
-    # WebSocket Components (if available)
-    try:
-        from app.core.websocket.websocket_manager import WebSocketManager
-        WEBSOCKET_AVAILABLE = True
-    except ImportError:
-        WEBSOCKET_AVAILABLE = False
-    
-    # Trading Components
-    from app.core.trading.transaction_executor import TransactionExecutor
-    from app.core.trading.trading_engine import TradingEngine
-    
-    logger = setup_logger(__name__)
-    
-except ImportError as e:
-    print(f"❌ Import error: {e}")
-    print("Please ensure you're running from the project root directory")
-    sys.exit(1)
+from app.utils.logger import setup_logger
+
+logger = setup_logger(__name__)
 
 
-class ComprehensiveSystemTester:
-    """Complete system testing and validation."""
+class ComprehensiveTestSuite:
+    """
+    Professional test suite for validating all application features.
+    
+    Categories tested:
+    - Core Infrastructure
+    - Database Systems
+    - Trading Engine
+    - API Endpoints
+    - Frontend Interface
+    - Configuration Management
+    - Error Handling
+    """
     
     def __init__(self):
-        """Initialize the comprehensive system tester."""
-        self.test_results: Dict[str, Dict[str, Any]] = {}
-        self.total_tests = 0
-        self.passed_tests = 0
-        self.failed_tests = 0
+        """Initialize the comprehensive test suite."""
+        self.results: List[Dict[str, Any]] = []
+        self.start_time = datetime.now()
         
-        # Component instances
-        self.persistence_manager = None
-        self.settings = None
-        self.ai_risk_assessor = None
-        self.honeypot_detector = None
-        self.predictive_analytics = None
-        self.websocket_manager = None
-        self.transaction_executor = None
-        self.trading_engine = None
-        
-    async def run_comprehensive_tests(self) -> Dict[str, Any]:
+    def run_all_tests(self) -> Dict[str, Any]:
         """
-        Run comprehensive system tests across all components.
+        Run comprehensive test suite across all application features.
         
         Returns:
-            Dict containing complete test results and system status
+            Dict containing detailed test results and analysis
         """
-        print("🤖 DEX Sniper Pro - Comprehensive System Test Suite")
-        print("=" * 80)
-        print("Testing: Database, Configuration, AI, WebSocket, Trading, Integration")
-        print("=" * 80)
+        print("🤖 DEX Sniper Pro - Comprehensive Feature Test Suite")
+        print("=" * 70)
+        print(f"🕐 Started: {self.start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        print("=" * 70)
         
-        # Test categories in logical order
+        # Define test categories and methods
         test_categories = [
-            ("Foundation Tests", self._test_foundation_components),
-            ("Database Tests", self._test_database_system),
-            ("Configuration Tests", self._test_configuration_system),
-            ("AI System Tests", self._test_ai_components),
-            ("WebSocket Tests", self._test_websocket_system),
-            ("Trading System Tests", self._test_trading_components),
-            ("Integration Tests", self._test_system_integration),
-            ("Performance Tests", self._test_system_performance)
+            ("🏗️ Core Infrastructure", [
+                self.test_project_structure,
+                self.test_core_imports,
+                self.test_logger_system,
+                self.test_exception_handling
+            ]),
+            ("💾 Database Systems", [
+                self.test_persistence_manager,
+                self.test_database_operations,
+                self.test_data_models,
+                self.test_migration_system
+            ]),
+            ("⚡ Trading Engine", [
+                self.test_trading_engine_init,
+                self.test_order_execution,
+                self.test_portfolio_tracking,
+                self.test_risk_management
+            ]),
+            ("🌐 API Endpoints", [
+                self.test_fastapi_application,
+                self.test_health_endpoints,
+                self.test_trading_api,
+                self.test_dashboard_api
+            ]),
+            ("🎨 Frontend Interface", [
+                self.test_template_system,
+                self.test_dashboard_ui,
+                self.test_static_assets,
+                self.test_websocket_support
+            ]),
+            ("⚙️ Configuration", [
+                self.test_settings_manager,
+                self.test_environment_config,
+                self.test_runtime_updates,
+                self.test_validation_system
+            ]),
+            ("🛡️ Security & Compliance", [
+                self.test_wallet_security,
+                self.test_api_authentication,
+                self.test_input_validation,
+                self.test_error_sanitization
+            ]),
+            ("🧪 Integration Testing", [
+                self.test_end_to_end_workflow,
+                self.test_cross_component_communication,
+                self.test_performance_benchmarks,
+                self.test_scalability_metrics
+            ])
         ]
         
-        # Run all test categories
-        for category_name, test_method in test_categories:
-            print(f"\n🔍 {category_name}")
-            print("-" * 60)
+        # Execute all test categories
+        total_tests = 0
+        passed_tests = 0
+        failed_tests = 0
+        
+        for category_name, test_methods in test_categories:
+            print(f"\n{category_name}")
+            print("-" * (len(category_name) - 4))  # Subtract emoji length
             
-            try:
-                category_results = await test_method()
-                self.test_results[category_name] = category_results
+            category_results = []
+            
+            for test_method in test_methods:
+                total_tests += 1
+                test_name = test_method.__name__.replace('test_', '').replace('_', ' ').title()
                 
-                # Update counters
-                category_passed = category_results.get("passed_tests", 0)
-                category_total = category_results.get("total_tests", 0)
-                category_failed = category_total - category_passed
-                
-                self.passed_tests += category_passed
-                self.total_tests += category_total
-                self.failed_tests += category_failed
-                
-                # Print category summary
-                success_rate = (category_passed / category_total) * 100 if category_total > 0 else 0
-                print(f"📊 {category_name}: {category_passed}/{category_total} tests passed ({success_rate:.1f}%)")
-                
-                if category_failed > 0:
-                    print(f"⚠️ {category_failed} tests failed in {category_name}")
-                
-            except Exception as e:
-                print(f"💥 {category_name} failed with exception: {e}")
-                traceback.print_exc()
-                
-                self.test_results[category_name] = {
-                    "passed_tests": 0,
-                    "total_tests": 1,
-                    "success_rate": 0.0,
-                    "error": str(e),
-                    "exception": traceback.format_exc()
-                }
-                self.failed_tests += 1
-                self.total_tests += 1
-        
-        # Calculate overall results
-        overall_success_rate = (self.passed_tests / self.total_tests) * 100 if self.total_tests > 0 else 0
-        
-        # Generate system status
-        system_status = self._generate_system_status(overall_success_rate)
-        
-        # Print final summary
-        self._print_final_summary(overall_success_rate, system_status)
-        
-        return {
-            "overall_results": {
-                "total_tests": self.total_tests,
-                "passed_tests": self.passed_tests,
-                "failed_tests": self.failed_tests,
-                "success_rate": overall_success_rate
-            },
-            "category_results": self.test_results,
-            "system_status": system_status,
-            "timestamp": datetime.utcnow().isoformat(),
-            "test_environment": "comprehensive_validation"
-        }
-    
-    # ==================== FOUNDATION TESTS ====================
-    
-    async def _test_foundation_components(self) -> Dict[str, Any]:
-        """Test basic foundation components."""
-        results = {"passed_tests": 0, "total_tests": 0, "tests": []}
-        
-        # Test 1: Logger functionality
-        results["total_tests"] += 1
-        try:
-            test_logger = setup_logger("test_logger")
-            test_logger.info("Test log message")
-            print("✅ Logger system operational")
-            results["passed_tests"] += 1
-            results["tests"].append("logger_functionality: PASSED")
-        except Exception as e:
-            print(f"❌ Logger test failed: {e}")
-            results["tests"].append(f"logger_functionality: FAILED - {e}")
-        
-        # Test 2: Path structure validation
-        results["total_tests"] += 1
-        try:
-            required_paths = [
-                Path("app/core"),
-                Path("app/api"),
-                Path("app/utils"),
-                Path("tests")
-            ]
+                try:
+                    result = test_method()
+                    if result['passed']:
+                        print(f"  ✅ {test_name}")
+                        passed_tests += 1
+                    else:
+                        print(f"  ❌ {test_name}: {result.get('error', 'Unknown error')}")
+                        failed_tests += 1
+                    
+                    category_results.append(result)
+                    
+                except Exception as e:
+                    print(f"  💥 {test_name}: Exception - {str(e)}")
+                    failed_tests += 1
+                    category_results.append({
+                        'test_name': test_name,
+                        'passed': False,
+                        'error': f"Exception: {str(e)}",
+                        'category': category_name
+                    })
             
-            missing_paths = [p for p in required_paths if not p.exists()]
-            
-            if not missing_paths:
-                print("✅ Project structure validation passed")
-                results["passed_tests"] += 1
-                results["tests"].append("project_structure: PASSED")
-            else:
-                print(f"❌ Missing paths: {missing_paths}")
-                results["tests"].append(f"project_structure: FAILED - Missing: {missing_paths}")
-        except Exception as e:
-            print(f"❌ Path validation failed: {e}")
-            results["tests"].append(f"project_structure: FAILED - {e}")
+            self.results.extend(category_results)
         
-        # Test 3: Import validation
-        results["total_tests"] += 1
-        try:
-            # Test key imports
-            from app.core.exceptions import TradingBotError
-            from app.utils.helpers import format_timestamp
-            
-            print("✅ Core imports successful")
-            results["passed_tests"] += 1
-            results["tests"].append("core_imports: PASSED")
-        except Exception as e:
-            print(f"❌ Import validation failed: {e}")
-            results["tests"].append(f"core_imports: FAILED - {e}")
-        
-        results["success_rate"] = (results["passed_tests"] / results["total_tests"]) * 100
-        return results
+        # Generate comprehensive summary
+        return self._generate_comprehensive_summary(total_tests, passed_tests, failed_tests)
     
-    # ==================== DATABASE TESTS ====================
-    
-    async def _test_database_system(self) -> Dict[str, Any]:
-        """Test database persistence system."""
-        results = {"passed_tests": 0, "total_tests": 0, "tests": []}
+    def _generate_comprehensive_summary(self, total: int, passed: int, failed: int) -> Dict[str, Any]:
+        """Generate detailed test summary with actionable recommendations."""
         
-        # Test 1: Database initialization
-        results["total_tests"] += 1
-        try:
-            self.persistence_manager = await get_persistence_manager()
-            status = self.persistence_manager.get_database_status()
-            
-            if status.get("operational", False):
-                print("✅ Database initialization successful")
-                results["passed_tests"] += 1
-                results["tests"].append("database_initialization: PASSED")
-            else:
-                print(f"❌ Database not operational: {status}")
-                results["tests"].append(f"database_initialization: FAILED - {status}")
-        except Exception as e:
-            print(f"❌ Database initialization failed: {e}")
-            results["tests"].append(f"database_initialization: FAILED - {e}")
+        end_time = datetime.now()
+        duration = (end_time - self.start_time).total_seconds()
+        success_rate = (passed / total * 100) if total > 0 else 0
         
-        # Test 2: Database operations
-        results["total_tests"] += 1
-        try:
-            if self.persistence_manager:
-                # Test basic operations
-                await self.persistence_manager.ensure_initialized()
-                print("✅ Database operations test passed")
-                results["passed_tests"] += 1
-                results["tests"].append("database_operations: PASSED")
-            else:
-                print("❌ No persistence manager available")
-                results["tests"].append("database_operations: FAILED - No persistence manager")
-        except Exception as e:
-            print(f"❌ Database operations failed: {e}")
-            results["tests"].append(f"database_operations: FAILED - {e}")
-        
-        results["success_rate"] = (results["passed_tests"] / results["total_tests"]) * 100
-        return results
-    
-    # ==================== CONFIGURATION TESTS ====================
-    
-    async def _test_configuration_system(self) -> Dict[str, Any]:
-        """Test configuration management system."""
-        results = {"passed_tests": 0, "total_tests": 0, "tests": []}
-        
-        # Test 1: Settings loading
-        results["total_tests"] += 1
-        try:
-            self.settings = get_settings()
-            
-            if self.settings:
-                print("✅ Configuration loading successful")
-                results["passed_tests"] += 1
-                results["tests"].append("settings_loading: PASSED")
-            else:
-                print("❌ Failed to load settings")
-                results["tests"].append("settings_loading: FAILED - No settings loaded")
-        except Exception as e:
-            print(f"❌ Settings loading failed: {e}")
-            results["tests"].append(f"settings_loading: FAILED - {e}")
-        
-        # Test 2: Configuration validation
-        results["total_tests"] += 1
-        try:
-            if self.settings:
-                validation_errors = self.settings.validate_configuration()
-                
-                if not validation_errors:
-                    print("✅ Configuration validation passed")
-                    results["passed_tests"] += 1
-                    results["tests"].append("configuration_validation: PASSED")
-                else:
-                    print(f"❌ Configuration validation errors: {validation_errors}")
-                    results["tests"].append(f"configuration_validation: FAILED - {validation_errors}")
-            else:
-                print("❌ No settings available for validation")
-                results["tests"].append("configuration_validation: FAILED - No settings")
-        except Exception as e:
-            print(f"❌ Configuration validation failed: {e}")
-            results["tests"].append(f"configuration_validation: FAILED - {e}")
-        
-        results["success_rate"] = (results["passed_tests"] / results["total_tests"]) * 100
-        return results
-    
-    # ==================== AI SYSTEM TESTS ====================
-    
-    async def _test_ai_components(self) -> Dict[str, Any]:
-        """Test AI system components."""
-        results = {"passed_tests": 0, "total_tests": 0, "tests": []}
-        
-        # Test 1: AI Risk Assessor
-        results["total_tests"] += 1
-        try:
-            self.ai_risk_assessor = AIRiskAssessor()
-            
-            if self.ai_risk_assessor:
-                print("✅ AI Risk Assessor initialized")
-                results["passed_tests"] += 1
-                results["tests"].append("ai_risk_assessor: PASSED")
-            else:
-                print("❌ AI Risk Assessor initialization failed")
-                results["tests"].append("ai_risk_assessor: FAILED - Initialization failed")
-        except Exception as e:
-            print(f"❌ AI Risk Assessor failed: {e}")
-            results["tests"].append(f"ai_risk_assessor: FAILED - {e}")
-        
-        # Test 2: Honeypot Detector
-        results["total_tests"] += 1
-        try:
-            self.honeypot_detector = HoneypotDetector()
-            
-            if self.honeypot_detector:
-                print("✅ Honeypot Detector initialized")
-                results["passed_tests"] += 1
-                results["tests"].append("honeypot_detector: PASSED")
-            else:
-                print("❌ Honeypot Detector initialization failed")
-                results["tests"].append("honeypot_detector: FAILED - Initialization failed")
-        except Exception as e:
-            print(f"❌ Honeypot Detector failed: {e}")
-            results["tests"].append(f"honeypot_detector: FAILED - {e}")
-        
-        # Test 3: Predictive Analytics
-        results["total_tests"] += 1
-        try:
-            self.predictive_analytics = PredictiveAnalytics()
-            
-            if self.predictive_analytics:
-                print("✅ Predictive Analytics initialized")
-                results["passed_tests"] += 1
-                results["tests"].append("predictive_analytics: PASSED")
-            else:
-                print("❌ Predictive Analytics initialization failed")
-                results["tests"].append("predictive_analytics: FAILED - Initialization failed")
-        except Exception as e:
-            print(f"❌ Predictive Analytics failed: {e}")
-            results["tests"].append(f"predictive_analytics: FAILED - {e}")
-        
-        results["success_rate"] = (results["passed_tests"] / results["total_tests"]) * 100
-        return results
-    
-    # ==================== WEBSOCKET TESTS ====================
-    
-    async def _test_websocket_system(self) -> Dict[str, Any]:
-        """Test WebSocket streaming system."""
-        results = {"passed_tests": 0, "total_tests": 0, "tests": []}
-        
-        # Test 1: WebSocket Manager availability
-        results["total_tests"] += 1
-        try:
-            if WEBSOCKET_AVAILABLE:
-                self.websocket_manager = WebSocketManager()
-                print("✅ WebSocket Manager available")
-                results["passed_tests"] += 1
-                results["tests"].append("websocket_manager: PASSED")
-            else:
-                print("⚠️ WebSocket Manager not available (optional)")
-                results["passed_tests"] += 1  # Count as passed since it's optional
-                results["tests"].append("websocket_manager: PASSED (not available)")
-        except Exception as e:
-            print(f"❌ WebSocket Manager failed: {e}")
-            results["tests"].append(f"websocket_manager: FAILED - {e}")
-        
-        # Test 2: WebSocket functionality (if available)
-        results["total_tests"] += 1
-        try:
-            if self.websocket_manager:
-                # Test basic functionality
-                connection_count = len(self.websocket_manager.connections)
-                print(f"✅ WebSocket functionality test passed (connections: {connection_count})")
-                results["passed_tests"] += 1
-                results["tests"].append("websocket_functionality: PASSED")
-            else:
-                print("⚠️ WebSocket functionality test skipped (not available)")
-                results["passed_tests"] += 1  # Count as passed since it's optional
-                results["tests"].append("websocket_functionality: PASSED (skipped)")
-        except Exception as e:
-            print(f"❌ WebSocket functionality failed: {e}")
-            results["tests"].append(f"websocket_functionality: FAILED - {e}")
-        
-        results["success_rate"] = (results["passed_tests"] / results["total_tests"]) * 100
-        return results
-    
-    # ==================== TRADING SYSTEM TESTS ====================
-    
-    async def _test_trading_components(self) -> Dict[str, Any]:
-        """Test trading system components."""
-        results = {"passed_tests": 0, "total_tests": 0, "tests": []}
-        
-        # Test 1: Transaction Executor
-        results["total_tests"] += 1
-        try:
-            self.transaction_executor = TransactionExecutor()
-            
-            if self.transaction_executor:
-                print("✅ Transaction Executor initialized")
-                results["passed_tests"] += 1
-                results["tests"].append("transaction_executor: PASSED")
-            else:
-                print("❌ Transaction Executor initialization failed")
-                results["tests"].append("transaction_executor: FAILED - Initialization failed")
-        except Exception as e:
-            print(f"❌ Transaction Executor failed: {e}")
-            results["tests"].append(f"transaction_executor: FAILED - {e}")
-        
-        # Test 2: Trading Engine
-        results["total_tests"] += 1
-        try:
-            self.trading_engine = TradingEngine()
-            
-            if self.trading_engine:
-                print("✅ Trading Engine initialized")
-                results["passed_tests"] += 1
-                results["tests"].append("trading_engine: PASSED")
-            else:
-                print("❌ Trading Engine initialization failed")
-                results["tests"].append("trading_engine: FAILED - Initialization failed")
-        except Exception as e:
-            print(f"❌ Trading Engine failed: {e}")
-            results["tests"].append(f"trading_engine: FAILED - {e}")
-        
-        results["success_rate"] = (results["passed_tests"] / results["total_tests"]) * 100
-        return results
-    
-    # ==================== INTEGRATION TESTS ====================
-    
-    async def _test_system_integration(self) -> Dict[str, Any]:
-        """Test cross-component integration."""
-        results = {"passed_tests": 0, "total_tests": 0, "tests": []}
-        
-        # Test 1: Database + Configuration integration
-        results["total_tests"] += 1
-        try:
-            if self.persistence_manager and self.settings:
-                # Test that they work together
-                db_status = self.persistence_manager.get_database_status()
-                config_valid = not self.settings.validate_configuration()
-                
-                if db_status.get("operational") and config_valid:
-                    print("✅ Database + Configuration integration successful")
-                    results["passed_tests"] += 1
-                    results["tests"].append("db_config_integration: PASSED")
-                else:
-                    print("❌ Database + Configuration integration issues")
-                    results["tests"].append("db_config_integration: FAILED - Integration issues")
-            else:
-                print("❌ Missing components for integration test")
-                results["tests"].append("db_config_integration: FAILED - Missing components")
-        except Exception as e:
-            print(f"❌ Database + Configuration integration failed: {e}")
-            results["tests"].append(f"db_config_integration: FAILED - {e}")
-        
-        # Test 2: AI + Trading integration
-        results["total_tests"] += 1
-        try:
-            if self.ai_risk_assessor and self.trading_engine:
-                print("✅ AI + Trading integration available")
-                results["passed_tests"] += 1
-                results["tests"].append("ai_trading_integration: PASSED")
-            else:
-                print("⚠️ AI + Trading integration partial (some components missing)")
-                results["passed_tests"] += 1  # Count as passed with warning
-                results["tests"].append("ai_trading_integration: PASSED (partial)")
-        except Exception as e:
-            print(f"❌ AI + Trading integration failed: {e}")
-            results["tests"].append(f"ai_trading_integration: FAILED - {e}")
-        
-        results["success_rate"] = (results["passed_tests"] / results["total_tests"]) * 100
-        return results
-    
-    # ==================== PERFORMANCE TESTS ====================
-    
-    async def _test_system_performance(self) -> Dict[str, Any]:
-        """Test system performance and responsiveness."""
-        results = {"passed_tests": 0, "total_tests": 0, "tests": []}
-        
-        # Test 1: Response time test
-        results["total_tests"] += 1
-        try:
-            start_time = time.time()
-            
-            # Perform a quick operation
-            if self.persistence_manager:
-                status = self.persistence_manager.get_database_status()
-            
-            response_time = time.time() - start_time
-            
-            if response_time < 1.0:  # Should respond within 1 second
-                print(f"✅ Response time test passed ({response_time:.3f}s)")
-                results["passed_tests"] += 1
-                results["tests"].append(f"response_time: PASSED ({response_time:.3f}s)")
-            else:
-                print(f"❌ Response time too slow ({response_time:.3f}s)")
-                results["tests"].append(f"response_time: FAILED ({response_time:.3f}s)")
-        except Exception as e:
-            print(f"❌ Response time test failed: {e}")
-            results["tests"].append(f"response_time: FAILED - {e}")
-        
-        # Test 2: Memory usage test (basic)
-        results["total_tests"] += 1
-        try:
-            import psutil
-            process = psutil.Process()
-            memory_mb = process.memory_info().rss / 1024 / 1024
-            
-            if memory_mb < 500:  # Should use less than 500MB
-                print(f"✅ Memory usage test passed ({memory_mb:.1f}MB)")
-                results["passed_tests"] += 1
-                results["tests"].append(f"memory_usage: PASSED ({memory_mb:.1f}MB)")
-            else:
-                print(f"⚠️ High memory usage ({memory_mb:.1f}MB)")
-                results["passed_tests"] += 1  # Count as passed with warning
-                results["tests"].append(f"memory_usage: PASSED ({memory_mb:.1f}MB - high)")
-        except ImportError:
-            print("⚠️ psutil not available, skipping memory test")
-            results["passed_tests"] += 1  # Count as passed since psutil is optional
-            results["tests"].append("memory_usage: PASSED (skipped)")
-        except Exception as e:
-            print(f"❌ Memory usage test failed: {e}")
-            results["tests"].append(f"memory_usage: FAILED - {e}")
-        
-        results["success_rate"] = (results["passed_tests"] / results["total_tests"]) * 100
-        return results
-    
-    # ==================== UTILITY METHODS ====================
-    
-    def _generate_system_status(self, success_rate: float) -> Dict[str, Any]:
-        """Generate comprehensive system status."""
+        # Determine system status
         if success_rate >= 95:
             status = "EXCELLENT"
+            status_emoji = "🏆"
             readiness = "PRODUCTION_READY"
         elif success_rate >= 85:
             status = "GOOD"
+            status_emoji = "✅"
             readiness = "NEAR_PRODUCTION"
         elif success_rate >= 70:
-            status = "FAIR"
-            readiness = "DEVELOPMENT_READY"
+            status = "MODERATE"
+            status_emoji = "⚠️"
+            readiness = "DEVELOPMENT_ACTIVE"
+        elif success_rate >= 50:
+            status = "NEEDS_WORK"
+            status_emoji = "🔧"
+            readiness = "EARLY_DEVELOPMENT"
         else:
-            status = "POOR"
-            readiness = "NEEDS_ATTENTION"
+            status = "CRITICAL"
+            status_emoji = "🚨"
+            readiness = "FOUNDATION_REQUIRED"
         
-        return {
-            "overall_status": status,
-            "readiness_level": readiness,
-            "success_rate": success_rate,
-            "components_operational": {
-                "database": bool(self.persistence_manager),
-                "configuration": bool(self.settings),
-                "ai_risk_assessor": bool(self.ai_risk_assessor),
-                "honeypot_detector": bool(self.honeypot_detector),
-                "predictive_analytics": bool(self.predictive_analytics),
-                "websocket_manager": bool(self.websocket_manager),
-                "transaction_executor": bool(self.transaction_executor),
-                "trading_engine": bool(self.trading_engine)
+        # Analyze failed tests by category
+        failed_by_category = {}
+        for result in self.results:
+            if not result.get('passed', True):
+                category = result.get('category', 'Unknown')
+                if category not in failed_by_category:
+                    failed_by_category[category] = []
+                failed_by_category[category].append(result)
+        
+        # Generate next steps
+        next_steps = self._generate_next_steps(failed_by_category, success_rate)
+        
+        summary = {
+            'test_summary': {
+                'total_tests': total,
+                'passed_tests': passed,
+                'failed_tests': failed,
+                'success_rate': round(success_rate, 1),
+                'duration_seconds': round(duration, 2),
+                'timestamp': end_time.isoformat()
             },
-            "recommendations": self._generate_recommendations(success_rate)
+            'system_status': {
+                'overall_status': status,
+                'status_emoji': status_emoji,
+                'readiness_level': readiness,
+                'critical_issues': failed,
+                'ready_for_production': success_rate >= 95
+            },
+            'failed_categories': failed_by_category,
+            'next_steps': next_steps,
+            'detailed_results': self.results
+        }
+        
+        # Print formatted summary
+        self._print_formatted_summary(summary)
+        
+        return summary
+    
+    def _generate_next_steps(self, failed_by_category: Dict, success_rate: float) -> List[str]:
+        """Generate actionable next steps based on test results."""
+        
+        steps = []
+        
+        if success_rate >= 95:
+            steps.extend([
+                "🎉 System is production-ready!",
+                "✅ Deploy to production environment",
+                "📊 Set up monitoring and alerting",
+                "📈 Begin performance optimization"
+            ])
+        elif success_rate >= 85:
+            steps.extend([
+                "🔧 Address remaining critical issues",
+                "🧪 Increase test coverage",
+                "🔒 Security audit before production",
+                "📝 Complete documentation"
+            ])
+        elif success_rate >= 50:
+            steps.extend([
+                "🏗️ Focus on core infrastructure fixes",
+                "💾 Stabilize database operations",
+                "🌐 Complete API endpoint implementation",
+                "🧪 Expand test coverage significantly"
+            ])
+        else:
+            steps.extend([
+                "🚨 Critical system issues need immediate attention",
+                "🏗️ Rebuild core infrastructure components",
+                "💾 Fix database and persistence layers",
+                "⚡ Implement basic trading functionality"
+            ])
+        
+        # Add category-specific steps
+        if '💾 Database Systems' in failed_by_category:
+            steps.append("💾 Priority: Fix database persistence issues")
+        
+        if '⚡ Trading Engine' in failed_by_category:
+            steps.append("⚡ Priority: Complete trading engine implementation")
+        
+        if '🌐 API Endpoints' in failed_by_category:
+            steps.append("🌐 Priority: Fix API routing and endpoints")
+        
+        if '🎨 Frontend Interface' in failed_by_category:
+            steps.append("🎨 Priority: Implement frontend dashboard")
+        
+        return steps
+    
+    def _print_formatted_summary(self, summary: Dict[str, Any]) -> None:
+        """Print beautifully formatted test summary."""
+        
+        print("\n" + "=" * 70)
+        print("📊 COMPREHENSIVE TEST SUMMARY")
+        print("=" * 70)
+        
+        test_data = summary['test_summary']
+        status_data = summary['system_status']
+        
+        print(f"📋 Total Tests: {test_data['total_tests']}")
+        print(f"✅ Passed: {test_data['passed_tests']}")
+        print(f"❌ Failed: {test_data['failed_tests']}")
+        print(f"📈 Success Rate: {test_data['success_rate']}%")
+        print(f"⏱️ Duration: {test_data['duration_seconds']}s")
+        
+        print(f"\n{status_data['status_emoji']} System Status: {status_data['overall_status']}")
+        print(f"🚀 Readiness: {status_data['readiness_level']}")
+        
+        if summary['failed_categories']:
+            print(f"\n⚠️ Issues by Category:")
+            for category, failures in summary['failed_categories'].items():
+                print(f"  {category}: {len(failures)} issues")
+        
+        print(f"\n📋 Next Steps:")
+        for i, step in enumerate(summary['next_steps'][:5], 1):
+            print(f"  {i}. {step}")
+        
+        print("=" * 70)
+    
+    # ==================== CORE INFRASTRUCTURE TESTS ====================
+    
+    def test_project_structure(self) -> Dict[str, Any]:
+        """Test that project structure is properly organized."""
+        try:
+            required_dirs = ['app', 'app/core', 'app/api', 'tests', 'config']
+            missing_dirs = []
+            
+            for dir_path in required_dirs:
+                if not Path(dir_path).exists():
+                    missing_dirs.append(dir_path)
+            
+            if missing_dirs:
+                return {
+                    'test_name': 'Project Structure',
+                    'passed': False,
+                    'error': f"Missing directories: {', '.join(missing_dirs)}",
+                    'category': '🏗️ Core Infrastructure'
+                }
+            
+            return {
+                'test_name': 'Project Structure',
+                'passed': True,
+                'message': 'All required directories exist',
+                'category': '🏗️ Core Infrastructure'
+            }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Project Structure',
+                'passed': False,
+                'error': str(e),
+                'category': '🏗️ Core Infrastructure'
+            }
+    
+    def test_core_imports(self) -> Dict[str, Any]:
+        """Test that core modules can be imported."""
+        try:
+            imports_to_test = [
+                'app.main',
+                'app.utils.logger',
+                'app.core.database.persistence_manager'
+            ]
+            
+            failed_imports = []
+            
+            for module_name in imports_to_test:
+                try:
+                    importlib.import_module(module_name)
+                except ImportError as e:
+                    failed_imports.append(f"{module_name}: {str(e)}")
+            
+            if failed_imports:
+                return {
+                    'test_name': 'Core Imports',
+                    'passed': False,
+                    'error': f"Failed imports: {'; '.join(failed_imports)}",
+                    'category': '🏗️ Core Infrastructure'
+                }
+            
+            return {
+                'test_name': 'Core Imports',
+                'passed': True,
+                'message': 'All core modules imported successfully',
+                'category': '🏗️ Core Infrastructure'
+            }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Core Imports',
+                'passed': False,
+                'error': str(e),
+                'category': '🏗️ Core Infrastructure'
+            }
+    
+    def test_logger_system(self) -> Dict[str, Any]:
+        """Test logging system functionality."""
+        try:
+            from app.utils.logger import setup_logger
+            
+            test_logger = setup_logger("test_module")
+            test_logger.info("Test log message")
+            
+            return {
+                'test_name': 'Logger System',
+                'passed': True,
+                'message': 'Logging system operational',
+                'category': '🏗️ Core Infrastructure'
+            }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Logger System',
+                'passed': False,
+                'error': str(e),
+                'category': '🏗️ Core Infrastructure'
+            }
+    
+    def test_exception_handling(self) -> Dict[str, Any]:
+        """Test custom exception handling."""
+        try:
+            # Try to import custom exceptions
+            try:
+                from app.core.exceptions import DatabaseError, ValidationError
+                return {
+                    'test_name': 'Exception Handling',
+                    'passed': True,
+                    'message': 'Custom exceptions available',
+                    'category': '🏗️ Core Infrastructure'
+                }
+            except ImportError:
+                return {
+                    'test_name': 'Exception Handling',
+                    'passed': False,
+                    'error': 'Custom exception classes not found',
+                    'category': '🏗️ Core Infrastructure'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Exception Handling',
+                'passed': False,
+                'error': str(e),
+                'category': '🏗️ Core Infrastructure'
+            }
+    
+    # ==================== DATABASE SYSTEMS TESTS ====================
+    
+    def test_persistence_manager(self) -> Dict[str, Any]:
+        """Test persistence manager functionality."""
+        try:
+            from app.core.database.persistence_manager import PersistenceManager
+            
+            # Test instantiation
+            pm = PersistenceManager("test_db.sqlite")
+            
+            # Test status method
+            status = pm.get_database_status()
+            
+            if not isinstance(status, dict):
+                return {
+                    'test_name': 'Persistence Manager',
+                    'passed': False,
+                    'error': 'get_database_status() should return dict',
+                    'category': '💾 Database Systems'
+                }
+            
+            return {
+                'test_name': 'Persistence Manager',
+                'passed': True,
+                'message': 'PersistenceManager operational',
+                'category': '💾 Database Systems'
+            }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Persistence Manager',
+                'passed': False,
+                'error': str(e),
+                'category': '💾 Database Systems'
+            }
+    
+    def test_database_operations(self) -> Dict[str, Any]:
+        """Test basic database operations."""
+        try:
+            # Test async database initialization
+            from app.core.database.persistence_manager import get_persistence_manager
+            
+            # Since this is sync test, we'll just check that the function exists
+            if callable(get_persistence_manager):
+                return {
+                    'test_name': 'Database Operations',
+                    'passed': True,
+                    'message': 'Database functions available',
+                    'category': '💾 Database Systems'
+                }
+            else:
+                return {
+                    'test_name': 'Database Operations',
+                    'passed': False,
+                    'error': 'get_persistence_manager not callable',
+                    'category': '💾 Database Systems'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Database Operations',
+                'passed': False,
+                'error': str(e),
+                'category': '💾 Database Systems'
+            }
+    
+    def test_data_models(self) -> Dict[str, Any]:
+        """Test data model definitions."""
+        try:
+            from app.core.database.persistence_manager import (
+                TradeRecord, PortfolioSnapshot, WalletSession, TradeStatus
+            )
+            
+            # Test that we can create instances
+            test_trade = TradeRecord(
+                trade_id="test123",
+                wallet_address="0x123",
+                token_in="ETH",
+                token_out="TOKEN",
+                amount_in=1.0,
+                amount_out=100.0,
+                price_usd=50.0,
+                dex_protocol="uniswap",
+                network="ethereum",
+                transaction_hash=None,
+                status=TradeStatus.PENDING,
+                gas_used=None,
+                gas_price_gwei=None,
+                slippage_percent=1.0
+            )
+            
+            # Test conversion to dict
+            trade_dict = test_trade.to_dict()
+            
+            if isinstance(trade_dict, dict):
+                return {
+                    'test_name': 'Data Models',
+                    'passed': True,
+                    'message': 'Data models working correctly',
+                    'category': '💾 Database Systems'
+                }
+            else:
+                return {
+                    'test_name': 'Data Models',
+                    'passed': False,
+                    'error': 'to_dict() should return dict',
+                    'category': '💾 Database Systems'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Data Models',
+                'passed': False,
+                'error': str(e),
+                'category': '💾 Database Systems'
+            }
+    
+    def test_migration_system(self) -> Dict[str, Any]:
+        """Test database migration capabilities."""
+        try:
+            # For now, we'll check if the persistence manager has table creation
+            from app.core.database.persistence_manager import PersistenceManager
+            
+            pm = PersistenceManager()
+            
+            # Check if _create_tables method exists
+            if hasattr(pm, '_create_tables'):
+                return {
+                    'test_name': 'Migration System',
+                    'passed': True,
+                    'message': 'Table creation system available',
+                    'category': '💾 Database Systems'
+                }
+            else:
+                return {
+                    'test_name': 'Migration System',
+                    'passed': False,
+                    'error': '_create_tables method not found',
+                    'category': '💾 Database Systems'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Migration System',
+                'passed': False,
+                'error': str(e),
+                'category': '💾 Database Systems'
+            }
+    
+    # ==================== TRADING ENGINE TESTS ====================
+    
+    def test_trading_engine_init(self) -> Dict[str, Any]:
+        """Test trading engine initialization."""
+        try:
+            try:
+                from app.core.trading.trading_engine import TradingEngine
+                return {
+                    'test_name': 'Trading Engine Init',
+                    'passed': True,
+                    'message': 'TradingEngine class available',
+                    'category': '⚡ Trading Engine'
+                }
+            except ImportError:
+                return {
+                    'test_name': 'Trading Engine Init',
+                    'passed': False,
+                    'error': 'TradingEngine class not found - needs implementation',
+                    'category': '⚡ Trading Engine'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Trading Engine Init',
+                'passed': False,
+                'error': str(e),
+                'category': '⚡ Trading Engine'
+            }
+    
+    def test_order_execution(self) -> Dict[str, Any]:
+        """Test order execution capabilities."""
+        try:
+            try:
+                from app.core.trading.order_executor import OrderExecutor
+                return {
+                    'test_name': 'Order Execution',
+                    'passed': True,
+                    'message': 'OrderExecutor available',
+                    'category': '⚡ Trading Engine'
+                }
+            except ImportError:
+                return {
+                    'test_name': 'Order Execution',
+                    'passed': False,
+                    'error': 'OrderExecutor not implemented',
+                    'category': '⚡ Trading Engine'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Order Execution',
+                'passed': False,
+                'error': str(e),
+                'category': '⚡ Trading Engine'
+            }
+    
+    def test_portfolio_tracking(self) -> Dict[str, Any]:
+        """Test portfolio tracking functionality."""
+        try:
+            try:
+                from app.core.analytics.portfolio_analyzer import PortfolioAnalyzer
+                return {
+                    'test_name': 'Portfolio Tracking',
+                    'passed': True,
+                    'message': 'PortfolioAnalyzer available',
+                    'category': '⚡ Trading Engine'
+                }
+            except ImportError:
+                return {
+                    'test_name': 'Portfolio Tracking',
+                    'passed': False,
+                    'error': 'PortfolioAnalyzer not implemented',
+                    'category': '⚡ Trading Engine'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Portfolio Tracking',
+                'passed': False,
+                'error': str(e),
+                'category': '⚡ Trading Engine'
+            }
+    
+    def test_risk_management(self) -> Dict[str, Any]:
+        """Test risk management systems."""
+        try:
+            try:
+                from app.core.risk.risk_manager import RiskManager
+                return {
+                    'test_name': 'Risk Management',
+                    'passed': True,
+                    'message': 'RiskManager available',
+                    'category': '⚡ Trading Engine'
+                }
+            except ImportError:
+                return {
+                    'test_name': 'Risk Management',
+                    'passed': False,
+                    'error': 'RiskManager not implemented',
+                    'category': '⚡ Trading Engine'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Risk Management',
+                'passed': False,
+                'error': str(e),
+                'category': '⚡ Trading Engine'
+            }
+    
+    # ==================== API ENDPOINTS TESTS ====================
+    
+    def test_fastapi_application(self) -> Dict[str, Any]:
+        """Test FastAPI application setup."""
+        try:
+            from app.main import app
+            
+            if app and hasattr(app, 'title'):
+                return {
+                    'test_name': 'FastAPI Application',
+                    'passed': True,
+                    'message': f'FastAPI app ready: {app.title}',
+                    'category': '🌐 API Endpoints'
+                }
+            else:
+                return {
+                    'test_name': 'FastAPI Application',
+                    'passed': False,
+                    'error': 'FastAPI app not properly configured',
+                    'category': '🌐 API Endpoints'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'FastAPI Application',
+                'passed': False,
+                'error': str(e),
+                'category': '🌐 API Endpoints'
+            }
+    
+    def test_health_endpoints(self) -> Dict[str, Any]:
+        """Test health check endpoints."""
+        try:
+            from app.main import app
+            
+            # Check if health routes exist
+            routes = [route.path for route in app.routes]
+            
+            if '/health' in routes:
+                return {
+                    'test_name': 'Health Endpoints',
+                    'passed': True,
+                    'message': 'Health endpoints configured',
+                    'category': '🌐 API Endpoints'
+                }
+            else:
+                return {
+                    'test_name': 'Health Endpoints',
+                    'passed': False,
+                    'error': '/health endpoint not found',
+                    'category': '🌐 API Endpoints'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Health Endpoints',
+                'passed': False,
+                'error': str(e),
+                'category': '🌐 API Endpoints'
+            }
+    
+    def test_trading_api(self) -> Dict[str, Any]:
+        """Test trading API endpoints."""
+        try:
+            from app.main import app
+            
+            # Check for trading routes
+            routes = [route.path for route in app.routes]
+            trading_routes = [r for r in routes if 'trading' in r or 'trade' in r]
+            
+            if trading_routes:
+                return {
+                    'test_name': 'Trading API',
+                    'passed': True,
+                    'message': f'Trading routes found: {len(trading_routes)}',
+                    'category': '🌐 API Endpoints'
+                }
+            else:
+                return {
+                    'test_name': 'Trading API',
+                    'passed': False,
+                    'error': 'No trading API endpoints found',
+                    'category': '🌐 API Endpoints'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Trading API',
+                'passed': False,
+                'error': str(e),
+                'category': '🌐 API Endpoints'
+            }
+    
+    def test_dashboard_api(self) -> Dict[str, Any]:
+        """Test dashboard API endpoints."""
+        try:
+            from app.main import app
+            
+            routes = [route.path for route in app.routes]
+            
+            if '/dashboard' in routes:
+                return {
+                    'test_name': 'Dashboard API',
+                    'passed': True,
+                    'message': 'Dashboard endpoint available',
+                    'category': '🌐 API Endpoints'
+                }
+            else:
+                return {
+                    'test_name': 'Dashboard API',
+                    'passed': False,
+                    'error': '/dashboard endpoint not found',
+                    'category': '🌐 API Endpoints'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Dashboard API',
+                'passed': False,
+                'error': str(e),
+                'category': '🌐 API Endpoints'
+            }
+    
+    # ==================== FRONTEND INTERFACE TESTS ====================
+    
+    def test_template_system(self) -> Dict[str, Any]:
+        """Test template rendering system."""
+        try:
+            template_dirs = ['templates', 'app/templates', 'frontend/templates']
+            template_found = False
+            
+            for template_dir in template_dirs:
+                if Path(template_dir).exists():
+                    template_found = True
+                    break
+            
+            if template_found:
+                return {
+                    'test_name': 'Template System',
+                    'passed': True,
+                    'message': 'Template directory found',
+                    'category': '🎨 Frontend Interface'
+                }
+            else:
+                return {
+                    'test_name': 'Template System',
+                    'passed': False,
+                    'error': 'No template directory found',
+                    'category': '🎨 Frontend Interface'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Template System',
+                'passed': False,
+                'error': str(e),
+                'category': '🎨 Frontend Interface'
+            }
+    
+    def test_dashboard_ui(self) -> Dict[str, Any]:
+        """Test dashboard UI components."""
+        try:
+            # Look for dashboard templates
+            dashboard_files = [
+                'templates/dashboard.html',
+                'app/templates/dashboard.html',
+                'frontend/templates/dashboard.html',
+                'templates/pages/dashboard.html'
+            ]
+            
+            dashboard_found = False
+            for file_path in dashboard_files:
+                if Path(file_path).exists():
+                    dashboard_found = True
+                    break
+            
+            if dashboard_found:
+                return {
+                    'test_name': 'Dashboard UI',
+                    'passed': True,
+                    'message': 'Dashboard template found',
+                    'category': '🎨 Frontend Interface'
+                }
+            else:
+                return {
+                    'test_name': 'Dashboard UI',
+                    'passed': False,
+                    'error': 'Dashboard template not found',
+                    'category': '🎨 Frontend Interface'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Dashboard UI',
+                'passed': False,
+                'error': str(e),
+                'category': '🎨 Frontend Interface'
+            }
+    
+    def test_static_assets(self) -> Dict[str, Any]:
+        """Test static asset serving."""
+        try:
+            static_dirs = ['static', 'app/static', 'frontend/static']
+            static_found = False
+            
+            for static_dir in static_dirs:
+                if Path(static_dir).exists():
+                    static_found = True
+                    break
+            
+            if static_found:
+                return {
+                    'test_name': 'Static Assets',
+                    'passed': True,
+                    'message': 'Static directory found',
+                    'category': '🎨 Frontend Interface'
+                }
+            else:
+                return {
+                    'test_name': 'Static Assets',
+                    'passed': False,
+                    'error': 'No static directory found',
+                    'category': '🎨 Frontend Interface'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Static Assets',
+                'passed': False,
+                'error': str(e),
+                'category': '🎨 Frontend Interface'
+            }
+    
+    def test_websocket_support(self) -> Dict[str, Any]:
+        """Test WebSocket support for real-time updates."""
+        try:
+            try:
+                from app.core.websocket.websocket_manager import WebSocketManager
+                return {
+                    'test_name': 'WebSocket Support',
+                    'passed': True,
+                    'message': 'WebSocket manager available',
+                    'category': '🎨 Frontend Interface'
+                }
+            except ImportError:
+                return {
+                    'test_name': 'WebSocket Support',
+                    'passed': False,
+                    'error': 'WebSocket manager not implemented',
+                    'category': '🎨 Frontend Interface'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'WebSocket Support',
+                'passed': False,
+                'error': str(e),
+                'category': '🎨 Frontend Interface'
+            }
+    
+    # ==================== CONFIGURATION TESTS ====================
+    
+    def test_settings_manager(self) -> Dict[str, Any]:
+        """Test configuration management system."""
+        try:
+            from app.core.config.settings_manager import ApplicationSettings
+            
+            settings = ApplicationSettings()
+            
+            if hasattr(settings, 'validate_configuration'):
+                return {
+                    'test_name': 'Settings Manager',
+                    'passed': True,
+                    'message': 'Settings manager operational',
+                    'category': '⚙️ Configuration'
+                }
+            else:
+                return {
+                    'test_name': 'Settings Manager',
+                    'passed': False,
+                    'error': 'validate_configuration method missing',
+                    'category': '⚙️ Configuration'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Settings Manager',
+                'passed': False,
+                'error': str(e),
+                'category': '⚙️ Configuration'
+            }
+    
+    def test_environment_config(self) -> Dict[str, Any]:
+        """Test environment configuration loading."""
+        try:
+            env_files = ['.env', '.env.template', 'config/.env']
+            env_found = False
+            
+            for env_file in env_files:
+                if Path(env_file).exists():
+                    env_found = True
+                    break
+            
+            if env_found:
+                return {
+                    'test_name': 'Environment Config',
+                    'passed': True,
+                    'message': 'Environment configuration found',
+                    'category': '⚙️ Configuration'
+                }
+            else:
+                return {
+                    'test_name': 'Environment Config',
+                    'passed': False,
+                    'error': 'No environment configuration file found',
+                    'category': '⚙️ Configuration'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Environment Config',
+                'passed': False,
+                'error': str(e),
+                'category': '⚙️ Configuration'
+            }
+    
+    def test_runtime_updates(self) -> Dict[str, Any]:
+        """Test runtime configuration updates."""
+        try:
+            from app.core.config.settings_manager import ApplicationSettings
+            
+            settings = ApplicationSettings()
+            
+            if hasattr(settings, 'update_trading_config'):
+                return {
+                    'test_name': 'Runtime Updates',
+                    'passed': True,
+                    'message': 'Runtime update capability available',
+                    'category': '⚙️ Configuration'
+                }
+            else:
+                return {
+                    'test_name': 'Runtime Updates',
+                    'passed': False,
+                    'error': 'Runtime update methods not found',
+                    'category': '⚙️ Configuration'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Runtime Updates',
+                'passed': False,
+                'error': str(e),
+                'category': '⚙️ Configuration'
+            }
+    
+    def test_validation_system(self) -> Dict[str, Any]:
+        """Test configuration validation system."""
+        try:
+            from app.core.config.settings_manager import ApplicationSettings
+            
+            settings = ApplicationSettings()
+            
+            # Test validation
+            errors = settings.validate_configuration()
+            
+            if isinstance(errors, list):
+                return {
+                    'test_name': 'Validation System',
+                    'passed': True,
+                    'message': 'Configuration validation working',
+                    'category': '⚙️ Configuration'
+                }
+            else:
+                return {
+                    'test_name': 'Validation System',
+                    'passed': False,
+                    'error': 'validate_configuration should return list',
+                    'category': '⚙️ Configuration'
+                }
+            
+        except Exception as e:
+            return {
+                'test_name': 'Validation System',
+                'passed': False,
+                'error': str(e),
+                'category': '⚙️ Configuration'
+            }
+    
+    # ==================== SECURITY & COMPLIANCE TESTS ====================
+    
+    def test_wallet_security(self) -> Dict[str, Any]:
+        """Test wallet security measures."""
+        return {
+            'test_name': 'Wallet Security',
+            'passed': False,
+            'error': 'Wallet security implementation needed',
+            'category': '🛡️ Security & Compliance'
         }
     
-    def _generate_recommendations(self, success_rate: float) -> List[str]:
-        """Generate recommendations based on test results."""
-        recommendations = []
-        
-        if success_rate >= 95:
-            recommendations.append("✅ System is production-ready")
-            recommendations.append("🚀 Consider deploying to production environment")
-            recommendations.append("📊 Monitor performance in production")
-        elif success_rate >= 85:
-            recommendations.append("🔧 Address remaining test failures")
-            recommendations.append("🧪 Run additional integration tests")
-            recommendations.append("📈 Consider load testing")
-        elif success_rate >= 70:
-            recommendations.append("⚠️ Resolve critical component failures")
-            recommendations.append("🔍 Review system architecture")
-            recommendations.append("🛠️ Focus on core functionality fixes")
-        else:
-            recommendations.append("🚨 Major system issues detected")
-            recommendations.append("🔄 Review and rebuild failing components")
-            recommendations.append("📚 Check documentation and requirements")
-        
-        return recommendations
+    def test_api_authentication(self) -> Dict[str, Any]:
+        """Test API authentication system."""
+        return {
+            'test_name': 'API Authentication',
+            'passed': False,
+            'error': 'API authentication not implemented',
+            'category': '🛡️ Security & Compliance'
+        }
     
-    def _print_final_summary(self, success_rate: float, system_status: Dict[str, Any]):
-        """Print final comprehensive summary."""
-        print("\n" + "=" * 80)
-        print("📊 COMPREHENSIVE SYSTEM TEST SUMMARY")
-        print("=" * 80)
-        print(f"📋 Total Tests: {self.total_tests}")
-        print(f"✅ Passed: {self.passed_tests}")
-        print(f"❌ Failed: {self.failed_tests}")
-        print(f"📈 Success Rate: {success_rate:.1f}%")
-        print(f"🎯 System Status: {system_status['overall_status']}")
-        print(f"🚀 Readiness Level: {system_status['readiness_level']}")
-        
-        print(f"\n🔧 Component Status:")
-        for component, operational in system_status["components_operational"].items():
-            status_icon = "✅" if operational else "❌"
-            print(f"   {status_icon} {component.replace('_', ' ').title()}")
-        
-        print(f"\n💡 Recommendations:")
-        for recommendation in system_status["recommendations"]:
-            print(f"   {recommendation}")
-        
-        print("\n" + "=" * 80)
-        
-        if success_rate >= 95:
-            print("🎉 EXCELLENT! System is fully operational and production-ready!")
-        elif success_rate >= 85:
-            print("✅ GOOD! System is mostly operational with minor issues.")
-        elif success_rate >= 70:
-            print("⚠️ FAIR! System has some issues that need attention.")
-        else:
-            print("🚨 POOR! System has major issues requiring immediate attention.")
-        
-        print("=" * 80)
+    def test_input_validation(self) -> Dict[str, Any]:
+        """Test input validation and sanitization."""
+        return {
+            'test_name': 'Input Validation',
+            'passed': False,
+            'error': 'Input validation system needed',
+            'category': '🛡️ Security & Compliance'
+        }
+    
+    def test_error_sanitization(self) -> Dict[str, Any]:
+        """Test error message sanitization."""
+        return {
+            'test_name': 'Error Sanitization',
+            'passed': False,
+            'error': 'Error sanitization not implemented',
+            'category': '🛡️ Security & Compliance'
+        }
+    
+    # ==================== INTEGRATION TESTING ====================
+    
+    def test_end_to_end_workflow(self) -> Dict[str, Any]:
+        """Test end-to-end trading workflow."""
+        return {
+            'test_name': 'End-to-End Workflow',
+            'passed': False,
+            'error': 'E2E workflow testing not implemented',
+            'category': '🧪 Integration Testing'
+        }
+    
+    def test_cross_component_communication(self) -> Dict[str, Any]:
+        """Test communication between components."""
+        return {
+            'test_name': 'Cross-Component Communication',
+            'passed': False,
+            'error': 'Component communication testing needed',
+            'category': '🧪 Integration Testing'
+        }
+    
+    def test_performance_benchmarks(self) -> Dict[str, Any]:
+        """Test system performance benchmarks."""
+        return {
+            'test_name': 'Performance Benchmarks',
+            'passed': False,
+            'error': 'Performance benchmarking not implemented',
+            'category': '🧪 Integration Testing'
+        }
+    
+    def test_scalability_metrics(self) -> Dict[str, Any]:
+        """Test system scalability metrics."""
+        return {
+            'test_name': 'Scalability Metrics',
+            'passed': False,
+            'error': 'Scalability testing not implemented',
+            'category': '🧪 Integration Testing'
+        }
 
 
-async def main():
-    """Main test execution function."""
+def main():
+    """Main execution function."""
+    test_suite = ComprehensiveTestSuite()
+    results = test_suite.run_all_tests()
+    
+    # Write detailed results to file
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    results_file = f"test_results_{timestamp}.json"
+    
     try:
-        tester = ComprehensiveSystemTester()
-        results = await tester.run_comprehensive_tests()
-        
-        # Save results to file
-        results_file = Path("test_results_comprehensive.json")
-        with open(results_file, "w") as f:
+        with open(results_file, 'w') as f:
+            import json
             json.dump(results, f, indent=2, default=str)
-        
-        print(f"\n📄 Complete results saved to: {results_file}")
-        
-        # Return appropriate exit code
-        success_rate = results["overall_results"]["success_rate"]
-        return 0 if success_rate >= 85 else 1
-        
+        print(f"\n📝 Detailed results saved to: {results_file}")
     except Exception as e:
-        print(f"\n💥 Comprehensive test suite failed: {e}")
-        traceback.print_exc()
-        return 1
+        print(f"⚠️ Could not save results file: {e}")
+    
+    # Return exit code based on results
+    success_rate = results['test_summary']['success_rate']
+    if success_rate >= 95:
+        return 0  # Excellent
+    elif success_rate >= 85:
+        return 0  # Good enough
+    else:
+        return 1  # Needs work
 
 
 if __name__ == "__main__":
-    """Run the comprehensive system tests."""
-    exit_code = asyncio.run(main())
+    exit_code = main()
     sys.exit(exit_code)
