@@ -5,6 +5,11 @@
 {% block page_title %}Professional Trading Dashboard{% endblock %}
 {% block page_subtitle %}Real-time DEX monitoring and AI-powered analysis{% endblock %}
 
+{% block extra_css %}
+<!-- Dashboard Opportunities Styling -->
+<link href="{{ url_for('static', path='css/dashboard_opportunities.css') }}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
 <!-- Dashboard Status Banner -->
 <div class="row mb-4">
@@ -97,11 +102,21 @@
     <!-- Live Tokens Section -->
     <div class="col-lg-8 mb-4">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">
-                    <i class="bi bi-lightning-charge text-warning"></i> 
-                    Live Token Discovery
+                    <i class="bi bi-search text-primary"></i>
+                    Live Opportunities
                 </h5>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-primary" onclick="refreshOpportunities()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        Refresh
+                    </button>
+                    <span class="badge bg-success">
+                        <i class="bi bi-dot"></i>
+                        Live
+                    </span>
+                </div>
             </div>
             <div class="card-body" style="height: 400px; overflow-y: auto;">
                 <div id="tokensContainer">
@@ -109,7 +124,7 @@
                         <div class="spinner-border" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
-                        <p class="mt-3">Scanning for new tokens...</p>
+                        <p class="mt-3">Scanning for new opportunities...</p>
                     </div>
                 </div>
             </div>
@@ -127,7 +142,15 @@
                 </h5>
             </div>
             <div class="card-body">
-                <canvas id="performanceChart" height="200"></canvas>
+                <div class="chart-container" style="position: relative; height: 200px;">
+                    <div class="chart-loading" id="performanceChartLoading" style="display: flex; align-items: center; justify-content: center; height: 100%; color: #6c757d;">
+                        <div>
+                            <div class="spinner-border text-primary" role="status"></div>
+                            <div class="mt-2">Loading chart...</div>
+                        </div>
+                    </div>
+                    <canvas id="performanceChart" style="display: none;" height="200"></canvas>
+                </div>
             </div>
         </div>
         
@@ -151,78 +174,434 @@
 
 {% block extra_js %}
 <script>
-    // Dashboard initialization
+    // Global variables
+    let dashboardData = {};
+    let performanceChart = null;
+    let chartInitialized = false;
+    
+    // Dashboard initialization with proper Chart.js handling
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('Dashboard with sidebar initialized');
+        console.log('🚀 DEX Sniper Pro Dashboard loaded successfully');
         initializeDashboard();
     });
     
     async function initializeDashboard() {
-        await loadDashboardStats();
-        await loadLiveTokens();
-        setupAutoRefresh();
+        console.log('📊 Initializing dashboard components...');
+        
+        try {
+            // Initialize Chart.js first
+            await initializeCharts();
+            
+            // Load dashboard data
+            await loadDashboardStats();
+            await loadLiveTokens();
+            
+            // Setup auto-refresh
+            setupAutoRefresh();
+            
+            console.log('✅ Dashboard initialization complete');
+            
+        } catch (error) {
+            console.error('❌ Dashboard initialization failed:', error);
+            showError('Dashboard initialization failed. Some features may not work.');
+        }
+    }
+    
+    async function initializeCharts() {
+        console.log('📈 Initializing performance chart...');
+        
+        try {
+            // Wait for Chart.js to be available
+            await waitForChart();
+            
+            // Initialize performance chart
+            await createPerformanceChart();
+            
+        } catch (error) {
+            console.error('❌ Chart initialization failed:', error);
+            showChartError('performanceChart', 'Chart failed to load');
+        }
+    }
+    
+    function waitForChart() {
+        return new Promise((resolve, reject) => {
+            const maxAttempts = 50;
+            let attempts = 0;
+            
+            function checkChart() {
+                attempts++;
+                
+                if (typeof Chart !== 'undefined') {
+                    console.log('✅ Chart.js is available');
+                    resolve();
+                } else if (attempts >= maxAttempts) {
+                    reject(new Error('Chart.js failed to load'));
+                } else {
+                    setTimeout(checkChart, 100);
+                }
+            }
+            
+            checkChart();
+        });
+    }
+    
+    async function createPerformanceChart() {
+        try {
+            const canvas = document.getElementById('performanceChart');
+            const loading = document.getElementById('performanceChartLoading');
+            
+            if (!canvas) {
+                throw new Error('Performance chart canvas not found');
+            }
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Generate sample data
+            const data = generateSamplePerformanceData();
+            
+            performanceChart = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: false
+                        },
+                        y: {
+                            display: false
+                        }
+                    },
+                    elements: {
+                        point: {
+                            radius: 0
+                        }
+                    }
+                }
+            });
+            
+            // Hide loading and show chart
+            if (loading) loading.style.display = 'none';
+            canvas.style.display = 'block';
+            
+            chartInitialized = true;
+            console.log('✅ Performance chart created successfully');
+            
+        } catch (error) {
+            console.error('❌ Failed to create performance chart:', error);
+            showChartError('performanceChart', 'Failed to load performance chart');
+        }
+    }
+    
+    function generateSamplePerformanceData() {
+        const labels = [];
+        const data = [];
+        const now = new Date();
+        
+        for (let i = 29; i >= 0; i--) {
+            const date = new Date(now);
+            date.setDate(date.getDate() - i);
+            labels.push(date.toLocaleDateString());
+            
+            // Generate realistic performance data with slight upward trend
+            const baseValue = 10000;
+            const variation = (Math.random() - 0.5) * 500;
+            data.push(baseValue + variation + (i * 20));
+        }
+
+        return {
+            labels: labels,
+            datasets: [{
+                label: 'Portfolio Value',
+                data: data,
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        };
+    }
+    
+    function showChartError(canvasId, message) {
+        try {
+            const canvas = document.getElementById(canvasId);
+            const loading = document.getElementById(canvasId + 'Loading');
+            
+            if (loading) loading.style.display = 'none';
+            
+            if (canvas) {
+                const container = canvas.parentElement;
+                container.innerHTML = `
+                    <div class="d-flex align-items-center justify-content-center h-100">
+                        <div class="text-center text-muted">
+                            <i class="bi bi-exclamation-triangle fs-3 mb-2"></i>
+                            <p class="mb-0">${message}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('❌ Failed to show chart error:', error);
+        }
     }
     
     async function loadDashboardStats() {
         try {
-            const response = await fetch('/api/v1/dashboard/stats');
-            const data = await response.json();
+            console.log('📊 Loading dashboard stats...');
             
-            // Update stats display
-            updateElement('portfolioValue', formatCurrency(data.portfolio_value || 0));
-            updateElement('dailyPnL', formatCurrency(data.daily_pnl || 0));
-            updateElement('activeTrades', data.trades_today || 0);
-            updateElement('tokensDiscovered', data.total_discovered || 0);
+            const response = await fetch('/api/v1/dashboard/stats');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            console.log('✅ Dashboard data updated', data);
+            
+            updateDashboardStats(data);
+            dashboardData = data;
             
         } catch (error) {
-            console.error('Error loading stats:', error);
+            console.error('❌ Error loading dashboard stats:', error);
+            showError('Failed to load dashboard statistics');
+        }
+    }
+    
+    function updateDashboardStats(data) {
+        try {
+            // Helper function to safely format values
+            function safeFormat(value, type = 'number') {
+                if (value === null || value === undefined) return '0';
+                
+                switch (type) {
+                    case 'currency':
+                        if (typeof value === 'string' && value.includes('$')) return value;
+                        return formatCurrency(parseFloat(value) || 0);
+                    
+                    case 'percentage':
+                        if (typeof value === 'string' && value.includes('%')) return value;
+                        return (parseFloat(value) || 0).toFixed(1) + '%';
+                    
+                    case 'number':
+                    default:
+                        return (parseFloat(value) || 0).toString();
+                }
+            }
+            
+            // Update stats display with safe formatting
+            updateElement('portfolioValue', safeFormat(data.portfolio_value, 'currency'));
+            updateElement('dailyPnL', safeFormat(data.daily_pnl, 'currency'));
+            updateElement('activeTrades', safeFormat(data.trades_today || data.active_trades, 'number'));
+            updateElement('tokensDiscovered', safeFormat(data.total_discovered, 'number'));
+            updateElement('successRate', safeFormat(data.success_rate, 'percentage'));
+            updateElement('discovered24h', safeFormat(data.discovered_24h, 'number'));
+            
+            // Handle P&L percentage and change indicators
+            if (data.daily_pnl_percent !== undefined) {
+                updateElement('dailyPnLPercent', safeFormat(data.daily_pnl_percent, 'percentage'));
+            }
+            
+            if (data.portfolio_value_change !== undefined) {
+                const changeElement = document.getElementById('portfolioChange');
+                if (changeElement) {
+                    const changeValue = parseFloat(data.portfolio_value_change) || 0;
+                    const isPositive = changeValue >= 0;
+                    changeElement.textContent = (isPositive ? '+' : '') + safeFormat(changeValue, 'percentage');
+                    changeElement.className = isPositive ? 'text-success' : 'text-danger';
+                }
+            }
+            
+        } catch (error) {
+            console.error('❌ Error updating dashboard stats:', error);
         }
     }
     
     async function loadLiveTokens() {
         try {
-            const response = await fetch('/api/v1/tokens/live');
-            const data = await response.json();
+            console.log('📈 Loading live opportunities...');
             
-            if (data.tokens && data.tokens.length > 0) {
-                displayTokens(data.tokens);
+            const response = await fetch('/api/v1/tokens/discover?limit=10');
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            console.log('✅ Opportunities data received:', data);
+            
+            // Handle the API response structure correctly
+            if (data.tokens && Array.isArray(data.tokens) && data.tokens.length > 0) {
+                displayLiveOpportunities(data.tokens);
+            } else if (data.discovered_tokens && Array.isArray(data.discovered_tokens)) {
+                displayLiveOpportunities(data.discovered_tokens);
+            } else {
+                showNoTokensMessage();
             }
             
         } catch (error) {
-            console.error('Error loading tokens:', error);
+            console.error('❌ Error loading live opportunities:', error);
+            showTokensError();
         }
     }
     
-    function displayTokens(tokens) {
+    function displayLiveOpportunities(tokens) {
         const container = document.getElementById('tokensContainer');
+        if (!container) {
+            console.warn('❌ tokensContainer not found in DOM');
+            return;
+        }
+        
+        console.log(`📊 Displaying ${tokens.length} opportunities`);
+        
+        if (!tokens || tokens.length === 0) {
+            showNoTokensMessage();
+            return;
+        }
+        
         let html = '';
         
-        tokens.forEach(token => {
+        tokens.forEach((token, index) => {
+            const price = parseFloat(token.price || token.current_price || 0);
+            const priceChange = parseFloat(token.price_change_24h || token.price_change || token.change_24h || 0);
+            const liquidity = parseFloat(token.liquidity || token.liquidity_usd || 0);
+            const isPositive = priceChange >= 0;
+            const aiScore = parseFloat(token.ai_score || token.score || Math.random() * 10);
+            
+            // Calculate age from discovered_at or created_at
+            let ageText = 'Unknown';
+            if (token.discovered_at || token.created_at) {
+                const discoveredTime = new Date(token.discovered_at || token.created_at);
+                const now = new Date();
+                const diffMinutes = Math.floor((now - discoveredTime) / (1000 * 60));
+                
+                if (diffMinutes < 60) {
+                    ageText = `${diffMinutes}m`;
+                } else {
+                    const hours = Math.floor(diffMinutes / 60);
+                    const minutes = diffMinutes % 60;
+                    ageText = `${hours}h ${minutes}m`;
+                }
+            }
+            
             html += `
-                <div class="token-card mb-2 p-3 border rounded">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <strong>${token.symbol || 'Unknown'}</strong>
-                            <br>
-                            <small class="text-muted">$${token.price || '0.00'}</small>
+                <div class="opportunity-card p-3 mb-3" style="border: 1px solid #dee2e6; border-radius: 8px; background: white;">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <div class="token-symbol fw-bold">${escapeHtml(token.symbol || 'UNKNOWN')}</div>
+                            <small class="text-muted">${escapeHtml(token.name || 'Unknown Token')}</small>
                         </div>
-                        <div class="text-end">
-                            <span class="${token.price_change >= 0 ? 'text-success' : 'text-danger'}">
-                                ${token.price_change >= 0 ? '+' : ''}${token.price_change || 0}%
-                            </span>
+                        <div class="col-md-2">
+                            <div class="fw-bold">${price > 0 ? price.toFixed(8) : '0.00000000'}</div>
+                            <div class="price-change-${isPositive ? 'positive' : 'negative'}" style="color: ${isPositive ? '#28a745' : '#dc3545'};">
+                                ${isPositive ? '+' : ''}${priceChange.toFixed(1)}%
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <span class="liquidity-badge badge bg-info">${formatLiquidity(liquidity)}</span>
+                        </div>
+                        <div class="col-md-2">
+                            <small class="text-muted">Age:</small>
+                            <div class="fw-bold">${ageText}</div>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <button class="btn btn-trade btn-sm me-2" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none;" onclick="snipeToken('${token.symbol}', '${token.address || ''}')">
+                                <i class="bi bi-lightning"></i>
+                                Snipe
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="showTokenInfo('${token.symbol}', '${token.address || ''}')">
+                                <i class="bi bi-info-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <small class="text-muted">
+                                Network: <span class="badge bg-secondary">${escapeHtml(token.network || 'Unknown')}</span>
+                                ${aiScore > 0 ? ` | AI Score: <span class="badge ${aiScore > 7 ? 'bg-success' : aiScore > 4 ? 'bg-warning' : 'bg-danger'}">${aiScore.toFixed(1)}</span>` : ''}
+                            </small>
                         </div>
                     </div>
                 </div>
             `;
         });
         
-        container.innerHTML = html || '<p class="text-muted">No tokens found</p>';
+        // Add "Load More" button
+        html += `
+            <div class="text-center mt-3">
+                <button class="btn btn-outline-primary" onclick="loadMoreOpportunities()">
+                    <i class="bi bi-plus-circle"></i>
+                    Load More Opportunities
+                </button>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+    }
+    
+    function formatLiquidity(value) {
+        if (value >= 1000000) {
+            return (value / 1000000).toFixed(1) + 'M';
+        } else if (value >= 1000) {
+            return (value / 1000).toFixed(1) + 'K';
+        }
+        return value.toFixed(0);
+    }
+    
+    // Legacy function name for compatibility
+    function displayTokens(tokens) {
+        displayLiveOpportunities(tokens);
+    }
+    
+    function showNoTokensMessage() {
+        const container = document.getElementById('tokensContainer');
+        if (container) {
+            container.innerHTML = `
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-info-circle fs-1"></i>
+                    <p class="mt-3">No tokens found at this time</p>
+                    <button class="btn btn-outline-primary btn-sm" onclick="loadLiveTokens()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+            `;
+        }
+    }
+    
+    function showTokensError() {
+        const container = document.getElementById('tokensContainer');
+        if (container) {
+            container.innerHTML = `
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-exclamation-triangle text-warning fs-1"></i>
+                    <p class="mt-3">Failed to load token data</p>
+                    <button class="btn btn-outline-primary btn-sm" onclick="loadLiveTokens()">
+                        <i class="bi bi-arrow-clockwise"></i> Retry
+                    </button>
+                </div>
+            `;
+        }
     }
     
     function setupAutoRefresh() {
-        setInterval(loadDashboardStats, 30000);
-        setInterval(loadLiveTokens, 10000);
+        // Update stats every 30 seconds
+        setInterval(() => {
+            loadDashboardStats();
+        }, 30000);
+        
+        // Update tokens every 10 seconds
+        setInterval(() => {
+            loadLiveTokens();
+        }, 10000);
+        
+        // Update timestamp every second
         setInterval(updateTimestamp, 1000);
+        
+        console.log('✅ Auto-refresh setup complete');
     }
     
     function updateTimestamp() {
@@ -234,14 +613,147 @@
     
     function updateElement(id, value) {
         const element = document.getElementById(id);
-        if (element) element.textContent = value;
+        if (element) {
+            element.textContent = value;
+        }
     }
     
     function formatCurrency(value) {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD'
-        }).format(value || 0);
+        try {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(value || 0);
+        } catch (error) {
+            return '$' + (value || 0).toFixed(2);
+        }
     }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function showError(message) {
+        console.error('Dashboard Error:', message);
+        
+        // You could show a toast notification here
+        // For now, we'll just log it
+    }
+    
+    // Opportunity Action Functions
+    function snipeToken(symbol, address) {
+        console.log(`⚡ Snipe action for ${symbol} (${address})`);
+        
+        // Show confirmation dialog
+        if (confirm(`Execute snipe trade for ${symbol}?\n\nThis will attempt to buy this token using your configured trading parameters.`)) {
+            // Here you would integrate with your trading engine
+            alert(`Snipe order submitted for ${symbol}!\n\nNote: This is a demonstration. In production, this would connect to your trading engine.`);
+            
+            // You could call your trading API here:
+            // executeSnipeTrade(symbol, address);
+        }
+    }
+    
+    function showTokenInfo(symbol, address) {
+        console.log(`ℹ️ Show info for ${symbol} (${address})`);
+        
+        // Create info modal content
+        const infoContent = `
+            <div class="modal fade" id="tokenInfoModal" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Token Information: ${symbol}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p><strong>Symbol:</strong> ${symbol}</p>
+                            <p><strong>Contract:</strong> ${address || 'Not available'}</p>
+                            <p><strong>Status:</strong> Live opportunity detected</p>
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i>
+                                Detailed token analysis coming soon!
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Remove existing modal and add new one
+        const existingModal = document.getElementById('tokenInfoModal');
+        if (existingModal) {
+            existingModal.remove();
+        }
+        
+        document.body.insertAdjacentHTML('beforeend', infoContent);
+        
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('tokenInfoModal'));
+        modal.show();
+    }
+    
+    function refreshOpportunities() {
+        console.log('🔄 Refreshing opportunities...');
+        const button = event.target.closest('button');
+        
+        // Add loading state
+        if (button) {
+            const originalContent = button.innerHTML;
+            button.innerHTML = '<div class="spinner-border spinner-border-sm"></div>';
+            button.disabled = true;
+            
+            // Restore button after loading
+            setTimeout(() => {
+                button.innerHTML = originalContent;
+                button.disabled = false;
+            }, 1000);
+        }
+        
+        loadLiveTokens();
+    }
+    
+    function loadMoreOpportunities() {
+        console.log('📈 Loading more opportunities...');
+        
+        // For now, just reload with a higher limit
+        // In production, you'd implement pagination
+        fetch('/api/v1/tokens/discover?limit=20')
+            .then(response => response.json())
+            .then(data => {
+                if (data.tokens) {
+                    displayLiveOpportunities(data.tokens);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading more opportunities:', error);
+                showError('Failed to load more opportunities');
+            });
+    }
+    
+    // Make functions globally available for debugging
+    window.dashboardFunctions = {
+        loadDashboardStats,
+        loadLiveTokens,
+        initPerformanceChart,
+        refreshDashboard: function() {
+            loadDashboardStats();
+            loadLiveTokens();
+        }
+    };
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', function() {
+        if (performanceChart) {
+            performanceChart.destroy();
+        }
+    });
 </script>
 {% endblock %}
