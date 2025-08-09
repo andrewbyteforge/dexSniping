@@ -129,6 +129,94 @@ def setup_frontend_routes(app: FastAPI) -> None:
         return exists
     
     # Main dashboard page
+    @app.get("/dashboard", response_class=HTMLResponse)
+    async def serve_dashboard(request: Request) -> HTMLResponse:
+        """
+        Serve the main trading dashboard.
+        
+        Args:
+            request: HTTP request object
+            
+        Returns:
+            HTMLResponse: Dashboard HTML page
+        """
+        try:
+            # Verify template exists
+            if not verify_template_exists("pages/dashboard.html"):
+                # Try backup
+                if verify_template_exists("pages/dashboard.html.backup"):
+                    logger.info("Using backup dashboard template")
+                    return templates.TemplateResponse(
+                        "pages/dashboard.html.backup", 
+                        {"request": request}
+                    )
+                else:
+                    logger.error("No dashboard template found")
+                    raise HTTPException(
+                        status_code=500, 
+                        detail="Dashboard template not found"
+                    )
+            
+            # Serve the professional dashboard
+            logger.info("Serving professional dashboard")
+            return templates.TemplateResponse(
+                "pages/dashboard.html", 
+                {
+                    "request": request,
+                    "title": "DEX Sniper Pro Dashboard",
+                    "version": "4.0.0"
+                }
+            )
+            
+        except HTTPException:
+            raise
+        except Exception as error:
+            logger.error(f"Failed to serve dashboard: {error}")
+            # Create a proper error response instead of fallback
+            raise HTTPException(
+                status_code=500, 
+                detail=f"Dashboard unavailable: {str(error)}"
+            )
+    
+    # Token discovery page - for now serve dashboard
+    @app.get("/token-discovery", response_class=HTMLResponse)
+    async def serve_token_discovery(request: Request) -> HTMLResponse:
+        """
+        Serve the token discovery page.
+        Currently serves dashboard until dedicated template is created.
+        """
+        return await serve_dashboard(request)
+    
+    # Live trading page - for now serve dashboard
+    @app.get("/live-trading", response_class=HTMLResponse)
+    async def serve_live_trading(request: Request) -> HTMLResponse:
+        """
+        Serve the live trading page.
+        Currently serves dashboard until dedicated template is created.
+        """
+        return await serve_dashboard(request)
+    
+    # Portfolio page - for now serve dashboard
+    @app.get("/portfolio", response_class=HTMLResponse)
+    async def serve_portfolio(request: Request) -> HTMLResponse:
+        """
+        Serve the portfolio management page.
+        Currently serves dashboard until dedicated template is created.
+        """
+        return await serve_dashboard(request)
+    
+    # Root redirect to dashboard
+    @app.get("/", response_class=HTMLResponse)
+    async def root_redirect(request: Request) -> HTMLResponse:
+        """
+        Root endpoint that redirects to the dashboard.
+        """
+        # Direct serve instead of redirect for better reliability
+        return await serve_dashboard(request)
+    
+    logger.info("Frontend routes configured successfully")
+
+
 def setup_system_routes(app: FastAPI) -> None:
     """
     Setup system routes for health checks and status.

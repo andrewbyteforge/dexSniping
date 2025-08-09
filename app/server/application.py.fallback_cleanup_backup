@@ -10,11 +10,6 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import AsyncGenerator
 
-# NOTE: This application factory is no longer used for frontend routes.
-# Frontend routes are handled directly in app/main.py to serve the professional dashboard.
-# This file remains for potential future modular use.
-
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles

@@ -1,22 +1,34 @@
 """
 Main Application Entry Point
 File: app/main.py
+CLEAN VERSION - NO FALLBACK LOGIC - PROFESSIONAL DASHBOARD ONLY
+
 Streamlined main entry point for the DEX Sniper Pro application.
-Uses modular architecture with separate managers for different concerns.
-FIXED: Dashboard route registration to serve professional template with sidebar.
+Removed ALL fallback mechanisms that were overriding the professional dashboard.
+BYPASSES app/factory.py and app/server/routes.py to avoid fallback routes.
 """
 
 import sys
+import logging
 from pathlib import Path
 from typing import Dict, Any
 
-from fastapi import Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.utils.logger import setup_logger
-from app.factory import create_app
-from app.core.lifecycle_manager import LifecycleManager
+
+# Configure detailed logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
 
 logger = setup_logger(__name__)
 
@@ -26,156 +38,224 @@ __phase__ = "4C - AI Risk Assessment Integration"
 __description__ = "Professional trading bot with AI-powered risk assessment"
 
 
-def verify_template_structure() -> bool:
+def verify_template_files() -> bool:
     """
-    Verify that required template files exist before starting the application.
+    Verify that all required template files exist.
     
     Returns:
-        bool: True if all required templates exist
+        bool: True if all templates exist
         
     Raises:
-        FileNotFoundError: If critical template files are missing
+        FileNotFoundError: If required templates are missing
     """
+    logger.info("🔍 Starting template verification...")
+    
+    template_dir = Path("frontend/templates")
+    logger.info(f"📁 Checking template directory: {template_dir.absolute()}")
+    
+    if not template_dir.exists():
+        logger.error(f"❌ Template directory does not exist: {template_dir.absolute()}")
+        raise FileNotFoundError(f"Template directory not found: {template_dir.absolute()}")
+    
+    logger.info(f"✅ Template directory exists: {template_dir.absolute()}")
+    
+    # Check required template files
+    required_templates = [
+        "base/layout.html",
+        "pages/dashboard.html"
+    ]
+    
+    for template_path in required_templates:
+        full_path = template_dir / template_path
+        logger.info(f"🔍 Checking template: {full_path}")
+        
+        if not full_path.exists():
+            logger.error(f"❌ Required template missing: {full_path}")
+            raise FileNotFoundError(f"Required template not found: {full_path}")
+        
+        logger.info(f"✅ Template found: {template_path}")
+    
+    logger.info("✅ All template files verified successfully")
+    return True
+
+
+def setup_static_files(app: FastAPI) -> None:
+    """
+    Setup static file serving.
+    
+    Args:
+        app: FastAPI application instance
+    """
+    logger.info("🔧 Setting up static files...")
+    
     try:
-        logger.info("🔍 Verifying template structure...")
-        
-        template_dir = Path("frontend/templates")
-        if not template_dir.exists():
-            logger.warning(f"⚠️ Template directory not found: {template_dir}")
-            template_dir.mkdir(parents=True, exist_ok=True)
-            logger.info(f"✅ Created template directory: {template_dir}")
-        
-        # Check required template files
-        required_templates = {
-            "base/layout.html": "Professional layout with sidebar",
-            "pages/dashboard.html": "Main dashboard template"
-        }
-        
-        missing_templates = []
-        for template_path, description in required_templates.items():
-            full_path = template_dir / template_path
-            if not full_path.exists():
-                missing_templates.append(f"{template_path} ({description})")
-                logger.error(f"❌ Missing template: {template_path}")
-            else:
-                logger.info(f"✅ Found template: {template_path}")
-        
-        if missing_templates:
-            error_msg = f"Missing required templates: {missing_templates}"
-            logger.error(f"❌ Template verification failed: {error_msg}")
-            raise FileNotFoundError(error_msg)
-        
-        logger.info("✅ Template structure verification completed successfully")
-        return True
-        
+        static_dir = Path("frontend/static")
+        if static_dir.exists():
+            app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+            logger.info(f"✅ Static files mounted: {static_dir.absolute()}")
+        else:
+            logger.warning(f"⚠️ Static directory not found: {static_dir.absolute()}")
     except Exception as error:
-        logger.error(f"❌ Template structure verification failed: {error}")
+        logger.error(f"❌ Static files setup failed: {error}")
+        # Don't fail - static files are not critical
+
+
+def setup_middleware(app: FastAPI) -> None:
+    """
+    Setup application middleware.
+    
+    Args:
+        app: FastAPI application instance
+    """
+    logger.info("🔧 Setting up middleware...")
+    
+    try:
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_credentials=True,
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
+        logger.info("✅ CORS middleware configured")
+    except Exception as error:
+        logger.error(f"❌ Middleware setup failed: {error}")
         raise
 
 
-def setup_professional_dashboard_routes(app) -> None:
+def setup_api_routes(app: FastAPI) -> None:
     """
-    Setup professional dashboard routes that serve the template with sidebar.
+    Setup API routes with detailed logging.
+    
+    Args:
+        app: FastAPI application instance
+    """
+    logger.info("🔧 Setting up API routes...")
+    
+    try:
+        # Import API routers with error handling
+        try:
+            from app.api.v1.endpoints.dashboard import dashboard_router, tokens_router
+            logger.info("✅ Dashboard and tokens routers imported successfully")
+        except ImportError as error:
+            logger.error(f"❌ Failed to import API routers: {error}")
+            raise
+        
+        # Include API routers
+        app.include_router(dashboard_router, prefix="/api/v1", tags=["dashboard"])
+        app.include_router(tokens_router, prefix="/api/v1", tags=["tokens"])
+        logger.info("✅ API routes configured successfully")
+        
+    except Exception as error:
+        logger.error(f"❌ API routes setup failed: {error}")
+        raise
+
+
+def setup_professional_dashboard_routes(app: FastAPI) -> None:
+    """
+    Setup ONLY the professional dashboard routes - NO FALLBACK LOGIC.
     
     Args:
         app: FastAPI application instance
         
     Raises:
-        RuntimeError: If template initialization fails
+        RuntimeError: If template setup fails
     """
+    logger.info("🎯 Setting up PROFESSIONAL dashboard routes...")
+    
+    # First verify all templates exist
+    verify_template_files()
+    
+    # Initialize Jinja2Templates
     try:
-        logger.info("🔧 Setting up professional dashboard routes...")
-        
-        # Verify templates exist before initializing Jinja2
-        verify_template_structure()
-        
-        # Initialize Jinja2Templates with error handling
-        try:
-            templates = Jinja2Templates(directory="frontend/templates")
-            logger.info("✅ Jinja2Templates initialized successfully")
-        except Exception as template_error:
-            logger.error(f"❌ Failed to initialize Jinja2Templates: {template_error}")
-            raise RuntimeError(f"Template initialization failed: {template_error}")
-        
-        @app.get("/dashboard", response_class=HTMLResponse)
-        async def serve_professional_dashboard(request: Request) -> HTMLResponse:
-            """
-            Serve the professional trading dashboard with sidebar.
-            
-            Args:
-                request: HTTP request object
-                
-            Returns:
-                HTMLResponse: Professional dashboard template
-                
-            Raises:
-                HTTPException: If template rendering fails
-            """
-            try:
-                logger.info("🎯 Serving professional dashboard with sidebar")
-                return templates.TemplateResponse(
-                    "pages/dashboard.html", 
-                    {"request": request}
-                )
-            except Exception as render_error:
-                logger.error(f"❌ Dashboard template rendering failed: {render_error}")
-                raise HTTPException(
-                    status_code=500,
-                    detail=f"Dashboard template error: {render_error}"
-                )
-        
-        @app.get("/wallet-connection", response_class=HTMLResponse)
-        async def serve_wallet_connection(request: Request) -> HTMLResponse:
-            """Serve wallet connection page using professional template."""
-            try:
-                return templates.TemplateResponse(
-                    "pages/dashboard.html", 
-                    {"request": request}
-                )
-            except Exception as error:
-                logger.error(f"❌ Wallet connection template error: {error}")
-                raise HTTPException(status_code=500, detail=f"Template error: {error}")
-        
-        @app.get("/live-trading", response_class=HTMLResponse)
-        async def serve_live_trading(request: Request) -> HTMLResponse:
-            """Serve live trading interface using professional template."""
-            try:
-                return templates.TemplateResponse(
-                    "pages/dashboard.html", 
-                    {"request": request}
-                )
-            except Exception as error:
-                logger.error(f"❌ Live trading template error: {error}")
-                raise HTTPException(status_code=500, detail=f"Template error: {error}")
-        
-        @app.get("/portfolio", response_class=HTMLResponse)
-        async def serve_portfolio(request: Request) -> HTMLResponse:
-            """Serve portfolio management page using professional template."""
-            try:
-                return templates.TemplateResponse(
-                    "pages/dashboard.html", 
-                    {"request": request}
-                )
-            except Exception as error:
-                logger.error(f"❌ Portfolio template error: {error}")
-                raise HTTPException(status_code=500, detail=f"Template error: {error}")
-        
-        # Root redirect to dashboard
-        @app.get("/", response_class=HTMLResponse)
-        async def root_redirect(request: Request) -> HTMLResponse:
-            """Root endpoint redirects to professional dashboard."""
-            return await serve_professional_dashboard(request)
-        
-        logger.info("✅ Professional dashboard routes configured successfully")
-        
+        templates = Jinja2Templates(directory="frontend/templates")
+        logger.info("✅ Jinja2Templates initialized successfully")
     except Exception as error:
-        logger.error(f"❌ Failed to setup professional dashboard routes: {error}")
-        raise RuntimeError(f"Dashboard routes setup failed: {error}")
+        logger.error(f"❌ Failed to initialize Jinja2Templates: {error}")
+        raise RuntimeError(f"Template initialization failed: {error}")
+    
+    @app.get("/dashboard", response_class=HTMLResponse)
+    async def serve_professional_dashboard(request: Request) -> HTMLResponse:
+        """
+        Serve the PROFESSIONAL trading dashboard with sidebar.
+        NO FALLBACK - If this fails, we want to see the error.
+        """
+        logger.info("🎯 Serving PROFESSIONAL dashboard with sidebar")
+        logger.info(f"📄 Template: pages/dashboard.html")
+        logger.info(f"🔗 Request URL: {request.url}")
+        
+        try:
+            response = templates.TemplateResponse(
+                "pages/dashboard.html", 
+                {"request": request}
+            )
+            logger.info("✅ Professional dashboard rendered successfully")
+            return response
+        except Exception as error:
+            logger.error(f"❌ CRITICAL: Professional dashboard template failed: {error}")
+            logger.error(f"❌ Template path: frontend/templates/pages/dashboard.html")
+            logger.error(f"❌ Request details: {request.url}, {request.method}")
+            # NO FALLBACK - Raise the error so we can fix it
+            raise HTTPException(
+                status_code=500,
+                detail=f"Professional dashboard template error: {error}"
+            )
+    
+    @app.get("/", response_class=HTMLResponse)
+    async def root_redirect(request: Request) -> HTMLResponse:
+        """Root redirects to professional dashboard."""
+        logger.info("🔄 Root request redirecting to professional dashboard")
+        return await serve_professional_dashboard(request)
+    
+    @app.get("/wallet-connection", response_class=HTMLResponse)
+    async def serve_wallet_connection(request: Request) -> HTMLResponse:
+        """Serve wallet connection using professional template."""
+        logger.info("🔗 Serving wallet connection page")
+        return templates.TemplateResponse("pages/dashboard.html", {"request": request})
+    
+    @app.get("/live-trading", response_class=HTMLResponse)
+    async def serve_live_trading(request: Request) -> HTMLResponse:
+        """Serve live trading using professional template."""
+        logger.info("⚡ Serving live trading page")
+        return templates.TemplateResponse("pages/dashboard.html", {"request": request})
+    
+    @app.get("/portfolio", response_class=HTMLResponse)
+    async def serve_portfolio(request: Request) -> HTMLResponse:
+        """Serve portfolio using professional template."""
+        logger.info("📊 Serving portfolio page")
+        return templates.TemplateResponse("pages/dashboard.html", {"request": request})
+    
+    logger.info("✅ PROFESSIONAL dashboard routes configured - NO FALLBACK")
 
 
-def create_application():
+def setup_health_routes(app: FastAPI) -> None:
     """
-    Create the FastAPI application instance with professional dashboard routes.
+    Setup health check routes.
+    
+    Args:
+        app: FastAPI application instance
+    """
+    logger.info("🔧 Setting up health routes...")
+    
+    @app.get("/health")
+    async def health_check() -> Dict[str, Any]:
+        """Health check endpoint."""
+        logger.info("🏥 Health check requested")
+        return {
+            "status": "healthy",
+            "service": "DEX Sniper Pro Trading Bot",
+            "version": __version__,
+            "phase": __phase__,
+            "dashboard": "professional_template",
+            "timestamp": "2025-08-09T00:00:00Z"
+        }
+    
+    logger.info("✅ Health routes configured")
+
+
+def create_application() -> FastAPI:
+    """
+    Create the FastAPI application - PROFESSIONAL DASHBOARD ONLY.
     
     Returns:
         FastAPI: Configured application instance
@@ -183,127 +263,73 @@ def create_application():
     Raises:
         RuntimeError: If application creation fails
     """
+    logger.info("🚀 Creating DEX Sniper Pro application - PROFESSIONAL DASHBOARD ONLY")
+    logger.info(f"📖 Version: {__version__}")
+    logger.info(f"🎯 Phase: {__phase__}")
+    
     try:
-        logger.info("🚀 Creating DEX Sniper Pro application...")
+        # Create FastAPI app
+        app = FastAPI(
+            title="DEX Sniper Pro - Live Trading Bot",
+            description=__description__,
+            version=__version__,
+            docs_url="/docs",
+            redoc_url="/redoc"
+        )
+        logger.info("✅ FastAPI application created")
         
-        # Create lifecycle manager
-        lifecycle_manager = LifecycleManager()
+        # Setup middleware
+        setup_middleware(app)
         
-        # Create application using factory
-        app = create_app()
+        # Setup static files
+        setup_static_files(app)
         
-        # Set up lifespan management
-        app.router.lifespan_context = lifecycle_manager.lifespan
+        # Setup API routes
+        setup_api_routes(app)
         
-        # Setup professional dashboard routes (CRITICAL FIX)
-        try:
-            setup_professional_dashboard_routes(app)
-            logger.info("✅ Professional dashboard routes integrated successfully")
-        except Exception as routes_error:
-            logger.error(f"❌ Dashboard routes setup failed: {routes_error}")
-            # Don't create fallback routes - fail transparently to fix the real issue
-            raise RuntimeError(f"Dashboard routes setup failed: {routes_error}")
+        # Setup PROFESSIONAL dashboard routes (NO FALLBACK)
+        setup_professional_dashboard_routes(app)
         
-        # Add startup and shutdown event handlers
+        # Setup health routes
+        setup_health_routes(app)
+        
+        # Add startup event
         @app.on_event("startup")
         async def startup_event():
-            """Application startup event handler with template verification."""
-            try:
-                await lifecycle_manager.display_startup_message()
-                logger.info("✅ Professional dashboard with sidebar is ready")
-            except Exception as startup_error:
-                logger.error(f"❌ Startup event failed: {startup_error}")
+            """Application startup event."""
+            logger.info("🎉 DEX Sniper Pro startup complete")
+            logger.info("🎯 PROFESSIONAL dashboard with sidebar ready")
+            logger.info("📍 Dashboard URL: http://localhost:8000/dashboard")
         
-        @app.on_event("shutdown")
-        async def shutdown_event():
-            """Application shutdown event handler."""
-            try:
-                await lifecycle_manager.display_shutdown_message()
-            except Exception as shutdown_error:
-                logger.error(f"❌ Shutdown event failed: {shutdown_error}")
-        
-        logger.info("✅ DEX Sniper Pro Phase 4C application instance created successfully")
+        logger.info("✅ Application creation completed successfully")
         return app
         
     except Exception as error:
-        logger.error(f"❌ Critical: Failed to create application instance: {error}")
+        logger.error(f"❌ CRITICAL: Application creation failed: {error}")
         raise RuntimeError(f"Application creation failed: {error}")
 
 
-def create_emergency_dashboard_route(app) -> None:
-    """
-    Create emergency dashboard route as absolute fallback for development.
-    Only used if main dashboard routes fail completely.
-    
-    Args:
-        app: FastAPI application instance
-    """
-    try:
-        logger.warning("⚠️ Creating emergency dashboard route as fallback")
-        
-        @app.get("/dashboard-emergency", response_class=HTMLResponse)
-        async def emergency_dashboard(request: Request) -> HTMLResponse:
-            """Emergency dashboard route for debugging template issues."""
-            try:
-                from fastapi.templating import Jinja2Templates
-                templates = Jinja2Templates(directory="frontend/templates")
-                return templates.TemplateResponse("pages/dashboard.html", {"request": request})
-            except Exception as error:
-                logger.error(f"❌ Emergency dashboard failed: {error}")
-                return HTMLResponse(
-                    content=f"""
-                    <!DOCTYPE html>
-                    <html>
-                    <head><title>DEX Sniper Pro - Template Debug</title></head>
-                    <body>
-                        <h1>DEX Sniper Pro - Template Debug</h1>
-                        <h2>Error: {error}</h2>
-                        <p><strong>Template Path:</strong> frontend/templates/pages/dashboard.html</p>
-                        <p><strong>Solution:</strong> Ensure the template file exists and is properly formatted</p>
-                        <ul>
-                            <li>Check that frontend/templates/pages/dashboard.html exists</li>
-                            <li>Check that frontend/templates/base/layout.html exists</li>
-                            <li>Verify template syntax is correct</li>
-                        </ul>
-                        <p><a href="/docs">API Documentation</a> | <a href="/health">Health Check</a></p>
-                    </body>
-                    </html>
-                    """,
-                    status_code=500
-                )
-        
-        logger.info("✅ Emergency dashboard route created at /dashboard-emergency")
-        
-    except Exception as error:
-        logger.error(f"❌ Failed to create emergency dashboard route: {error}")
-
-
-# Create the FastAPI application instance
+# Create the application instance - BYPASSING FACTORY
+logger.info("🔥 Initializing DEX Sniper Pro - BYPASSING FACTORY...")
 try:
     app = create_application()
-    
-    # Add emergency route for development debugging
-    create_emergency_dashboard_route(app)
-    
+    logger.info("✅ Application instance created successfully - NO FALLBACK ROUTES")
 except Exception as error:
-    logger.error(f"❌ Application creation error: {error}")
+    logger.error(f"❌ FATAL: Failed to create application: {error}")
     raise
 
 
 def main():
     """
     Main entry point for development server.
-    
-    Raises:
-        SystemExit: If server startup fails
     """
     import uvicorn
     
+    logger.info("🚀 Starting DEX Sniper Pro development server...")
+    logger.info("🎯 PROFESSIONAL dashboard mode - NO FALLBACK")
+    logger.info("📊 Sidebar and token discovery features enabled")
+    
     try:
-        logger.info("🚀 Starting DEX Sniper Pro Phase 4C development server...")
-        logger.info("🎯 AI Risk Assessment features enabled")
-        logger.info("📊 Professional dashboard with sidebar ready")
-        
         uvicorn.run(
             "app.main:app",
             host="127.0.0.1",
@@ -312,7 +338,6 @@ def main():
             log_level="info",
             access_log=True
         )
-        
     except KeyboardInterrupt:
         logger.info("🛑 Server stopped by user")
     except Exception as error:
