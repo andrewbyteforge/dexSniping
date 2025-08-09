@@ -102,7 +102,7 @@ async def execute_trade(
     """
     try:
         logger.info(
-            f"🚀 Executing trade: {trade_request.side} {trade_request.amount} "
+            f"[START] Executing trade: {trade_request.side} {trade_request.amount} "
             f"of {trade_request.token_address[:10]}... for wallet {user_wallet[:10]}..."
         )
         
@@ -136,7 +136,7 @@ async def execute_trade(
                     transaction_hash=result.get("transaction_hashes", [""])[0]
                 )
                 
-                logger.info(f"✅ Portfolio updated for trade: {result['order_id']}")
+                logger.info(f"[OK] Portfolio updated for trade: {result['order_id']}")
             
         else:
             # Create limit order
@@ -156,7 +156,7 @@ async def execute_trade(
         }
         
     except Exception as e:
-        logger.error(f"❌ Trade execution failed: {e}")
+        logger.error(f"[ERROR] Trade execution failed: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
 
@@ -167,7 +167,7 @@ async def cancel_order(
 ) -> Dict[str, Any]:
     """Cancel an active order."""
     try:
-        logger.info(f"❌ Cancelling order: {cancel_request.order_id}")
+        logger.info(f"[ERROR] Cancelling order: {cancel_request.order_id}")
         
         result = await order_executor.cancel_order(cancel_request.order_id)
         
@@ -178,7 +178,7 @@ async def cancel_order(
         }
         
     except Exception as e:
-        logger.error(f"❌ Order cancellation failed: {e}")
+        logger.error(f"[ERROR] Order cancellation failed: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
 
@@ -220,7 +220,7 @@ async def get_orders(
         }
         
     except Exception as e:
-        logger.error(f"❌ Error getting orders: {e}")
+        logger.error(f"[ERROR] Error getting orders: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -240,7 +240,7 @@ async def get_order_status(
         }
         
     except Exception as e:
-        logger.error(f"❌ Error getting order status: {e}")
+        logger.error(f"[ERROR] Error getting order status: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -277,7 +277,7 @@ async def get_portfolio(
         }
         
     except Exception as e:
-        logger.error(f"❌ Error getting portfolio: {e}")
+        logger.error(f"[ERROR] Error getting portfolio: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -289,7 +289,7 @@ async def get_portfolio_pnl(
 ) -> Dict[str, Any]:
     """Calculate portfolio or position P&L."""
     try:
-        logger.info(f"📊 Calculating P&L for wallet {user_wallet[:10]}...")
+        logger.info(f"[STATS] Calculating P&L for wallet {user_wallet[:10]}...")
         
         portfolio_manager = get_portfolio_manager(user_wallet)
         
@@ -305,7 +305,7 @@ async def get_portfolio_pnl(
         }
         
     except Exception as e:
-        logger.error(f"❌ Error calculating P&L: {e}")
+        logger.error(f"[ERROR] Error calculating P&L: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -317,7 +317,7 @@ async def update_portfolio_balance(
     """Update portfolio balance (for deposits, withdrawals, etc.)."""
     try:
         logger.info(
-            f"💰 Updating balance: {balance_update.transaction_type} "
+            f"[TRADE] Updating balance: {balance_update.transaction_type} "
             f"{balance_update.amount} for wallet {user_wallet[:10]}..."
         )
         
@@ -349,7 +349,7 @@ async def update_portfolio_balance(
         }
         
     except Exception as e:
-        logger.error(f"❌ Error updating balance: {e}")
+        logger.error(f"[ERROR] Error updating balance: {e}")
         raise HTTPException(status_code=400, detail=str(e))
 
 
@@ -362,7 +362,7 @@ async def get_transaction_history(
 ) -> Dict[str, Any]:
     """Get transaction history with optional filtering."""
     try:
-        logger.info(f"📊 Getting transaction history for wallet {user_wallet[:10]}...")
+        logger.info(f"[STATS] Getting transaction history for wallet {user_wallet[:10]}...")
         
         portfolio_manager = get_portfolio_manager(user_wallet)
         
@@ -393,7 +393,7 @@ async def get_transaction_history(
         }
         
     except Exception as e:
-        logger.error(f"❌ Error getting transaction history: {e}")
+        logger.error(f"[ERROR] Error getting transaction history: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -451,7 +451,7 @@ async def get_arbitrage_opportunities() -> Dict[str, Any]:
         }
         
     except Exception as e:
-        logger.error(f"❌ Error getting arbitrage opportunities: {e}")
+        logger.error(f"[ERROR] Error getting arbitrage opportunities: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -487,5 +487,5 @@ async def get_trading_status() -> Dict[str, Any]:
         }
         
     except Exception as e:
-        logger.error(f"❌ Error getting trading status: {e}")
+        logger.error(f"[ERROR] Error getting trading status: {e}")
         raise HTTPException(status_code=500, detail=str(e))

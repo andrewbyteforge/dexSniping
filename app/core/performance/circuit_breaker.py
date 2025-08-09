@@ -1,95 +1,65 @@
 """
+Circuit Breaker Manager
 File: app/core/performance/circuit_breaker.py
 
-Simple circuit breaker implementation for protecting external service calls.
+Simple circuit breaker implementation for resilience.
 """
 
-import asyncio
 import time
 from enum import Enum
-from typing import Any, Callable, Dict, Optional, Union, Awaitable
-from dataclasses import dataclass, field
-from collections import deque
+from typing import Dict, Any, Optional
+from dataclasses import dataclass
 
 from app.utils.logger import setup_logger
-from app.utils.exceptions import DexSnipingException
 
-logger = setup_logger(__name__, "application")
-
-
-class CircuitBreakerError(DexSnipingException):
-    """Exception raised when circuit breaker is open."""
-    pass
+logger = setup_logger(__name__)
 
 
 class CircuitState(Enum):
     """Circuit breaker states."""
-    CLOSED = "closed"        # Normal operation
-    OPEN = "open"           # Failing, blocking calls
-    HALF_OPEN = "half_open" # Testing if service recovered
+    CLOSED = "closed"
+    OPEN = "open"
+    HALF_OPEN = "half_open"
 
 
 @dataclass
 class CircuitBreakerConfig:
-    """Configuration for circuit breaker."""
-    failure_threshold: int = 5           # Failures before opening
-    recovery_timeout: float = 60.0       # Seconds before trying half-open
-    success_threshold: int = 3           # Successes to close from half-open
-    timeout: float = 30.0                # Request timeout in seconds
+    """Circuit breaker configuration."""
+    failure_threshold: int = 5
+    recovery_timeout: int = 60
+    expected_exception: type = Exception
 
 
-@dataclass
-class CircuitStats:
-    """Circuit breaker statistics."""
-    total_requests: int = 0
-    successful_requests: int = 0
-    failed_requests: int = 0
-    timeouts: int = 0
-    circuit_opens: int = 0
-    last_failure_time: Optional[float] = None
-    last_success_time: Optional[float] = None
-    recent_failures: deque = field(default_factory=lambda: deque(maxlen=50))
-
-
-class SimpleCircuitBreaker:
+class CircuitBreaker:
     """
     Simple circuit breaker implementation.
     
-    Features:
-    - Automatic failure detection
-    - Configurable thresholds
-    - Half-open state for recovery testing
-    - Request timeout handling
-    - Statistics tracking
+    Prevents cascading failures by temporarily disabling failing operations.
     """
     
-    def __init__(self, name: str, config: Optional[CircuitBreakerConfig] = None):
+    def __init__(self, name: str, config: CircuitBreakerConfig):
         """
         Initialize circuit breaker.
         
         Args:
-            name: Circuit breaker name for identification
-            config: Configuration parameters
+            name: Circuit breaker name
+            config: Configuration settings
         """
         self.name = name
-        self.config = config or CircuitBreakerConfig()
+        self.config = config
         self.state = CircuitState.CLOSED
-        self.stats = CircuitStats()
-        self._lock = asyncio.Lock()
-        self._last_state_change = time.time()
-        self._half_open_successes = 0
+        self.failure_count = 0
+        self.last_failure_time = None
+        self.success_count = 0
+        
+        logger.info(f"[OK] Circuit breaker '{name}' initialized")
     
-    async def call(
-        self,
-        func: Union[Callable[[], Any], Callable[[], Awaitable[Any]]],
-        *args,
-        **kwargs
-    ) -> Any:
+    def call(self, func, *args, **kwargs):
         """
-        Execute function with circuit breaker protection.
+        Call function through circuit breaker.
         
         Args:
-            func: Function to execute
+            func: Function to call
             *args: Function arguments
             **kwargs: Function keyword arguments
             
@@ -97,170 +67,76 @@ class SimpleCircuitBreaker:
             Function result
             
         Raises:
-            CircuitBreakerError: If circuit is open
-            Exception: Original function exceptions
+            Exception: If circuit is open or function fails
         """
-        async with self._lock:
-            # Check circuit state
-            await self._update_state()
-            
-            if self.state == CircuitState.OPEN:
-                logger.warning(f"Circuit breaker {self.name} is OPEN, blocking call")
-                raise CircuitBreakerError(f"Circuit breaker {self.name} is open")
-        
-        # Execute the function
-        try:
-            # Handle both sync and async functions
-            if asyncio.iscoroutinefunction(func):
-                result = await asyncio.wait_for(
-                    func(*args, **kwargs),
-                    timeout=self.config.timeout
-                )
-            else:
-                result = func(*args, **kwargs)
-            
-            # Record success
-            await self._record_success()
-            return result
-            
-        except asyncio.TimeoutError:
-            await self._record_timeout()
-            raise CircuitBreakerError(f"Request timeout after {self.config.timeout}s")
-            
-        except Exception as e:
-            await self._record_failure(e)
-            raise
-    
-    async def _update_state(self) -> None:
-        """Update circuit state based on current conditions."""
-        current_time = time.time()
-        
         if self.state == CircuitState.OPEN:
-            # Check if we should try half-open
-            if current_time - self._last_state_change >= self.config.recovery_timeout:
-                await self._transition_to_half_open()
+            if self._should_attempt_reset():
+                self.state = CircuitState.HALF_OPEN
+                logger.info(f"[INFO] Circuit breaker '{self.name}' moved to HALF_OPEN")
+            else:
+                raise Exception(f"Circuit breaker '{self.name}' is OPEN")
         
-        elif self.state == CircuitState.CLOSED:
-            # Check if we should open due to failures
-            if self._should_open_circuit():
-                await self._transition_to_open()
+        try:
+            result = func(*args, **kwargs)
+            self._on_success()
+            return result
+        except self.config.expected_exception as e:
+            self._on_failure()
+            raise e
+    
+    def _on_success(self):
+        """Handle successful operation."""
+        self.failure_count = 0
         
-        elif self.state == CircuitState.HALF_OPEN:
-            # Check if we should close (enough successes)
-            if self._half_open_successes >= self.config.success_threshold:
-                await self._transition_to_closed()
+        if self.state == CircuitState.HALF_OPEN:
+            self.success_count += 1
+            if self.success_count >= 3:  # Require 3 successes to close
+                self.state = CircuitState.CLOSED
+                self.success_count = 0
+                logger.info(f"[OK] Circuit breaker '{self.name}' CLOSED")
     
-    async def _record_success(self) -> None:
-        """Record a successful request."""
-        async with self._lock:
-            self.stats.total_requests += 1
-            self.stats.successful_requests += 1
-            self.stats.last_success_time = time.time()
-            
-            if self.state == CircuitState.HALF_OPEN:
-                self._half_open_successes += 1
-    
-    async def _record_failure(self, exception: Exception) -> None:
-        """Record a failed request."""
-        async with self._lock:
-            self.stats.total_requests += 1
-            self.stats.failed_requests += 1
-            self.stats.last_failure_time = time.time()
-            self.stats.recent_failures.append({
-                'timestamp': time.time(),
-                'exception': str(exception),
-                'type': type(exception).__name__
-            })
-            
-            # Reset half-open success counter on failure
-            if self.state == CircuitState.HALF_OPEN:
-                self._half_open_successes = 0
-                await self._transition_to_open()
-    
-    async def _record_timeout(self) -> None:
-        """Record a timeout."""
-        async with self._lock:
-            self.stats.total_requests += 1
-            self.stats.failed_requests += 1
-            self.stats.timeouts += 1
-            self.stats.last_failure_time = time.time()
-            
-            # Timeouts count as failures
-            if self.state == CircuitState.HALF_OPEN:
-                self._half_open_successes = 0
-                await self._transition_to_open()
-    
-    def _should_open_circuit(self) -> bool:
-        """Check if circuit should be opened based on failure threshold."""
-        return len(self.stats.recent_failures) >= self.config.failure_threshold
-    
-    async def _transition_to_open(self) -> None:
-        """Transition circuit to OPEN state."""
-        if self.state != CircuitState.OPEN:
+    def _on_failure(self):
+        """Handle failed operation."""
+        self.failure_count += 1
+        self.last_failure_time = time.time()
+        
+        if self.failure_count >= self.config.failure_threshold:
             self.state = CircuitState.OPEN
-            self._last_state_change = time.time()
-            self.stats.circuit_opens += 1
-            logger.warning(f"Circuit breaker {self.name} transitioned to OPEN")
+            logger.warning(f"[WARN] Circuit breaker '{self.name}' OPENED")
     
-    async def _transition_to_half_open(self) -> None:
-        """Transition circuit to HALF_OPEN state."""
-        self.state = CircuitState.HALF_OPEN
-        self._last_state_change = time.time()
-        self._half_open_successes = 0
-        logger.info(f"Circuit breaker {self.name} transitioned to HALF_OPEN")
-    
-    async def _transition_to_closed(self) -> None:
-        """Transition circuit to CLOSED state."""
-        self.state = CircuitState.CLOSED
-        self._last_state_change = time.time()
-        self._half_open_successes = 0
-        # Clear recent failures on successful recovery
-        self.stats.recent_failures.clear()
-        logger.info(f"Circuit breaker {self.name} transitioned to CLOSED")
-    
-    def get_stats(self) -> Dict[str, Any]:
-        """
-        Get circuit breaker statistics.
+    def _should_attempt_reset(self) -> bool:
+        """Check if circuit breaker should attempt reset."""
+        if self.last_failure_time is None:
+            return False
         
-        Returns:
-            Statistics dictionary
-        """
-        success_rate = (
-            self.stats.successful_requests / self.stats.total_requests
-            if self.stats.total_requests > 0 else 0
-        )
-        
+        return (time.time() - self.last_failure_time) >= self.config.recovery_timeout
+    
+    def get_state(self) -> Dict[str, Any]:
+        """Get circuit breaker state information."""
         return {
             "name": self.name,
             "state": self.state.value,
-            "total_requests": self.stats.total_requests,
-            "successful_requests": self.stats.successful_requests,
-            "failed_requests": self.stats.failed_requests,
-            "timeouts": self.stats.timeouts,
-            "circuit_opens": self.stats.circuit_opens,
-            "success_rate": round(success_rate * 100, 2),
-            "last_failure_time": self.stats.last_failure_time,
-            "last_success_time": self.stats.last_success_time,
-            "recent_failures_count": len(self.stats.recent_failures),
-            "time_since_last_state_change": time.time() - self._last_state_change
+            "failure_count": self.failure_count,
+            "last_failure_time": self.last_failure_time,
+            "success_count": self.success_count
         }
 
 
 class CircuitBreakerManager:
     """
-    Manager for multiple circuit breakers.
+    Manages multiple circuit breakers.
     """
     
     def __init__(self):
         """Initialize circuit breaker manager."""
-        self._breakers: Dict[str, SimpleCircuitBreaker] = {}
-        self._lock = asyncio.Lock()
+        self.circuit_breakers: Dict[str, CircuitBreaker] = {}
+        logger.info("[OK] Circuit breaker manager initialized")
     
-    def get_breaker(
-        self,
-        name: str,
+    def get_circuit_breaker(
+        self, 
+        name: str, 
         config: Optional[CircuitBreakerConfig] = None
-    ) -> SimpleCircuitBreaker:
+    ) -> CircuitBreaker:
         """
         Get or create a circuit breaker.
         
@@ -269,56 +145,31 @@ class CircuitBreakerManager:
             config: Configuration (uses default if None)
             
         Returns:
-            SimpleCircuitBreaker instance
+            CircuitBreaker instance
         """
-        if name not in self._breakers:
-            self._breakers[name] = SimpleCircuitBreaker(name, config)
+        if name not in self.circuit_breakers:
+            config = config or CircuitBreakerConfig()
+            self.circuit_breakers[name] = CircuitBreaker(name, config)
         
-        return self._breakers[name]
+        return self.circuit_breakers[name]
     
-    async def get_all_stats(self) -> Dict[str, Dict[str, Any]]:
-        """
-        Get statistics for all circuit breakers.
-        
-        Returns:
-            Dictionary mapping breaker names to their stats
-        """
-        async with self._lock:
-            return {
-                name: breaker.get_stats()
-                for name, breaker in self._breakers.items()
-            }
-    
-    def get_breaker_names(self) -> list:
-        """Get list of all circuit breaker names."""
-        return list(self._breakers.keys())
-    
-    async def health_check(self) -> Dict[str, Any]:
-        """
-        Perform health check on all circuit breakers.
-        
-        Returns:
-            Health status summary
-        """
-        stats = await self.get_all_stats()
-        
-        open_breakers = [name for name, stat in stats.items() if stat["state"] == "open"]
-        half_open_breakers = [name for name, stat in stats.items() if stat["state"] == "half_open"]
-        
-        total_requests = sum(stat["total_requests"] for stat in stats.values())
-        total_failures = sum(stat["failed_requests"] for stat in stats.values())
-        
-        overall_success_rate = (
-            ((total_requests - total_failures) / total_requests * 100)
-            if total_requests > 0 else 100
-        )
-        
+    def get_all_states(self) -> Dict[str, Dict[str, Any]]:
+        """Get states of all circuit breakers."""
         return {
-            "status": "unhealthy" if open_breakers else "healthy",
-            "total_breakers": len(self._breakers),
-            "open_breakers": open_breakers,
-            "half_open_breakers": half_open_breakers,
-            "overall_success_rate": round(overall_success_rate, 2),
-            "total_requests": total_requests,
-            "total_failures": total_failures
+            name: cb.get_state() 
+            for name, cb in self.circuit_breakers.items()
         }
+
+
+# Global circuit breaker manager
+_circuit_breaker_manager = None
+
+
+def get_circuit_breaker_manager() -> CircuitBreakerManager:
+    """Get global circuit breaker manager."""
+    global _circuit_breaker_manager
+    
+    if _circuit_breaker_manager is None:
+        _circuit_breaker_manager = CircuitBreakerManager()
+    
+    return _circuit_breaker_manager

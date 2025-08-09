@@ -290,13 +290,13 @@ class TradingEngine:
             # Mark as running
             self.is_running = True
             
-            logger.info("✅ Trading Engine components initialized successfully")
-            logger.info("  ✅ Portfolio Manager: Ready")
-            logger.info("  ✅ Order Executor: Ready") 
-            logger.info("  ✅ Market Scanner: Ready")
+            logger.info("[OK] Trading Engine components initialized successfully")
+            logger.info("  [OK] Portfolio Manager: Ready")
+            logger.info("  [OK] Order Executor: Ready") 
+            logger.info("  [OK] Market Scanner: Ready")
             
         except Exception as e:
-            logger.error(f"❌ Trading Engine initialization failed: {e}")
+            logger.error(f"[ERROR] Trading Engine initialization failed: {e}")
             raise TradingError(f"Initialization failed: {e}")
     
     async def start_trading(self, wallet_address: str) -> Dict[str, Any]:
@@ -316,7 +316,7 @@ class TradingEngine:
             if not self.is_running:
                 raise TradingError("Trading engine not initialized")
             
-            logger.info(f"🚀 Starting automated trading for wallet: {wallet_address[:10]}...")
+            logger.info(f"[START] Starting automated trading for wallet: {wallet_address[:10]}...")
             
             # Validate wallet
             if not self.wallet_manager._is_valid_address(wallet_address):
@@ -331,11 +331,11 @@ class TradingEngine:
                 "started_at": datetime.utcnow().isoformat()
             }
             
-            logger.info("✅ Automated trading started successfully")
+            logger.info("[OK] Automated trading started successfully")
             return result
             
         except Exception as e:
-            logger.error(f"❌ Failed to start trading: {e}")
+            logger.error(f"[ERROR] Failed to start trading: {e}")
             raise TradingError(f"Trading start failed: {e}")
     
     async def stop_trading(self) -> Dict[str, Any]:
@@ -358,11 +358,11 @@ class TradingEngine:
                 "successful_trades": self.successful_trades
             }
             
-            logger.info("✅ Automated trading stopped successfully")
+            logger.info("[OK] Automated trading stopped successfully")
             return result
             
         except Exception as e:
-            logger.error(f"❌ Failed to stop trading: {e}")
+            logger.error(f"[ERROR] Failed to stop trading: {e}")
             return {"success": False, "error": str(e)}
     
     async def generate_signals(self) -> List[TradingSignal]:
@@ -401,7 +401,7 @@ class TradingEngine:
     async def shutdown(self) -> None:
         """Shutdown the trading engine gracefully."""
         try:
-            logger.info("🔄 Shutting down trading engine...")
+            logger.info("[UPDATE] Shutting down trading engine...")
             
             if self.is_running:
                 await self.stop_trading()
@@ -411,10 +411,10 @@ class TradingEngine:
             self.order_executor = None
             self.market_scanner = None
             
-            logger.info("✅ Trading engine shutdown complete")
+            logger.info("[OK] Trading engine shutdown complete")
             
         except Exception as e:
-            logger.error(f"❌ Shutdown error: {e}")
+            logger.error(f"[ERROR] Shutdown error: {e}")
 
 
 # Additional helper functions for service integration

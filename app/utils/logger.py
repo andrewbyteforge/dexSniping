@@ -24,23 +24,23 @@ class WindowsCompatibleHandler(logging.StreamHandler):
     """
     
     EMOJI_REPLACEMENTS = {
-        "📝": "[LOG]",
-        "🎯": "[TARGET]", 
-        "💰": "[TRADE]",
-        "🛡️": "[RISK]",
-        "🔗": "[WALLET]",
-        "📊": "[TX]",
+        "[LOG]": "[LOG]",
+        "[TARGET]": "[TARGET]", 
+        "[TRADE]": "[TRADE]",
+        "[SECURE]": "[RISK]",
+        "[LINK]": "[WALLET]",
+        "[STATS]": "[TX]",
         "⏱️": "[TIMER]",
-        "🔍": "[DEBUG]",
+        "[SEARCH]": "[DEBUG]",
         "ℹ️": "[INFO]",
-        "⚠️": "[WARN]",
-        "❌": "[ERROR]",
-        "🚀": "[START]",
+        "[WARN]": "[WARN]",
+        "[ERROR]": "[ERROR]",
+        "[START]": "[START]",
         "🛑": "[STOP]",
         "📅": "[TIME]",
         "📁": "[DIR]",
         "🐍": "[PYTHON]",
-        "🔧": "[CONFIG]",
+        "[FIX]": "[CONFIG]",
         "👋": "[BYE]"
     }
     
@@ -106,7 +106,7 @@ class DEXSniperLogger:
         (logs_dir / "errors").mkdir(exist_ok=True)
         
         cls._initialized = True
-        print(f"✅ Logging system initialized - Logs directory: {logs_dir.absolute()}")
+        print(f"[OK] Logging system initialized - Logs directory: {logs_dir.absolute()}")
     
     @classmethod
     def get_logger(cls, name: str, component: str = "application") -> logging.Logger:
@@ -201,7 +201,7 @@ class DEXSniperLogger:
         cls._loggers[name] = logger
         
         # Log logger creation
-        logger.info(f"📝 Logger initialized for {name} (component: {component})")
+        logger.info(f"[LOG] Logger initialized for {name} (component: {component})")
         
         return logger
 
@@ -251,7 +251,7 @@ class PerformanceLogger:
         import time
         
         if operation not in self.start_times:
-            self.logger.warning(f"⚠️ Timer not found for operation: {operation}")
+            self.logger.warning(f"[WARN] Timer not found for operation: {operation}")
             return
         
         elapsed = time.time() - self.start_times[operation]
@@ -264,7 +264,7 @@ class PerformanceLogger:
     
     def log_performance_metrics(self, metrics: Dict[str, Any]):
         """Log performance metrics."""
-        self.logger.info(f"📊 Performance Metrics: {metrics}")
+        self.logger.info(f"[STATS] Performance Metrics: {metrics}")
 
 
 class TradingLogger:
@@ -278,23 +278,23 @@ class TradingLogger:
     
     def log_trade_execution(self, trade_data: Dict[str, Any]):
         """Log trade execution details."""
-        self.logger.info(f"💰 Trade Executed: {trade_data}")
+        self.logger.info(f"[TRADE] Trade Executed: {trade_data}")
     
     def log_trade_opportunity(self, opportunity: Dict[str, Any]):
         """Log trading opportunity detection."""
-        self.logger.info(f"🎯 Opportunity Detected: {opportunity}")
+        self.logger.info(f"[TARGET] Opportunity Detected: {opportunity}")
     
     def log_risk_assessment(self, assessment: Dict[str, Any]):
         """Log risk assessment results."""
-        self.logger.info(f"🛡️ Risk Assessment: {assessment}")
+        self.logger.info(f"[SECURE] Risk Assessment: {assessment}")
     
     def log_wallet_connection(self, wallet_address: str, status: str):
         """Log wallet connection events."""
-        self.logger.info(f"🔗 Wallet {status}: {wallet_address}")
+        self.logger.info(f"[LINK] Wallet {status}: {wallet_address}")
     
     def log_transaction_status(self, tx_hash: str, status: str):
         """Log transaction status updates."""
-        self.logger.info(f"📊 Transaction {status}: {tx_hash}")
+        self.logger.info(f"[STATS] Transaction {status}: {tx_hash}")
 
 
 def get_trading_logger(name: str) -> TradingLogger:
@@ -313,17 +313,17 @@ def log_application_startup():
     """Log application startup information."""
     logger = setup_logger("app.startup")
     
-    logger.info("🚀 DEX Sniper Pro - Application Starting")
+    logger.info("[START] DEX Sniper Pro - Application Starting")
     logger.info(f"📅 Startup Time: {datetime.now().isoformat()}")
     logger.info(f"📁 Working Directory: {Path.cwd()}")
     logger.info(f"🐍 Python Version: {sys.version}")
-    logger.info(f"📝 Logs Directory: {Path('logs').absolute()}")
+    logger.info(f"[LOG] Logs Directory: {Path('logs').absolute()}")
     
     # Log environment information
     env_vars = ["ENVIRONMENT", "TRADING_ENABLED", "LOG_LEVEL"]
     for var in env_vars:
         value = os.getenv(var, "Not Set")
-        logger.info(f"🔧 {var}: {value}")
+        logger.info(f"[FIX] {var}: {value}")
 
 
 def log_application_shutdown():

@@ -96,7 +96,7 @@ class EnhancedWalletManager:
     
     def __init__(self):
         """Initialize the enhanced wallet manager."""
-        logger.info("🔗 Initializing Enhanced Wallet Manager...")
+        logger.info("[LINK] Initializing Enhanced Wallet Manager...")
         
         # Core components
         self.network_manager = get_network_manager()
@@ -136,7 +136,7 @@ class EnhancedWalletManager:
             }
         }
         
-        logger.info("✅ Enhanced Wallet Manager initialized successfully")
+        logger.info("[OK] Enhanced Wallet Manager initialized successfully")
     
     async def connect_wallet(
         self, 
@@ -156,7 +156,7 @@ class EnhancedWalletManager:
             Dict containing connection result and details
         """
         try:
-            logger.info(f"🔗 Connecting {wallet_type.value} wallet to {network_type.value}...")
+            logger.info(f"[LINK] Connecting {wallet_type.value} wallet to {network_type.value}...")
             
             # Validate inputs
             if wallet_type not in self.supported_wallets:
@@ -184,7 +184,7 @@ class EnhancedWalletManager:
             )
             
             if connection_result["success"]:
-                logger.info(f"✅ Successfully connected {wallet_type.value} wallet")
+                logger.info(f"[OK] Successfully connected {wallet_type.value} wallet")
                 
                 # Start balance monitoring
                 asyncio.create_task(self._monitor_wallet_balance(connection_result["connection_id"]))
@@ -199,7 +199,7 @@ class EnhancedWalletManager:
                 raise WalletError(connection_result.get("error", "Connection failed"))
                 
         except Exception as e:
-            logger.error(f"❌ Wallet connection failed: {e}")
+            logger.error(f"[ERROR] Wallet connection failed: {e}")
             return {
                 "success": False,
                 "error": str(e),
@@ -215,18 +215,18 @@ class EnhancedWalletManager:
                 return True
             
             # Attempt connection
-            logger.info(f"🔗 Connecting to {network_type.value} network for wallet...")
+            logger.info(f"[LINK] Connecting to {network_type.value} network for wallet...")
             success = await self.network_manager.connect_to_network(network_type)
             
             if success:
-                logger.info(f"✅ Network connection established: {network_type.value}")
+                logger.info(f"[OK] Network connection established: {network_type.value}")
                 return True
             else:
-                logger.warning(f"⚠️ Failed to connect to {network_type.value}")
+                logger.warning(f"[WARN] Failed to connect to {network_type.value}")
                 return False
                 
         except Exception as e:
-            logger.error(f"❌ Network connection error: {e}")
+            logger.error(f"[ERROR] Network connection error: {e}")
             return False
     
     async def _create_wallet_connection(
@@ -270,7 +270,7 @@ class EnhancedWalletManager:
             # Store connection
             self.active_connections[connection_id] = connection
             
-            logger.info(f"✅ Wallet connection created: {connection_id}")
+            logger.info(f"[OK] Wallet connection created: {connection_id}")
             
             return {
                 "success": True,
@@ -280,7 +280,7 @@ class EnhancedWalletManager:
             }
             
         except Exception as e:
-            logger.error(f"❌ Failed to create wallet connection: {e}")
+            logger.error(f"[ERROR] Failed to create wallet connection: {e}")
             return {
                 "success": False,
                 "error": str(e)
@@ -301,7 +301,7 @@ class EnhancedWalletManager:
         address_bytes = secrets.token_bytes(20)
         address = "0x" + address_bytes.hex()
         
-        logger.info(f"🎯 Simulated {wallet_type.value} address: {address}")
+        logger.info(f"[TARGET] Simulated {wallet_type.value} address: {address}")
         return address
     
     async def disconnect_wallet(self, connection_id: str) -> Dict[str, Any]:
@@ -333,7 +333,7 @@ class EnhancedWalletManager:
             if connection_id in self.wallet_balances:
                 del self.wallet_balances[connection_id]
             
-            logger.info(f"✅ Wallet disconnected: {connection_id}")
+            logger.info(f"[OK] Wallet disconnected: {connection_id}")
             
             return {
                 "success": True,
@@ -342,7 +342,7 @@ class EnhancedWalletManager:
             }
             
         except Exception as e:
-            logger.error(f"❌ Wallet disconnection failed: {e}")
+            logger.error(f"[ERROR] Wallet disconnection failed: {e}")
             return {
                 "success": False,
                 "error": str(e)
@@ -384,7 +384,7 @@ class EnhancedWalletManager:
             }
             
         except Exception as e:
-            logger.error(f"❌ Failed to get wallet balance: {e}")
+            logger.error(f"[ERROR] Failed to get wallet balance: {e}")
             return {
                 "success": False,
                 "error": str(e)
@@ -417,7 +417,7 @@ class EnhancedWalletManager:
                     last_updated=datetime.utcnow()
                 )
                 
-                logger.info(f"✅ Fetched balance for {wallet_info.address}: {balance_eth} {network_config.currency_symbol}")
+                logger.info(f"[OK] Fetched balance for {wallet_info.address}: {balance_eth} {network_config.currency_symbol}")
                 
             else:
                 # Fallback to simulated balance when no network connection
@@ -434,7 +434,7 @@ class EnhancedWalletManager:
                     last_updated=datetime.utcnow()
                 )
                 
-                logger.info(f"💡 Using simulated balance for {wallet_info.address}")
+                logger.info(f"[INFO] Using simulated balance for {wallet_info.address}")
             
             # Cache the balance
             self.wallet_balances[connection.connection_id] = balance
@@ -442,7 +442,7 @@ class EnhancedWalletManager:
             return balance
             
         except Exception as e:
-            logger.error(f"❌ Failed to fetch wallet balance: {e}")
+            logger.error(f"[ERROR] Failed to fetch wallet balance: {e}")
             # Return empty balance on error
             return WalletBalance(
                 address=connection.wallet_info.address,
@@ -465,7 +465,7 @@ class EnhancedWalletManager:
                 await asyncio.sleep(self.balance_refresh_interval)
                 
         except Exception as e:
-            logger.error(f"❌ Balance monitoring error for {connection_id}: {e}")
+            logger.error(f"[ERROR] Balance monitoring error for {connection_id}: {e}")
     
     async def _cleanup_expired_connections(self) -> None:
         """Clean up expired wallet connections."""
@@ -482,10 +482,10 @@ class EnhancedWalletManager:
                 logger.info(f"🧹 Cleaned up expired connection: {connection_id}")
             
             if expired_connections:
-                logger.info(f"✅ Cleaned up {len(expired_connections)} expired connections")
+                logger.info(f"[OK] Cleaned up {len(expired_connections)} expired connections")
                 
         except Exception as e:
-            logger.error(f"❌ Connection cleanup error: {e}")
+            logger.error(f"[ERROR] Connection cleanup error: {e}")
     
     def get_active_connections(self) -> Dict[str, Dict[str, Any]]:
         """Get information about all active wallet connections."""
@@ -506,7 +506,7 @@ class EnhancedWalletManager:
             return connections_info
             
         except Exception as e:
-            logger.error(f"❌ Failed to get active connections: {e}")
+            logger.error(f"[ERROR] Failed to get active connections: {e}")
             return {}
     
     def get_supported_wallets(self) -> Dict[str, Any]:
@@ -546,7 +546,7 @@ class EnhancedWalletManager:
             }
             
         except Exception as e:
-            logger.error(f"❌ Failed to refresh wallet balance: {e}")
+            logger.error(f"[ERROR] Failed to refresh wallet balance: {e}")
             return {
                 "success": False,
                 "error": str(e)
@@ -589,7 +589,7 @@ class EnhancedWalletManager:
             # Refresh balance for new network
             await self._fetch_wallet_balance(connection)
             
-            logger.info(f"✅ Switched wallet from {old_network.value} to {new_network.value}")
+            logger.info(f"[OK] Switched wallet from {old_network.value} to {new_network.value}")
             
             return {
                 "success": True,
@@ -599,7 +599,7 @@ class EnhancedWalletManager:
             }
             
         except Exception as e:
-            logger.error(f"❌ Network switch failed: {e}")
+            logger.error(f"[ERROR] Network switch failed: {e}")
             return {
                 "success": False,
                 "error": str(e)
@@ -638,7 +638,7 @@ class EnhancedWalletManager:
             }
             
         except Exception as e:
-            logger.error(f"❌ Failed to get transaction history: {e}")
+            logger.error(f"[ERROR] Failed to get transaction history: {e}")
             return {
                 "success": False,
                 "error": str(e)
@@ -658,10 +658,10 @@ class EnhancedWalletManager:
             self.active_connections.clear()
             self.wallet_balances.clear()
             
-            logger.info("✅ Enhanced Wallet Manager shutdown complete")
+            logger.info("[OK] Enhanced Wallet Manager shutdown complete")
             
         except Exception as e:
-            logger.error(f"❌ Wallet manager shutdown error: {e}")
+            logger.error(f"[ERROR] Wallet manager shutdown error: {e}")
 
 
 # Global instance for the application
@@ -682,10 +682,10 @@ async def initialize_enhanced_wallet_manager() -> bool:
     """Initialize the global enhanced wallet manager."""
     try:
         manager = get_enhanced_wallet_manager()
-        logger.info("✅ Enhanced wallet manager initialized successfully")
+        logger.info("[OK] Enhanced wallet manager initialized successfully")
         return True
     except Exception as e:
-        logger.error(f"❌ Failed to initialize enhanced wallet manager: {e}")
+        logger.error(f"[ERROR] Failed to initialize enhanced wallet manager: {e}")
         return False
 
 

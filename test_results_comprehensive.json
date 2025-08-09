@@ -1,0 +1,106 @@
+{
+  "overall_results": {
+    "total_tests": 18,
+    "passed_tests": 14,
+    "failed_tests": 4,
+    "success_rate": 77.77777777777779
+  },
+  "category_results": {
+    "Foundation Tests": {
+      "passed_tests": 3,
+      "total_tests": 3,
+      "tests": [
+        "logger_functionality: PASSED",
+        "project_structure: PASSED",
+        "core_imports: PASSED"
+      ],
+      "success_rate": 100.0
+    },
+    "Database Tests": {
+      "passed_tests": 0,
+      "total_tests": 2,
+      "tests": [
+        "database_initialization: FAILED - 'PersistenceManager' object has no attribute 'get_database_status'",
+        "database_operations: FAILED - 'PersistenceManager' object has no attribute 'ensure_initialized'"
+      ],
+      "success_rate": 0.0
+    },
+    "Configuration Tests": {
+      "passed_tests": 2,
+      "total_tests": 2,
+      "tests": [
+        "settings_loading: PASSED",
+        "configuration_validation: PASSED"
+      ],
+      "success_rate": 100.0
+    },
+    "AI System Tests": {
+      "passed_tests": 3,
+      "total_tests": 3,
+      "tests": [
+        "ai_risk_assessor: PASSED",
+        "honeypot_detector: PASSED",
+        "predictive_analytics: PASSED"
+      ],
+      "success_rate": 100.0
+    },
+    "WebSocket Tests": {
+      "passed_tests": 2,
+      "total_tests": 2,
+      "tests": [
+        "websocket_manager: PASSED",
+        "websocket_functionality: PASSED"
+      ],
+      "success_rate": 100.0
+    },
+    "Trading System Tests": {
+      "passed_tests": 2,
+      "total_tests": 2,
+      "tests": [
+        "transaction_executor: PASSED",
+        "trading_engine: PASSED"
+      ],
+      "success_rate": 100.0
+    },
+    "Integration Tests": {
+      "passed_tests": 1,
+      "total_tests": 2,
+      "tests": [
+        "db_config_integration: FAILED - 'PersistenceManager' object has no attribute 'get_database_status'",
+        "ai_trading_integration: PASSED"
+      ],
+      "success_rate": 50.0
+    },
+    "Performance Tests": {
+      "passed_tests": 1,
+      "total_tests": 2,
+      "tests": [
+        "response_time: FAILED - 'PersistenceManager' object has no attribute 'get_database_status'",
+        "memory_usage: PASSED (skipped)"
+      ],
+      "success_rate": 50.0
+    }
+  },
+  "system_status": {
+    "overall_status": "FAIR",
+    "readiness_level": "DEVELOPMENT_READY",
+    "success_rate": 77.77777777777779,
+    "components_operational": {
+      "database": true,
+      "configuration": true,
+      "ai_risk_assessor": true,
+      "honeypot_detector": true,
+      "predictive_analytics": true,
+      "websocket_manager": true,
+      "transaction_executor": true,
+      "trading_engine": true
+    },
+    "recommendations": [
+      "\u26a0\ufe0f Resolve critical component failures",
+      "\ud83d\udd0d Review system architecture",
+      "\ud83d\udee0\ufe0f Focus on core functionality fixes"
+    ]
+  },
+  "timestamp": "2025-08-09T08:00:47.854145",
+  "test_environment": "comprehensive_validation"
+}

@@ -92,7 +92,7 @@ class WebSocketManager:
         # Setup subscription handlers
         self._setup_subscription_handlers()
         
-        logger.info("✅ WebSocket Manager initialized")
+        logger.info("[OK] WebSocket Manager initialized")
     
     def _setup_subscription_handlers(self) -> None:
         """Setup subscription handlers for different message types."""
@@ -164,10 +164,10 @@ class WebSocketManager:
                 }
             )
             
-            logger.info(f"✅ WebSocket client connected: {client_id}")
+            logger.info(f"[OK] WebSocket client connected: {client_id}")
             
         except Exception as e:
-            logger.error(f"❌ Failed to connect WebSocket client {client_id}: {e}")
+            logger.error(f"[ERROR] Failed to connect WebSocket client {client_id}: {e}")
             raise WebSocketManagerError(f"Connection failed: {e}")
     
     async def disconnect(self, client_id: str) -> None:
@@ -180,7 +180,7 @@ class WebSocketManager:
                 logger.warning(f"Error closing WebSocket for {client_id}: {e}")
             
             del self.connections[client_id]
-            logger.info(f"🔌 WebSocket client disconnected: {client_id}")
+            logger.info(f"[CONNECT] WebSocket client disconnected: {client_id}")
     
     async def handle_message(self, client_id: str, message: Dict[str, Any]) -> None:
         """Handle incoming message from client."""
@@ -261,7 +261,7 @@ class WebSocketManager:
             self.connections[client_id].subscriptions.add(subscription_type)
             await self.subscription_handlers[subscription_type](client_id, data)
             
-            logger.info(f"✅ Client {client_id} subscribed to {subscription_type}")
+            logger.info(f"[OK] Client {client_id} subscribed to {subscription_type}")
         else:
             await self._send_error(
                 client_id,
@@ -274,7 +274,7 @@ class WebSocketManager:
         
         if client_id in self.connections:
             self.connections[client_id].subscriptions.discard(subscription_type)
-            logger.info(f"🔌 Client {client_id} unsubscribed from {subscription_type}")
+            logger.info(f"[CONNECT] Client {client_id} unsubscribed from {subscription_type}")
     
     async def _handle_heartbeat(self, client_id: str) -> None:
         """Handle heartbeat from client."""

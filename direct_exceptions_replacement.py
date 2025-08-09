@@ -1,4 +1,20 @@
+#!/usr/bin/env python3
 """
+Direct Exceptions File Replacement
+File: direct_exceptions_replacement.py
+
+Directly replace the corrupted exceptions.py file with a clean version.
+"""
+
+import os
+from pathlib import Path
+
+
+def replace_exceptions_file_directly():
+    """Directly replace the exceptions.py file."""
+    
+    # Simple, clean exceptions content
+    clean_content = '''"""
 Core Trading Bot Exceptions
 File: app/core/exceptions.py
 
@@ -96,16 +112,6 @@ class TokenAnalysisError(AIAnalysisError):
     pass
 
 
-
-
-class TokenMetadataError(TokenAnalysisError):
-    """Failed to retrieve token metadata."""
-    pass
-
-class InvalidTokenError(TokenAnalysisError):
-    """Invalid or malformed token address."""
-    pass
-
 class BlockchainError(TradingBotError):
     """Blockchain errors."""
     pass
@@ -126,55 +132,20 @@ class TransactionError(BlockchainError):
     pass
 
 
-
-class TransactionFailedError(TransactionError):
-    """Transaction execution failed on blockchain."""
-    pass
-
 class GasEstimationError(TransactionError):
     """Gas estimation errors."""
     pass
 
-
-
-
-class InsufficientGasError(GasEstimationError):
-    """Insufficient gas for transaction execution."""
-    pass
-
-class GasEstimationFailedError(GasEstimationError):
-    """Gas estimation failed for transaction."""
-    pass
 
 class SlippageError(TradingError):
     """Slippage errors."""
     pass
 
 
-
-
-class MaxSlippageError(SlippageError):
-    """Maximum slippage limit exceeded."""
-    pass
-
-class SlippageExceededError(SlippageError):
-    """Slippage tolerance exceeded during trade execution."""
-    pass
-
 class LiquidityError(TradingError):
     """Liquidity errors."""
     pass
 
-
-
-
-class LiquidityPoolError(LiquidityError):
-    """Liquidity pool interaction failed."""
-    pass
-
-class InsufficientLiquidityError(LiquidityError):
-    """Insufficient liquidity for trade execution."""
-    pass
 
 class WalletError(TradingBotError):
     """Wallet errors."""
@@ -221,11 +192,6 @@ class ExecutionError(TradingError):
     pass
 
 
-
-class SwapExecutionError(ExecutionError):
-    """Swap execution failed."""
-    pass
-
 class OrderError(TradingError):
     """Order errors."""
     pass
@@ -240,11 +206,6 @@ class DataError(TradingBotError):
     """Data errors."""
     pass
 
-
-
-class PriceFeedError(DataError):
-    """Price feed data retrieval failed."""
-    pass
 
 class DataAnalysisError(DataError):
     """Data analysis errors."""
@@ -663,15 +624,46 @@ __all__ = [
     'ConfigError',
     'SettingsError',
     'EnvironmentError',
-    'InsufficientLiquidityError',
-    'SlippageExceededError',
-    'MaxSlippageError',
-    'GasEstimationFailedError',
-    'InsufficientGasError',
-    'TransactionFailedError',
-    'InvalidTokenError',
-    'TokenMetadataError',
-    'PriceFeedError',
-    'LiquidityPoolError',
-    'SwapExecutionError',
 ]
+'''
+    
+    exceptions_file = Path("app/core/exceptions.py")
+    
+    try:
+        # Delete corrupted file completely
+        if exceptions_file.exists():
+            os.remove(exceptions_file)
+            print("✅ Removed corrupted exceptions.py")
+        
+        # Write completely new file
+        exceptions_file.write_text(clean_content, encoding='utf-8')
+        print("✅ Created clean exceptions.py file")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error replacing exceptions file: {e}")
+        return False
+
+
+def main():
+    """Replace the exceptions file directly."""
+    print("🔧 Direct Exceptions File Replacement")
+    print("=" * 50)
+    
+    success = replace_exceptions_file_directly()
+    
+    if success:
+        print("\\n✅ Exceptions file replaced successfully!")
+        print("\\nNext steps:")
+        print("1. Run: python test_all_features.py")
+        print("2. Should now work without any syntax errors")
+    else:
+        print("\\n❌ Failed to replace exceptions file")
+    
+    return success
+
+
+if __name__ == "__main__":
+    success = main()
+    exit(0 if success else 1)

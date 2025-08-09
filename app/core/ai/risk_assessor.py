@@ -208,7 +208,7 @@ class AIRiskAssessor:
         self.cache_ttl = 3600  # 1 hour
         self.quick_cache_ttl = 300  # 5 minutes
         
-        logger.info("✅ AI Risk Assessor initialized")
+        logger.info("[OK] AI Risk Assessor initialized")
     
     async def initialize_models(self) -> bool:
         """
@@ -220,13 +220,13 @@ class AIRiskAssessor:
         try:
             await self._load_or_train_models()
             self.models_loaded = True
-            logger.info(f"✅ AI models loaded successfully (version {self.model_version})")
-            logger.info(f"📊 Model performance - Honeypot: {self.honeypot_accuracy:.3f}, "
+            logger.info(f"[OK] AI models loaded successfully (version {self.model_version})")
+            logger.info(f"[STATS] Model performance - Honeypot: {self.honeypot_accuracy:.3f}, "
                        f"Sentiment: {self.sentiment_accuracy:.3f}")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to initialize AI models: {e}")
+            logger.error(f"[ERROR] Failed to initialize AI models: {e}")
             self.models_loaded = False
             return False
     
@@ -266,7 +266,7 @@ class AIRiskAssessor:
                 logger.debug(f"📋 Using cached AI analysis for {token_address}")
                 return ComprehensiveRiskAssessment(**cached_result)
             
-            logger.info(f"🤖 Starting comprehensive AI analysis for {token_address} on {network}")
+            logger.info(f"[BOT] Starting comprehensive AI analysis for {token_address} on {network}")
             
             # Extract contract features
             contract_features = await self._extract_contract_features(
@@ -347,14 +347,14 @@ class AIRiskAssessor:
                 ttl=self.cache_ttl
             )
             
-            logger.info(f"✅ AI analysis complete for {token_address} - "
+            logger.info(f"[OK] AI analysis complete for {token_address} - "
                        f"Risk: {risk_level} ({overall_risk_score:.2f}), "
                        f"Honeypot: {honeypot_analysis.risk_level.value}")
             
             return assessment
             
         except Exception as e:
-            logger.error(f"❌ AI analysis failed for {token_address}: {e}")
+            logger.error(f"[ERROR] AI analysis failed for {token_address}: {e}")
             raise AIAnalysisError(f"AI analysis failed: {str(e)}")
     
     async def detect_honeypot(
@@ -438,13 +438,13 @@ class AIRiskAssessor:
                 ttl=self.quick_cache_ttl
             )
             
-            logger.info(f"✅ Honeypot analysis complete - Risk: {risk_level.value} "
+            logger.info(f"[OK] Honeypot analysis complete - Risk: {risk_level.value} "
                        f"(P={probability:.3f}, C={confidence:.3f})")
             
             return analysis
             
         except Exception as e:
-            logger.error(f"❌ Honeypot detection failed for {token_address}: {e}")
+            logger.error(f"[ERROR] Honeypot detection failed for {token_address}: {e}")
             raise HoneypotDetectionError(f"Honeypot detection failed: {str(e)}")
     
     async def analyze_market_sentiment(
@@ -471,7 +471,7 @@ class AIRiskAssessor:
             if cached_result:
                 return SentimentAnalysis(**cached_result)
             
-            logger.info(f"📊 Analyzing market sentiment for {token_address}")
+            logger.info(f"[STATS] Analyzing market sentiment for {token_address}")
             
             # Simulate sentiment analysis (in production, this would use real APIs)
             sentiment_score = np.random.uniform(-0.5, 0.8)  # Slightly bullish bias
@@ -508,13 +508,13 @@ class AIRiskAssessor:
                 ttl=self.quick_cache_ttl
             )
             
-            logger.info(f"✅ Sentiment analysis complete - {overall_sentiment.value} "
+            logger.info(f"[OK] Sentiment analysis complete - {overall_sentiment.value} "
                        f"(Score: {sentiment_score:.3f})")
             
             return analysis
             
         except Exception as e:
-            logger.error(f"❌ Sentiment analysis failed for {token_address}: {e}")
+            logger.error(f"[ERROR] Sentiment analysis failed for {token_address}: {e}")
             # Return neutral sentiment on error
             return self._create_neutral_sentiment()
     
@@ -542,7 +542,7 @@ class AIRiskAssessor:
             if cached_result:
                 return PredictiveAnalysis(**cached_result)
             
-            logger.info(f"📈 Predicting price trends for {token_address}")
+            logger.info(f"[GROWTH] Predicting price trends for {token_address}")
             
             # Simulate predictions (replace with real ML models)
             base_price = 1.0  # Assume normalized price
@@ -582,12 +582,12 @@ class AIRiskAssessor:
                 ttl=self.quick_cache_ttl
             )
             
-            logger.info(f"✅ Price prediction complete - Trend: {trend_direction}")
+            logger.info(f"[OK] Price prediction complete - Trend: {trend_direction}")
             
             return analysis
             
         except Exception as e:
-            logger.error(f"❌ Price prediction failed for {token_address}: {e}")
+            logger.error(f"[ERROR] Price prediction failed for {token_address}: {e}")
             return self._create_neutral_predictions()
     
     # ==================== PRIVATE METHODS ====================
@@ -606,10 +606,10 @@ class AIRiskAssessor:
                 self.honeypot_accuracy = metrics.get("honeypot_accuracy", 0.99)
                 self.sentiment_accuracy = metrics.get("sentiment_accuracy", 0.85)
             
-            logger.info("📁 Loaded existing ML models")
+            logger.info("[FOLDER] Loaded existing ML models")
             
         except FileNotFoundError:
-            logger.info("🔧 Training new ML models...")
+            logger.info("[FIX] Training new ML models...")
             await self._train_models()
     
     async def _train_models(self) -> None:
@@ -641,7 +641,7 @@ class AIRiskAssessor:
         self.feature_scaler = StandardScaler()
         self.feature_scaler.fit(X_honeypot)
         
-        logger.info(f"✅ Models trained - Honeypot accuracy: {self.honeypot_accuracy:.3f}")
+        logger.info(f"[OK] Models trained - Honeypot accuracy: {self.honeypot_accuracy:.3f}")
     
     def _generate_honeypot_training_data(self) -> Tuple[np.ndarray, np.ndarray]:
         """Generate synthetic honeypot training data."""
@@ -849,13 +849,13 @@ class AIRiskAssessor:
         if risk_level == HoneypotRisk.CRITICAL:
             return "⛔ AVOID - Critical honeypot risk detected"
         elif risk_level == HoneypotRisk.HIGH:
-            return "🚨 HIGH RISK - Proceed with extreme caution"
+            return "[ALERT] HIGH RISK - Proceed with extreme caution"
         elif risk_level == HoneypotRisk.MEDIUM:
-            return "⚠️ MEDIUM RISK - Use small test amounts first"
+            return "[WARN] MEDIUM RISK - Use small test amounts first"
         elif risk_level == HoneypotRisk.LOW:
             return "🟨 LOW RISK - Proceed with normal caution"
         else:
-            return "✅ SAFE - Low honeypot risk detected"
+            return "[OK] SAFE - Low honeypot risk detected"
     
     def _create_neutral_sentiment(self) -> SentimentAnalysis:
         """Create neutral sentiment analysis."""

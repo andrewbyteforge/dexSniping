@@ -1,4 +1,33 @@
+#!/usr/bin/env python3
 """
+Create Missing Risk Calculator Module
+File: create_risk_calculator.py
+
+Creates the missing risk calculator module with TokenRiskAssessment class.
+"""
+
+from pathlib import Path
+
+
+def create_risk_calculator_module():
+    """Create the risk calculator module."""
+    
+    risk_dir = Path("app/core/risk")
+    risk_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Create __init__.py
+    init_content = '''"""Risk management module."""
+
+from .risk_calculator import RiskFactors, TokenRiskAssessment, RiskCalculator
+
+__all__ = ['RiskFactors', 'TokenRiskAssessment', 'RiskCalculator']
+'''
+    
+    init_file = risk_dir / "__init__.py"
+    init_file.write_text(init_content, encoding='utf-8')
+    
+    # Create risk_calculator.py
+    risk_calculator_content = '''"""
 Risk Calculator
 File: app/core/risk/risk_calculator.py
 
@@ -555,3 +584,42 @@ def get_risk_calculator() -> RiskCalculator:
         _risk_calculator_instance = RiskCalculator()
     
     return _risk_calculator_instance
+'''
+    
+    calculator_file = risk_dir / "risk_calculator.py"
+    calculator_file.write_text(risk_calculator_content, encoding='utf-8')
+    
+    print("✅ Created risk calculator module")
+    return True
+
+
+def main():
+    """Create the missing risk calculator module."""
+    print("🔧 Creating Missing Risk Calculator Module")
+    print("=" * 60)
+    
+    success = create_risk_calculator_module()
+    
+    print("\n" + "=" * 60)
+    print("Risk Calculator Creation Summary:")
+    print("=" * 60)
+    
+    if success:
+        print("✅ Risk calculator module created successfully!")
+        print("\nModule includes:")
+        print("  - RiskFactors dataclass")
+        print("  - TokenRiskAssessment dataclass") 
+        print("  - RiskCalculator class")
+        print("  - Comprehensive risk analysis")
+        print("\nNext steps:")
+        print("1. Run: python test_all_features.py")
+        print("2. Verify: All imports work correctly")
+    else:
+        print("❌ Failed to create risk calculator module")
+    
+    return success
+
+
+if __name__ == "__main__":
+    success = main()
+    exit(0 if success else 1)

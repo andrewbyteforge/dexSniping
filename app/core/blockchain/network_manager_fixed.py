@@ -92,7 +92,7 @@ class NetworkManagerFixed:
     
     def __init__(self):
         """Initialize the network manager with enhanced error handling."""
-        logger.info("🔗 Initializing NetworkManagerFixed with enhanced validation...")
+        logger.info("[LINK] Initializing NetworkManagerFixed with enhanced validation...")
         
         # Initialize collections
         self.connections: Dict[NetworkType, Optional[AsyncWeb3]] = {}
@@ -105,7 +105,7 @@ class NetworkManagerFixed:
         # Initialize status for all networks
         self._initialize_network_status()
         
-        logger.info("✅ NetworkManagerFixed initialized successfully")
+        logger.info("[OK] NetworkManagerFixed initialized successfully")
     
     def _setup_network_configurations(self) -> None:
         """Setup configurations for all supported networks."""
@@ -217,10 +217,10 @@ class NetworkManagerFixed:
                 block_time_seconds=0.25
             )
             
-            logger.info(f"✅ Network configurations setup complete: {len(self.network_configs)} networks")
+            logger.info(f"[OK] Network configurations setup complete: {len(self.network_configs)} networks")
             
         except Exception as e:
-            logger.error(f"❌ Failed to setup network configurations: {e}")
+            logger.error(f"[ERROR] Failed to setup network configurations: {e}")
             raise NetworkError(f"Network configuration setup failed: {e}")
     
     def _initialize_network_status(self) -> None:
@@ -233,10 +233,10 @@ class NetworkManagerFixed:
                     last_checked=datetime.utcnow()
                 )
             
-            logger.info("✅ Network status tracking initialized")
+            logger.info("[OK] Network status tracking initialized")
             
         except Exception as e:
-            logger.error(f"❌ Failed to initialize network status: {e}")
+            logger.error(f"[ERROR] Failed to initialize network status: {e}")
     
     def _validate_network_type(self, network_input: Any) -> Optional[NetworkType]:
         """
@@ -251,7 +251,7 @@ class NetworkManagerFixed:
         try:
             # Handle None input
             if network_input is None:
-                logger.warning("⚠️ Network type is None")
+                logger.warning("[WARN] Network type is None")
                 return None
             
             # Handle NetworkType enum (already valid)
@@ -269,21 +269,21 @@ class NetworkManagerFixed:
                         if network_type.value.lower() == network_input.lower():
                             return network_type
                     
-                    logger.warning(f"⚠️ Unknown network string: '{network_input}'")
+                    logger.warning(f"[WARN] Unknown network string: '{network_input}'")
                     return None
             
             # Handle integer input (INVALID - this was causing the error)
             if isinstance(network_input, int):
-                logger.warning(f"⚠️ Invalid network type - received integer: {network_input}")
-                logger.info("💡 Network types must be strings (e.g., 'ethereum') or NetworkType enums")
+                logger.warning(f"[WARN] Invalid network type - received integer: {network_input}")
+                logger.info("[INFO] Network types must be strings (e.g., 'ethereum') or NetworkType enums")
                 return None
             
             # Handle other invalid types
-            logger.warning(f"⚠️ Invalid network type - unsupported type: {type(network_input)} - {network_input}")
+            logger.warning(f"[WARN] Invalid network type - unsupported type: {type(network_input)} - {network_input}")
             return None
             
         except Exception as e:
-            logger.error(f"❌ Error validating network type: {e}")
+            logger.error(f"[ERROR] Error validating network type: {e}")
             return None
     
     async def connect_to_network(self, network_input: Any) -> bool:
@@ -301,18 +301,18 @@ class NetworkManagerFixed:
             network_type = self._validate_network_type(network_input)
             
             if network_type is None:
-                logger.warning(f"⚠️ Cannot connect - invalid network type: {network_input}")
+                logger.warning(f"[WARN] Cannot connect - invalid network type: {network_input}")
                 return False
             
             if not WEB3_AVAILABLE:
-                logger.warning(f"⚠️ Web3 not available - cannot connect to {network_type.value}")
+                logger.warning(f"[WARN] Web3 not available - cannot connect to {network_type.value}")
                 return False
             
-            logger.info(f"🔗 Connecting to {network_type.value}...")
+            logger.info(f"[LINK] Connecting to {network_type.value}...")
             
             config = self.network_configs.get(network_type)
             if not config:
-                logger.warning(f"⚠️ No configuration found for network: {network_type.value}")
+                logger.warning(f"[WARN] No configuration found for network: {network_type.value}")
                 return False
             
             # Try to establish connection with proper fallback
@@ -321,16 +321,16 @@ class NetworkManagerFixed:
             if connection:
                 self.connections[network_type] = connection
                 await self._update_network_status(network_type, True, connection)
-                logger.info(f"✅ Successfully connected to {network_type.value}")
+                logger.info(f"[OK] Successfully connected to {network_type.value}")
                 return True
             else:
                 await self._update_network_status(network_type, False, None, "No working RPC endpoints")
-                logger.warning(f"⚠️ Failed to connect to {network_type.value} - no working endpoints")
+                logger.warning(f"[WARN] Failed to connect to {network_type.value} - no working endpoints")
                 return False
                 
         except Exception as e:
             error_msg = str(e)
-            logger.warning(f"⚠️ Connection to {network_input} failed: {error_msg}")
+            logger.warning(f"[WARN] Connection to {network_input} failed: {error_msg}")
             
             # Try to update status if we have a valid network type
             if network_type and isinstance(network_type, NetworkType):
@@ -374,7 +374,7 @@ class NetworkManagerFixed:
                     
                     if api_key:
                         all_endpoints.append(private_url.format(api_key=api_key))
-                        logger.info(f"✅ Added private RPC endpoint with API key")
+                        logger.info(f"[OK] Added private RPC endpoint with API key")
                     else:
                         logger.info(f"ℹ️ Skipping private endpoint - no API key available")
                 else:
@@ -383,7 +383,7 @@ class NetworkManagerFixed:
             # Try each endpoint until one works
             for i, rpc_url in enumerate(all_endpoints):
                 try:
-                    logger.info(f"🔄 Trying RPC endpoint {i+1}/{len(all_endpoints)}: {self._mask_url(rpc_url)}")
+                    logger.info(f"[UPDATE] Trying RPC endpoint {i+1}/{len(all_endpoints)}: {self._mask_url(rpc_url)}")
                     
                     # Create Web3 instance
                     provider = AsyncHTTPProvider(rpc_url)
@@ -399,21 +399,21 @@ class NetworkManagerFixed:
                     if is_connected:
                         # Verify we can get block info
                         latest_block = await asyncio.wait_for(w3.eth.block_number, timeout=10.0)
-                        logger.info(f"✅ Connected to {config.name} (Block: {latest_block})")
+                        logger.info(f"[OK] Connected to {config.name} (Block: {latest_block})")
                         return w3
                     else:
-                        logger.warning(f"⚠️ Connection test failed for: {self._mask_url(rpc_url)}")
+                        logger.warning(f"[WARN] Connection test failed for: {self._mask_url(rpc_url)}")
                         
                 except asyncio.TimeoutError:
-                    logger.warning(f"⚠️ Timeout connecting to: {self._mask_url(rpc_url)}")
+                    logger.warning(f"[WARN] Timeout connecting to: {self._mask_url(rpc_url)}")
                 except Exception as e:
-                    logger.warning(f"⚠️ Error with endpoint {self._mask_url(rpc_url)}: {str(e)[:100]}")
+                    logger.warning(f"[WARN] Error with endpoint {self._mask_url(rpc_url)}: {str(e)[:100]}")
             
-            logger.warning(f"❌ All RPC endpoints failed for {config.name}")
+            logger.warning(f"[ERROR] All RPC endpoints failed for {config.name}")
             return None
             
         except Exception as e:
-            logger.error(f"❌ Connection establishment failed: {e}")
+            logger.error(f"[ERROR] Connection establishment failed: {e}")
             return None
     
     def _mask_url(self, url: str) -> str:
@@ -454,12 +454,12 @@ class NetworkManagerFixed:
                     status.gas_price_gwei = float(gas_price_wei) / 10**9
                     
                 except Exception as e:
-                    logger.warning(f"⚠️ Could not fetch network details: {e}")
+                    logger.warning(f"[WARN] Could not fetch network details: {e}")
             
             self.network_status[network_type] = status
             
         except Exception as e:
-            logger.error(f"❌ Failed to update network status: {e}")
+            logger.error(f"[ERROR] Failed to update network status: {e}")
     
     async def disconnect_from_network(self, network_input: Any) -> bool:
         """
@@ -475,7 +475,7 @@ class NetworkManagerFixed:
             network_type = self._validate_network_type(network_input)
             
             if network_type is None:
-                logger.warning(f"⚠️ Cannot disconnect - invalid network type: {network_input}")
+                logger.warning(f"[WARN] Cannot disconnect - invalid network type: {network_input}")
                 return False
             
             if network_type in self.connections:
@@ -490,14 +490,14 @@ class NetworkManagerFixed:
                     error_message="Manually disconnected"
                 )
                 
-                logger.info(f"✅ Disconnected from {network_type.value}")
+                logger.info(f"[OK] Disconnected from {network_type.value}")
                 return True
             else:
                 logger.info(f"ℹ️ Not connected to {network_type.value}")
                 return True
                 
         except Exception as e:
-            logger.error(f"❌ Error disconnecting from network: {e}")
+            logger.error(f"[ERROR] Error disconnecting from network: {e}")
             return False
     
     def get_web3_instance(self, network_input: Any) -> Optional[AsyncWeb3]:
@@ -519,24 +519,24 @@ class NetworkManagerFixed:
             return self.connections.get(network_type)
             
         except Exception as e:
-            logger.error(f"❌ Error getting Web3 instance: {e}")
+            logger.error(f"[ERROR] Error getting Web3 instance: {e}")
             return None
     
     async def disconnect_all(self) -> None:
         """Disconnect from all networks."""
         try:
-            logger.info("🔌 Disconnecting from all networks...")
+            logger.info("[CONNECT] Disconnecting from all networks...")
             
             for network_type in list(self.connections.keys()):
                 try:
                     await self.disconnect_from_network(network_type)
                 except Exception as e:
-                    logger.error(f"❌ Error disconnecting from {network_type.value}: {e}")
+                    logger.error(f"[ERROR] Error disconnecting from {network_type.value}: {e}")
             
-            logger.info("✅ Disconnected from all networks")
+            logger.info("[OK] Disconnected from all networks")
             
         except Exception as e:
-            logger.error(f"❌ Error during disconnect_all: {e}")
+            logger.error(f"[ERROR] Error during disconnect_all: {e}")
     
     def get_network_status(self, network_input: Any) -> Optional[NetworkStatus]:
         """Get status for a specific network."""
@@ -549,7 +549,7 @@ class NetworkManagerFixed:
             return self.network_status.get(network_type)
             
         except Exception as e:
-            logger.error(f"❌ Error getting network status: {e}")
+            logger.error(f"[ERROR] Error getting network status: {e}")
             return None
     
     def get_all_network_status(self) -> Dict[NetworkType, NetworkStatus]:
@@ -579,7 +579,7 @@ class NetworkManagerFixed:
             return self.network_configs.get(network_type)
             
         except Exception as e:
-            logger.error(f"❌ Error getting network config: {e}")
+            logger.error(f"[ERROR] Error getting network config: {e}")
             return None
 
 
@@ -601,10 +601,10 @@ async def initialize_network_manager() -> bool:
     """Initialize the global network manager."""
     try:
         manager = get_network_manager()
-        logger.info("✅ Network manager initialized successfully")
+        logger.info("[OK] Network manager initialized successfully")
         return True
     except Exception as e:
-        logger.error(f"❌ Failed to initialize network manager: {e}")
+        logger.error(f"[ERROR] Failed to initialize network manager: {e}")
         return False
 
 

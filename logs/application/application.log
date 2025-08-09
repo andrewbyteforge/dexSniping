@@ -1,3 +1,69 @@
 2025-08-09 08:11:31 - test.windows - INFO - test_windows_logging.py:27 - [TARGET] Testing Windows-compatible logging system
 2025-08-09 08:11:31 - test.windows - WARNING - test_windows_logging.py:28 - [WARN] This is a test warning
 2025-08-09 08:11:31 - test.windows - ERROR - test_windows_logging.py:29 - [ERROR] This is a test error
+2025-08-09 08:37:20 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 08:39:44 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 08:40:08 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 08:44:06 - test - INFO - logger.py:204 - [LOG] Logger initialized for test (component: application)
+2025-08-09 08:44:07 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 08:44:12 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 08:44:13 - app.core.performance.circuit_breaker - INFO - logger.py:204 - [LOG] Logger initialized for app.core.performance.circuit_breaker (component: application)
+2025-08-09 08:44:13 - app.core.performance.cache_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.performance.cache_manager (component: application)
+2025-08-09 08:46:18 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 08:46:19 - app.core.performance.circuit_breaker - INFO - logger.py:204 - [LOG] Logger initialized for app.core.performance.circuit_breaker (component: application)
+2025-08-09 08:47:54 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 08:47:55 - app.core.blockchain.base_chain - INFO - logger.py:204 - [LOG] Logger initialized for app.core.blockchain.base_chain (component: application)
+2025-08-09 08:47:55 - app.core.performance.circuit_breaker - INFO - logger.py:204 - [LOG] Logger initialized for app.core.performance.circuit_breaker (component: application)
+2025-08-09 08:47:55 - app.core.ai.risk_assessor - INFO - logger.py:204 - [LOG] Logger initialized for app.core.ai.risk_assessor (component: application)
+2025-08-09 08:48:48 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 08:48:49 - app.core.blockchain.base_chain - INFO - logger.py:204 - [LOG] Logger initialized for app.core.blockchain.base_chain (component: application)
+2025-08-09 08:48:49 - app.core.performance.circuit_breaker - INFO - logger.py:204 - [LOG] Logger initialized for app.core.performance.circuit_breaker (component: application)
+2025-08-09 08:48:49 - app.core.ai.risk_assessor - INFO - logger.py:204 - [LOG] Logger initialized for app.core.ai.risk_assessor (component: application)
+2025-08-09 08:50:08 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 08:50:09 - app.core.blockchain.base_chain - INFO - logger.py:204 - [LOG] Logger initialized for app.core.blockchain.base_chain (component: application)
+2025-08-09 08:50:09 - app.core.performance.circuit_breaker - INFO - logger.py:204 - [LOG] Logger initialized for app.core.performance.circuit_breaker (component: application)
+2025-08-09 08:50:09 - app.core.ai.risk_assessor - INFO - logger.py:204 - [LOG] Logger initialized for app.core.ai.risk_assessor (component: application)
+2025-08-09 08:50:10 - app.core.ai.honeypot_detector - INFO - logger.py:204 - [LOG] Logger initialized for app.core.ai.honeypot_detector (component: application)
+2025-08-09 08:57:21 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 08:57:22 - app.core.blockchain.base_chain - INFO - logger.py:204 - [LOG] Logger initialized for app.core.blockchain.base_chain (component: application)
+2025-08-09 08:57:22 - app.core.performance.circuit_breaker - INFO - logger.py:204 - [LOG] Logger initialized for app.core.performance.circuit_breaker (component: application)
+2025-08-09 08:57:22 - app.core.ai.risk_assessor - INFO - logger.py:204 - [LOG] Logger initialized for app.core.ai.risk_assessor (component: application)
+2025-08-09 08:57:22 - app.core.ai.honeypot_detector - INFO - logger.py:204 - [LOG] Logger initialized for app.core.ai.honeypot_detector (component: application)
+2025-08-09 08:57:22 - app.core.ai.predictive_analytics - INFO - logger.py:204 - [LOG] Logger initialized for app.core.ai.predictive_analytics (component: application)
+2025-08-09 08:57:23 - app.core.websocket.websocket_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.websocket.websocket_manager (component: application)
+2025-08-09 08:58:53 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 08:58:54 - app.core.blockchain.base_chain - INFO - logger.py:204 - [LOG] Logger initialized for app.core.blockchain.base_chain (component: application)
+2025-08-09 08:58:54 - app.core.performance.circuit_breaker - INFO - logger.py:204 - [LOG] Logger initialized for app.core.performance.circuit_breaker (component: application)
+2025-08-09 08:58:54 - app.core.ai.risk_assessor - INFO - logger.py:204 - [LOG] Logger initialized for app.core.ai.risk_assessor (component: application)
+2025-08-09 08:58:54 - app.core.ai.honeypot_detector - INFO - logger.py:204 - [LOG] Logger initialized for app.core.ai.honeypot_detector (component: application)
+2025-08-09 08:58:54 - app.core.ai.predictive_analytics - INFO - logger.py:204 - [LOG] Logger initialized for app.core.ai.predictive_analytics (component: application)
+2025-08-09 08:58:54 - app.core.websocket.websocket_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.websocket.websocket_manager (component: application)
+2025-08-09 08:58:54 - app.core.websocket.websocket_manager - INFO - websocket_manager.py:95 - [OK] WebSocket Manager initialized
+2025-08-09 08:59:46 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 08:59:47 - app.core.blockchain.base_chain - INFO - logger.py:204 - [LOG] Logger initialized for app.core.blockchain.base_chain (component: application)
+2025-08-09 08:59:47 - app.core.performance.circuit_breaker - INFO - logger.py:204 - [LOG] Logger initialized for app.core.performance.circuit_breaker (component: application)
+2025-08-09 08:59:47 - app.core.ai.risk_assessor - INFO - logger.py:204 - [LOG] Logger initialized for app.core.ai.risk_assessor (component: application)
+2025-08-09 08:59:47 - app.core.ai.honeypot_detector - INFO - logger.py:204 - [LOG] Logger initialized for app.core.ai.honeypot_detector (component: application)
+2025-08-09 08:59:47 - app.core.ai.predictive_analytics - INFO - logger.py:204 - [LOG] Logger initialized for app.core.ai.predictive_analytics (component: application)
+2025-08-09 08:59:47 - app.core.websocket.websocket_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.websocket.websocket_manager (component: application)
+2025-08-09 08:59:47 - app.core.websocket.websocket_manager - INFO - websocket_manager.py:95 - [OK] WebSocket Manager initialized
+2025-08-09 09:00:43 - app.core.config.settings_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.config.settings_manager (component: application)
+2025-08-09 09:00:44 - app.core.blockchain.base_chain - INFO - logger.py:204 - [LOG] Logger initialized for app.core.blockchain.base_chain (component: application)
+2025-08-09 09:00:44 - app.core.performance.circuit_breaker - INFO - logger.py:204 - [LOG] Logger initialized for app.core.performance.circuit_breaker (component: application)
+2025-08-09 09:00:44 - app.core.ai.risk_assessor - INFO - logger.py:204 - [LOG] Logger initialized for app.core.ai.risk_assessor (component: application)
+2025-08-09 09:00:44 - app.core.ai.honeypot_detector - INFO - logger.py:204 - [LOG] Logger initialized for app.core.ai.honeypot_detector (component: application)
+2025-08-09 09:00:44 - app.core.ai.predictive_analytics - INFO - logger.py:204 - [LOG] Logger initialized for app.core.ai.predictive_analytics (component: application)
+2025-08-09 09:00:44 - app.core.websocket.websocket_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.websocket.websocket_manager (component: application)
+2025-08-09 09:00:44 - app.core.websocket.websocket_manager - INFO - websocket_manager.py:95 - [OK] WebSocket Manager initialized
+2025-08-09 09:00:46 - __main__ - INFO - logger.py:204 - [LOG] Logger initialized for __main__ (component: application)
+2025-08-09 09:00:46 - test_logger - INFO - logger.py:204 - [LOG] Logger initialized for test_logger (component: application)
+2025-08-09 09:00:46 - test_logger - INFO - test_all_features.py:171 - Test log message
+2025-08-09 09:00:47 - app.core.config.settings_manager - INFO - settings_manager.py:272 - [OK] Environment variables loaded
+2025-08-09 09:00:47 - app.core.config.settings_manager - INFO - settings_manager.py:180 - [CONFIG] Settings loaded for development environment
+2025-08-09 09:00:47 - app.core.config.settings_manager - INFO - settings_manager.py:394 - [OK] Configuration validation passed
+2025-08-09 09:00:47 - app.core.performance.circuit_breaker - INFO - circuit_breaker.py:133 - [OK] Circuit breaker manager initialized
+2025-08-09 09:00:47 - app.core.ai.risk_assessor - INFO - risk_assessor.py:211 - [OK] AI Risk Assessor initialized
+2025-08-09 09:00:47 - app.core.performance.circuit_breaker - INFO - circuit_breaker.py:133 - [OK] Circuit breaker manager initialized
+2025-08-09 09:00:47 - app.core.performance.circuit_breaker - INFO - circuit_breaker.py:133 - [OK] Circuit breaker manager initialized
+2025-08-09 09:00:47 - app.core.ai.predictive_analytics - INFO - predictive_analytics.py:240 - [GROWTH] Predictive Analytics Engine initialized
+2025-08-09 09:00:47 - app.core.websocket.websocket_manager - INFO - websocket_manager.py:95 - [OK] WebSocket Manager initialized

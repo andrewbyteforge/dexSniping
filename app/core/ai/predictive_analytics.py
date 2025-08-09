@@ -237,7 +237,7 @@ class PredictiveAnalytics:
         self.cache_ttl = 900  # 15 minutes
         self.pattern_cache_ttl = 3600  # 1 hour
         
-        logger.info("📈 Predictive Analytics Engine initialized")
+        logger.info("[GROWTH] Predictive Analytics Engine initialized")
     
     async def initialize(self) -> bool:
         """
@@ -256,13 +256,13 @@ class PredictiveAnalytics:
             # Validate model performance
             await self._validate_models()
             
-            logger.info(f"✅ Predictive analytics ready (v{self.model_version})")
-            logger.info(f"📊 Average model accuracy: {np.mean(list(self.model_accuracies.values())):.1%}")
+            logger.info(f"[OK] Predictive analytics ready (v{self.model_version})")
+            logger.info(f"[STATS] Average model accuracy: {np.mean(list(self.model_accuracies.values())):.1%}")
             
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to initialize predictive analytics: {e}")
+            logger.error(f"[ERROR] Failed to initialize predictive analytics: {e}")
             return False
     
     async def predict_price_movements(
@@ -301,7 +301,7 @@ class PredictiveAnalytics:
                 logger.debug(f"📋 Using cached prediction for {token_symbol}")
                 return PredictiveAnalysisResult(**cached_result)
             
-            logger.info(f"📈 Starting predictive analysis for {token_symbol}")
+            logger.info(f"[GROWTH] Starting predictive analysis for {token_symbol}")
             
             # Prepare historical data
             price_data, volume_data, features = await self._prepare_historical_data(
@@ -381,14 +381,14 @@ class PredictiveAnalytics:
             
             analysis_duration = int((datetime.utcnow() - start_time).total_seconds() * 1000)
             
-            logger.info(f"✅ Predictive analysis complete for {token_symbol} - "
+            logger.info(f"[OK] Predictive analysis complete for {token_symbol} - "
                        f"Trend: {trend_direction.value}, Confidence: {prediction_confidence:.1%} "
                        f"({analysis_duration}ms)")
             
             return result
             
         except Exception as e:
-            logger.error(f"❌ Predictive analysis failed for {token_symbol}: {e}")
+            logger.error(f"[ERROR] Predictive analysis failed for {token_symbol}: {e}")
             raise PredictionError(f"Prediction failed: {str(e)}")
     
     async def detect_breakout_opportunities(
@@ -407,7 +407,7 @@ class PredictiveAnalytics:
             List of breakout opportunities
         """
         try:
-            logger.info(f"🔍 Detecting breakout opportunities for {len(tokens)} tokens")
+            logger.info(f"[SEARCH] Detecting breakout opportunities for {len(tokens)} tokens")
             
             opportunities = []
             
@@ -435,17 +435,17 @@ class PredictiveAnalytics:
                         opportunities.append(opportunity)
                         
                 except Exception as e:
-                    logger.warning(f"⚠️ Breakout analysis failed for {token}: {e}")
+                    logger.warning(f"[WARN] Breakout analysis failed for {token}: {e}")
                     continue
             
             # Sort by breakout probability
             opportunities.sort(key=lambda x: x["breakout_probability"], reverse=True)
             
-            logger.info(f"✅ Found {len(opportunities)} breakout opportunities")
+            logger.info(f"[OK] Found {len(opportunities)} breakout opportunities")
             return opportunities
             
         except Exception as e:
-            logger.error(f"❌ Breakout detection failed: {e}")
+            logger.error(f"[ERROR] Breakout detection failed: {e}")
             return []
     
     async def forecast_market_volatility(
@@ -464,7 +464,7 @@ class PredictiveAnalytics:
             Volatility forecast summary
         """
         try:
-            logger.info(f"📊 Forecasting volatility for {len(tokens)} tokens ({forecast_horizon})")
+            logger.info(f"[STATS] Forecasting volatility for {len(tokens)} tokens ({forecast_horizon})")
             
             volatility_data = []
             
@@ -500,11 +500,11 @@ class PredictiveAnalytics:
                 "analysis_timestamp": datetime.utcnow().isoformat()
             }
             
-            logger.info(f"✅ Volatility forecast complete - Market regime: {summary['market_volatility_regime']}")
+            logger.info(f"[OK] Volatility forecast complete - Market regime: {summary['market_volatility_regime']}")
             return summary
             
         except Exception as e:
-            logger.error(f"❌ Volatility forecasting failed: {e}")
+            logger.error(f"[ERROR] Volatility forecasting failed: {e}")
             return {}
     
     # ==================== PRIVATE METHODS ====================
@@ -537,10 +537,10 @@ class PredictiveAnalytics:
                 self.model_accuracies = metrics.get("model_accuracies", {})
                 self.ensemble_weights = metrics.get("ensemble_weights", {})
             
-            logger.info("📁 Loaded existing predictive models")
+            logger.info("[FOLDER] Loaded existing predictive models")
             
         except FileNotFoundError:
-            logger.info("🔧 Training new predictive models...")
+            logger.info("[FIX] Training new predictive models...")
             await self._train_models()
     
     async def _train_models(self) -> None:
@@ -593,7 +593,7 @@ class PredictiveAnalytics:
             model.fit(X_scaled, y_price)
             score = model.score(X_scaled, y_price)
             self.model_accuracies[f"price_{name}"] = score
-            logger.info(f"📊 {name} price model trained - R² score: {score:.3f}")
+            logger.info(f"[STATS] {name} price model trained - R² score: {score:.3f}")
         
         for name, model in self.volatility_models.items():
             model.fit(X_scaled, y_volatility)
@@ -608,7 +608,7 @@ class PredictiveAnalytics:
         # Calculate ensemble weights based on performance
         self._calculate_ensemble_weights()
         
-        logger.info("✅ Predictive models trained successfully")
+        logger.info("[OK] Predictive models trained successfully")
     
     async def _generate_training_data(self) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
         """Generate synthetic training data."""
@@ -633,7 +633,7 @@ class PredictiveAnalytics:
         volume_multiplier = np.exp(np.random.randn(n_samples) * 0.5)
         y_volume = base_volume * volume_multiplier
         
-        logger.info(f"📊 Generated training data: {n_samples} samples, {n_features} features")
+        logger.info(f"[STATS] Generated training data: {n_samples} samples, {n_features} features")
         return X, y_price, y_volatility, y_volume
     
     def _calculate_ensemble_weights(self) -> None:
@@ -652,15 +652,15 @@ class PredictiveAnalytics:
     async def _initialize_technical_indicators(self) -> None:
         """Initialize technical indicator calculations."""
         # Mock initialization
-        logger.info("📈 Technical indicators initialized")
+        logger.info("[GROWTH] Technical indicators initialized")
     
     async def _validate_models(self) -> None:
         """Validate model performance."""
         avg_accuracy = np.mean(list(self.model_accuracies.values()))
         if avg_accuracy < 0.7:
-            logger.warning(f"⚠️ Average model accuracy {avg_accuracy:.1%} below recommended threshold")
+            logger.warning(f"[WARN] Average model accuracy {avg_accuracy:.1%} below recommended threshold")
         else:
-            logger.info(f"✅ Model validation passed - Average accuracy: {avg_accuracy:.1%}")
+            logger.info(f"[OK] Model validation passed - Average accuracy: {avg_accuracy:.1%}")
     
     async def _prepare_historical_data(
         self,
@@ -700,7 +700,7 @@ class PredictiveAnalytics:
         # Generate technical features
         features = await self._calculate_technical_features(price_data)
         
-        logger.debug(f"📊 Prepared {n_periods} periods of historical data")
+        logger.debug(f"[STATS] Prepared {n_periods} periods of historical data")
         return prices, volumes, features
     
     async def _calculate_technical_features(self, price_data: np.ndarray) -> np.ndarray:
@@ -761,7 +761,7 @@ class PredictiveAnalytics:
                     weight = self.ensemble_weights.get(f"price_{model_name}", 1.0)
                     predictions.append(pred[0] * weight)
                 except Exception as e:
-                    logger.warning(f"⚠️ Model {model_name} prediction failed: {e}")
+                    logger.warning(f"[WARN] Model {model_name} prediction failed: {e}")
                     continue
             
             if not predictions:
@@ -792,7 +792,7 @@ class PredictiveAnalytics:
             )
             
         except Exception as e:
-            logger.error(f"❌ Price prediction failed for {horizon.value}: {e}")
+            logger.error(f"[ERROR] Price prediction failed for {horizon.value}: {e}")
             # Return neutral prediction
             current_price = price_data[-1] if len(price_data) > 0 else 1.0
             return PriceTarget(

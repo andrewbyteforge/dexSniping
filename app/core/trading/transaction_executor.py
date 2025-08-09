@@ -218,9 +218,9 @@ class TransactionExecutor:
                 self.account = Account.from_key(private_key)
                 logger.info(f"🔑 Account initialized: {self.account.address[:10]}...")
             except Exception as e:
-                logger.error(f"❌ Failed to initialize account: {e}")
+                logger.error(f"[ERROR] Failed to initialize account: {e}")
         
-        logger.info("⚡ Transaction executor initialized")
+        logger.info("[ZAP] Transaction executor initialized")
     
     async def initialize(self, web3_provider=None) -> bool:
         """
@@ -237,7 +237,7 @@ class TransactionExecutor:
                 self.web3 = web3_provider
             
             if not WEB3_AVAILABLE:
-                logger.warning("⚠️ Web3 not available, using mock execution")
+                logger.warning("[WARN] Web3 not available, using mock execution")
                 return True  # Continue with mock for development
             
             if not self.web3:
@@ -247,20 +247,20 @@ class TransactionExecutor:
             # Test connection only if we have a provider
             try:
                 latest_block = self.web3.eth.block_number
-                logger.info(f"🔗 Connected to network, latest block: {latest_block}")
+                logger.info(f"[LINK] Connected to network, latest block: {latest_block}")
             except Exception as e:
-                logger.warning(f"⚠️ Web3 connection test failed, using mock mode: {e}")
+                logger.warning(f"[WARN] Web3 connection test failed, using mock mode: {e}")
                 return True  # Continue with mock mode
             
             # Start transaction monitoring only if we have real Web3
             if self.web3:
                 self._monitoring_task = asyncio.create_task(self._monitor_transactions())
             
-            logger.info("✅ Transaction executor initialized successfully")
+            logger.info("[OK] Transaction executor initialized successfully")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Transaction executor initialization failed: {e}")
+            logger.error(f"[ERROR] Transaction executor initialization failed: {e}")
             return False
 
 
@@ -285,7 +285,7 @@ class TransactionExecutor:
         transaction_id = str(uuid.uuid4())
         
         try:
-            logger.info(f"🔄 Executing swap: {swap_params.amount_in} {swap_params.token_in[:8]}... -> {swap_params.token_out[:8]}...")
+            logger.info(f"[UPDATE] Executing swap: {swap_params.amount_in} {swap_params.token_in[:8]}... -> {swap_params.token_out[:8]}...")
             
             # Validate parameters
             await self._validate_swap_parameters(swap_params, wallet_address)
@@ -313,11 +313,11 @@ class TransactionExecutor:
             # Save to database
             await self._save_transaction_to_database(result, swap_params, wallet_address)
             
-            logger.info(f"✅ Swap executed: {result.transaction_hash[:10]}...")
+            logger.info(f"[OK] Swap executed: {result.transaction_hash[:10]}...")
             return result
             
         except Exception as e:
-            logger.error(f"❌ Swap execution failed: {e}")
+            logger.error(f"[ERROR] Swap execution failed: {e}")
             
             # Return failed result
             return TransactionResult(
@@ -360,7 +360,7 @@ class TransactionExecutor:
                 # Add 20% buffer for safety
                 gas_limit = int(gas_limit * 1.2)
             except Exception as e:
-                logger.warning(f"⚠️ Gas estimation failed, using default: {e}")
+                logger.warning(f"[WARN] Gas estimation failed, using default: {e}")
                 gas_limit = 200000  # Default for swaps
             
             # Get current gas price
@@ -374,7 +374,7 @@ class TransactionExecutor:
             )
             
         except Exception as e:
-            logger.error(f"❌ Gas estimation error: {e}")
+            logger.error(f"[ERROR] Gas estimation error: {e}")
             raise GasEstimationError(f"Failed to estimate gas: {e}")
     
     async def monitor_transaction(
@@ -448,7 +448,7 @@ class TransactionExecutor:
             )
             
         except Exception as e:
-            logger.error(f"❌ Transaction monitoring error: {e}")
+            logger.error(f"[ERROR] Transaction monitoring error: {e}")
             return TransactionResult(
                 transaction_id=str(uuid.uuid4()),
                 transaction_hash=transaction_hash,
@@ -487,7 +487,7 @@ class TransactionExecutor:
         if swap_params.slippage_tolerance < 0 or swap_params.slippage_tolerance > Decimal("0.5"):
             raise ValidationError("Slippage tolerance must be between 0% and 50%")
         
-        logger.info("✅ Swap parameters validated")
+        logger.info("[OK] Swap parameters validated")
 
 
 
@@ -555,7 +555,7 @@ class TransactionExecutor:
             return result
             
         except Exception as e:
-            logger.error(f"❌ Real transaction execution failed: {e}")
+            logger.error(f"[ERROR] Real transaction execution failed: {e}")
             raise TransactionError(f"Transaction execution failed: {e}")
     
     async def _execute_mock_transaction(
@@ -607,11 +607,11 @@ class TransactionExecutor:
                 executed_at=result.confirmed_at
             )
             
-            await persistence_manager.save_trade(trade_record)
-            logger.info(f"💾 Transaction saved to database: {result.transaction_id}")
+            await (await get_persistence_manager()).save_trade(trade_record)
+            logger.info(f"[DATA] Transaction saved to database: {result.transaction_id}")
             
         except Exception as e:
-            logger.error(f"❌ Failed to save transaction to database: {e}")
+            logger.error(f"[ERROR] Failed to save transaction to database: {e}")
     
     async def _monitor_transactions(self):
         """Background task to monitor pending transactions."""
@@ -637,13 +637,13 @@ class TransactionExecutor:
                                     try:
                                         await callback(updated_result)
                                     except Exception as e:
-                                        logger.error(f"❌ Callback error: {e}")
+                                        logger.error(f"[ERROR] Callback error: {e}")
                                 
                                 # Clean up callbacks
                                 del self.confirmation_callbacks[transaction_id]
                 
             except Exception as e:
-                logger.error(f"❌ Transaction monitoring error: {e}")
+                logger.error(f"[ERROR] Transaction monitoring error: {e}")
     
     def get_execution_status(self) -> Dict[str, Any]:
         """
@@ -679,10 +679,10 @@ class TransactionExecutor:
             self.pending_transactions.clear()
             self.confirmation_callbacks.clear()
             
-            logger.info("✅ Transaction executor shutdown complete")
+            logger.info("[OK] Transaction executor shutdown complete")
             
         except Exception as e:
-            logger.error(f"❌ Error during transaction executor shutdown: {e}")
+            logger.error(f"[ERROR] Error during transaction executor shutdown: {e}")
 
 
 # Global instance

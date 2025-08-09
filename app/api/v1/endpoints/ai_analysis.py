@@ -97,7 +97,7 @@ async def initialize_ai_modules():
     global risk_assessor, honeypot_detector, sentiment_analyzer, predictive_analytics
     
     try:
-        logger.info("🤖 Initializing AI modules...")
+        logger.info("[BOT] Initializing AI modules...")
         
         # Initialize modules
         risk_assessor = AIRiskAssessor()
@@ -119,24 +119,24 @@ async def initialize_ai_modules():
         modules = ["Risk Assessor", "Honeypot Detector", "Sentiment Analyzer", "Predictive Analytics"]
         for i, result in enumerate(results):
             if isinstance(result, Exception):
-                logger.error(f"❌ Failed to initialize {modules[i]}: {result}")
+                logger.error(f"[ERROR] Failed to initialize {modules[i]}: {result}")
             elif result:
-                logger.info(f"✅ {modules[i]} initialized successfully")
+                logger.info(f"[OK] {modules[i]} initialized successfully")
             else:
-                logger.warning(f"⚠️ {modules[i]} initialization returned False")
+                logger.warning(f"[WARN] {modules[i]} initialization returned False")
         
         # Check if at least some modules are working
         successful_modules = sum(1 for result in results if result is True)
         
         if successful_modules == 0:
-            logger.error("❌ No AI modules initialized successfully")
+            logger.error("[ERROR] No AI modules initialized successfully")
             return False
         
-        logger.info(f"✅ AI initialization complete - {successful_modules}/4 modules ready")
+        logger.info(f"[OK] AI initialization complete - {successful_modules}/4 modules ready")
         return True
         
     except Exception as e:
-        logger.error(f"❌ AI module initialization failed: {e}")
+        logger.error(f"[ERROR] AI module initialization failed: {e}")
         return False
 
 
@@ -167,7 +167,7 @@ async def comprehensive_analysis(
         if not risk_assessor:
             raise HTTPException(status_code=503, detail="AI Risk Assessor not initialized")
         
-        logger.info(f"🤖 Starting comprehensive analysis for {request.token_address}")
+        logger.info(f"[BOT] Starting comprehensive analysis for {request.token_address}")
         
         # Perform comprehensive analysis
         analysis_result = await risk_assessor.analyze_contract(
@@ -240,16 +240,16 @@ async def comprehensive_analysis(
             "analysis_metadata": analysis_result.analysis_metadata
         }
         
-        logger.info(f"✅ Comprehensive analysis complete for {request.token_address} - "
+        logger.info(f"[OK] Comprehensive analysis complete for {request.token_address} - "
                    f"Risk: {analysis_result.risk_level}")
         
         return response
         
     except AIAnalysisError as e:
-        logger.error(f"❌ AI analysis error: {e}")
+        logger.error(f"[ERROR] AI analysis error: {e}")
         raise HTTPException(status_code=422, detail=str(e))
     except Exception as e:
-        logger.error(f"❌ Comprehensive analysis failed: {e}")
+        logger.error(f"[ERROR] Comprehensive analysis failed: {e}")
         raise HTTPException(status_code=500, detail="Analysis failed")
 
 
@@ -327,16 +327,16 @@ async def detect_honeypot(
             "models_used": detection_result.models_used
         }
         
-        logger.info(f"✅ Honeypot detection complete - Result: {'HONEYPOT' if detection_result.is_honeypot else 'SAFE'} "
+        logger.info(f"[OK] Honeypot detection complete - Result: {'HONEYPOT' if detection_result.is_honeypot else 'SAFE'} "
                    f"({detection_result.confidence_score:.1%} confidence)")
         
         return response
         
     except HoneypotDetectionError as e:
-        logger.error(f"❌ Honeypot detection error: {e}")
+        logger.error(f"[ERROR] Honeypot detection error: {e}")
         raise HTTPException(status_code=422, detail=str(e))
     except Exception as e:
-        logger.error(f"❌ Honeypot detection failed: {e}")
+        logger.error(f"[ERROR] Honeypot detection failed: {e}")
         raise HTTPException(status_code=500, detail="Detection failed")
 
 
@@ -393,12 +393,12 @@ async def batch_honeypot_detection(
             "network": request.network
         }
         
-        logger.info(f"✅ Batch honeypot detection complete - {honeypot_count}/{len(results)} honeypots detected")
+        logger.info(f"[OK] Batch honeypot detection complete - {honeypot_count}/{len(results)} honeypots detected")
         
         return response
         
     except Exception as e:
-        logger.error(f"❌ Batch honeypot detection failed: {e}")
+        logger.error(f"[ERROR] Batch honeypot detection failed: {e}")
         raise HTTPException(status_code=500, detail="Batch detection failed")
 
 
@@ -425,7 +425,7 @@ async def analyze_sentiment(
         if not sentiment_analyzer:
             raise HTTPException(status_code=503, detail="Sentiment Analyzer not initialized")
         
-        logger.info(f"📊 Starting sentiment analysis for {token_symbol}")
+        logger.info(f"[STATS] Starting sentiment analysis for {token_symbol}")
         
         # Perform sentiment analysis
         sentiment_result = await sentiment_analyzer.analyze_sentiment(
@@ -525,16 +525,16 @@ async def analyze_sentiment(
             "model_version": sentiment_result.model_version
         }
         
-        logger.info(f"✅ Sentiment analysis complete for {token_symbol} - "
+        logger.info(f"[OK] Sentiment analysis complete for {token_symbol} - "
                    f"Sentiment: {sentiment_result.overall_sentiment.value}")
         
         return response
         
     except SentimentAnalysisError as e:
-        logger.error(f"❌ Sentiment analysis error: {e}")
+        logger.error(f"[ERROR] Sentiment analysis error: {e}")
         raise HTTPException(status_code=422, detail=str(e))
     except Exception as e:
-        logger.error(f"❌ Sentiment analysis failed: {e}")
+        logger.error(f"[ERROR] Sentiment analysis failed: {e}")
         raise HTTPException(status_code=500, detail="Analysis failed")
 
 
@@ -554,7 +554,7 @@ async def get_trending_tokens(
         if not sentiment_analyzer:
             raise HTTPException(status_code=503, detail="Sentiment Analyzer not initialized")
         
-        logger.info(f"📈 Getting trending tokens ({period}, min {min_mentions} mentions)")
+        logger.info(f"[GROWTH] Getting trending tokens ({period}, min {min_mentions} mentions)")
         
         # Get trending tokens
         trending_tokens = await sentiment_analyzer.get_trending_tokens(
@@ -577,12 +577,12 @@ async def get_trending_tokens(
             "trending_tokens": trending_tokens
         }
         
-        logger.info(f"✅ Found {len(trending_tokens)} trending tokens")
+        logger.info(f"[OK] Found {len(trending_tokens)} trending tokens")
         
         return response
         
     except Exception as e:
-        logger.error(f"❌ Trending tokens query failed: {e}")
+        logger.error(f"[ERROR] Trending tokens query failed: {e}")
         raise HTTPException(status_code=500, detail="Query failed")
 
 
@@ -606,7 +606,7 @@ async def predict_price_movements(
         if not predictive_analytics:
             raise HTTPException(status_code=503, detail="Predictive Analytics not initialized")
         
-        logger.info(f"📈 Starting price prediction for {request.token_symbol}")
+        logger.info(f"[GROWTH] Starting price prediction for {request.token_symbol}")
         
         # Convert horizon strings to enum values
         from app.core.ai.predictive_analytics import PredictionHorizon
@@ -719,16 +719,16 @@ async def predict_price_movements(
             "model_version": prediction_result.model_version
         }
         
-        logger.info(f"✅ Price prediction complete for {request.token_symbol} - "
+        logger.info(f"[OK] Price prediction complete for {request.token_symbol} - "
                    f"Trend: {prediction_result.trend_direction.value}")
         
         return response
         
     except PredictionError as e:
-        logger.error(f"❌ Price prediction error: {e}")
+        logger.error(f"[ERROR] Price prediction error: {e}")
         raise HTTPException(status_code=422, detail=str(e))
     except Exception as e:
-        logger.error(f"❌ Price prediction failed: {e}")
+        logger.error(f"[ERROR] Price prediction failed: {e}")
         raise HTTPException(status_code=500, detail="Prediction failed")
 
 
@@ -747,7 +747,7 @@ async def detect_breakout_opportunities(
         if not predictive_analytics:
             raise HTTPException(status_code=503, detail="Predictive Analytics not initialized")
         
-        logger.info(f"🔍 Detecting breakout opportunities for {len(tokens)} tokens")
+        logger.info(f"[SEARCH] Detecting breakout opportunities for {len(tokens)} tokens")
         
         # Detect breakout opportunities
         opportunities = await predictive_analytics.detect_breakout_opportunities(
@@ -766,12 +766,12 @@ async def detect_breakout_opportunities(
             "opportunities": opportunities
         }
         
-        logger.info(f"✅ Found {len(opportunities)} breakout opportunities")
+        logger.info(f"[OK] Found {len(opportunities)} breakout opportunities")
         
         return response
         
     except Exception as e:
-        logger.error(f"❌ Breakout detection failed: {e}")
+        logger.error(f"[ERROR] Breakout detection failed: {e}")
         raise HTTPException(status_code=500, detail="Detection failed")
 
 
@@ -789,7 +789,7 @@ async def forecast_volatility(
         if not predictive_analytics:
             raise HTTPException(status_code=503, detail="Predictive Analytics not initialized")
         
-        logger.info(f"📊 Forecasting volatility for {len(tokens)} tokens")
+        logger.info(f"[STATS] Forecasting volatility for {len(tokens)} tokens")
         
         # Forecast volatility
         volatility_forecast = await predictive_analytics.forecast_market_volatility(
@@ -800,7 +800,7 @@ async def forecast_volatility(
         return volatility_forecast
         
     except Exception as e:
-        logger.error(f"❌ Volatility forecasting failed: {e}")
+        logger.error(f"[ERROR] Volatility forecasting failed: {e}")
         raise HTTPException(status_code=500, detail="Forecasting failed")
 
 
@@ -819,7 +819,7 @@ async def setup_sentiment_monitoring(
         if not sentiment_analyzer:
             raise HTTPException(status_code=503, detail="Sentiment Analyzer not initialized")
         
-        logger.info(f"🚨 Setting up sentiment monitoring for {len(request.tokens)} tokens")
+        logger.info(f"[ALERT] Setting up sentiment monitoring for {len(request.tokens)} tokens")
         
         # Setup monitoring (mock implementation)
         monitoring_id = f"monitor_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
@@ -835,12 +835,12 @@ async def setup_sentiment_monitoring(
             "next_check": (datetime.utcnow() + timedelta(minutes=15)).isoformat()
         }
         
-        logger.info(f"✅ Sentiment monitoring setup complete - ID: {monitoring_id}")
+        logger.info(f"[OK] Sentiment monitoring setup complete - ID: {monitoring_id}")
         
         return response
         
     except Exception as e:
-        logger.error(f"❌ Sentiment monitoring setup failed: {e}")
+        logger.error(f"[ERROR] Sentiment monitoring setup failed: {e}")
         raise HTTPException(status_code=500, detail="Setup failed")
 
 
@@ -884,7 +884,7 @@ async def get_sentiment_alerts(
         return response
         
     except Exception as e:
-        logger.error(f"❌ Failed to get sentiment alerts: {e}")
+        logger.error(f"[ERROR] Failed to get sentiment alerts: {e}")
         raise HTTPException(status_code=500, detail="Query failed")
 
 
@@ -933,7 +933,7 @@ async def ai_health_check() -> Dict[str, Any]:
         return health_status
         
     except Exception as e:
-        logger.error(f"❌ Health check failed: {e}")
+        logger.error(f"[ERROR] Health check failed: {e}")
         return {
             "overall_status": "error",
             "error": str(e),
@@ -973,7 +973,7 @@ async def get_model_info() -> Dict[str, Any]:
         return model_info
         
     except Exception as e:
-        logger.error(f"❌ Failed to get model info: {e}")
+        logger.error(f"[ERROR] Failed to get model info: {e}")
         raise HTTPException(status_code=500, detail="Query failed")
 
 
@@ -984,4 +984,4 @@ async def startup_ai_modules():
     """Initialize AI modules on startup."""
     success = await initialize_ai_modules()
     if not success:
-        logger.warning("⚠️ Some AI modules failed to initialize - API will run with reduced functionality")
+        logger.warning("[WARN] Some AI modules failed to initialize - API will run with reduced functionality")

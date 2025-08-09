@@ -251,14 +251,14 @@ class HoneypotDetector:
             # Validate model performance
             await self._validate_models()
             
-            logger.info(f"✅ Honeypot detector ready (v{self.model_version})")
-            logger.info(f"📊 Ensemble accuracy: {self.ensemble_accuracy:.1%}")
-            logger.info(f"📈 False positive rate: {self.false_positive_rate:.2%}")
+            logger.info(f"[OK] Honeypot detector ready (v{self.model_version})")
+            logger.info(f"[STATS] Ensemble accuracy: {self.ensemble_accuracy:.1%}")
+            logger.info(f"[GROWTH] False positive rate: {self.false_positive_rate:.2%}")
             
             return True
             
         except Exception as e:
-            logger.error(f"❌ Failed to initialize honeypot detector: {e}")
+            logger.error(f"[ERROR] Failed to initialize honeypot detector: {e}")
             return False
     
     async def detect_honeypot(
@@ -294,7 +294,7 @@ class HoneypotDetector:
                 logger.debug(f"📋 Using cached honeypot analysis for {token_address}")
                 return HoneypotDetectionResult(**cached_result)
             
-            logger.info(f"🔍 Starting honeypot detection for {token_address} on {network}")
+            logger.info(f"[SEARCH] Starting honeypot detection for {token_address} on {network}")
             
             # Extract features
             bytecode_features = await self._analyze_bytecode(token_address, network, chain)
@@ -372,14 +372,14 @@ class HoneypotDetector:
                 ttl=self.cache_ttl
             )
             
-            logger.info(f"✅ Honeypot detection complete for {token_address} - "
+            logger.info(f"[OK] Honeypot detection complete for {token_address} - "
                        f"Result: {'HONEYPOT' if is_honeypot else 'SAFE'} "
                        f"({model_consensus:.1%} confidence)")
             
             return result
             
         except Exception as e:
-            logger.error(f"❌ Honeypot detection failed for {token_address}: {e}")
+            logger.error(f"[ERROR] Honeypot detection failed for {token_address}: {e}")
             raise HoneypotDetectionError(f"Detection failed: {str(e)}")
     
     async def batch_detect(
@@ -399,7 +399,7 @@ class HoneypotDetector:
         Returns:
             List[HoneypotDetectionResult]: Detection results
         """
-        logger.info(f"🔍 Starting batch honeypot detection for {len(token_addresses)} tokens")
+        logger.info(f"[SEARCH] Starting batch honeypot detection for {len(token_addresses)} tokens")
         
         tasks = []
         for address in token_addresses:
@@ -412,11 +412,11 @@ class HoneypotDetector:
         valid_results = []
         for i, result in enumerate(results):
             if isinstance(result, Exception):
-                logger.error(f"❌ Batch detection failed for {token_addresses[i]}: {result}")
+                logger.error(f"[ERROR] Batch detection failed for {token_addresses[i]}: {result}")
             else:
                 valid_results.append(result)
         
-        logger.info(f"✅ Batch detection complete - {len(valid_results)}/{len(token_addresses)} successful")
+        logger.info(f"[OK] Batch detection complete - {len(valid_results)}/{len(token_addresses)} successful")
         return valid_results
     
     async def update_patterns(self, new_signatures: List[HoneypotSignature]) -> None:
@@ -426,7 +426,7 @@ class HoneypotDetector:
         Args:
             new_signatures: New honeypot signatures to add
         """
-        logger.info(f"🔄 Updating honeypot patterns with {len(new_signatures)} new signatures")
+        logger.info(f"[UPDATE] Updating honeypot patterns with {len(new_signatures)} new signatures")
         
         # Add new signatures
         self.honeypot_signatures.extend(new_signatures)
@@ -444,7 +444,7 @@ class HoneypotDetector:
         # Save updated signatures
         await self._save_honeypot_signatures()
         
-        logger.info(f"✅ Updated pattern database - {len(self.honeypot_signatures)} total patterns")
+        logger.info(f"[OK] Updated pattern database - {len(self.honeypot_signatures)} total patterns")
     
     # ==================== PRIVATE METHODS ====================
     
@@ -467,10 +467,10 @@ class HoneypotDetector:
                 self.false_positive_rate = metrics["false_positive_rate"]
                 self.false_negative_rate = metrics["false_negative_rate"]
             
-            logger.info("📁 Loaded existing honeypot detection models")
+            logger.info("[FOLDER] Loaded existing honeypot detection models")
             
         except FileNotFoundError:
-            logger.info("🔧 Training new honeypot detection models...")
+            logger.info("[FIX] Training new honeypot detection models...")
             await self._train_models()
     
     async def _train_models(self) -> None:
@@ -530,7 +530,7 @@ class HoneypotDetector:
             # Store model
             setattr(self, name.replace("_", "_"), model)
             
-            logger.info(f"📊 {name} trained - Accuracy: {accuracy:.3f}")
+            logger.info(f"[STATS] {name} trained - Accuracy: {accuracy:.3f}")
         
         # Calculate ensemble metrics
         await self._calculate_ensemble_metrics(X_scaled, y)
@@ -596,7 +596,7 @@ class HoneypotDetector:
         # Add some noise to make it more realistic
         X += np.random.normal(0, 0.1, X.shape)
         
-        logger.info(f"📊 Generated training data: {n_samples} samples, "
+        logger.info(f"[STATS] Generated training data: {n_samples} samples, "
                    f"{np.sum(y)} honeypots ({np.mean(y):.1%})")
         
         return X, y
@@ -630,7 +630,7 @@ class HoneypotDetector:
             return features
             
         except Exception as e:
-            logger.error(f"❌ Bytecode analysis failed for {token_address}: {e}")
+            logger.error(f"[ERROR] Bytecode analysis failed for {token_address}: {e}")
             return BytecodeFeatures()
     
     async def _analyze_behavior(
@@ -665,11 +665,11 @@ class HoneypotDetector:
                 min_transaction_value=float(np.random.uniform(1, 100))
             )
             
-            logger.debug(f"📊 Behavior analysis complete for {token_address}")
+            logger.debug(f"[STATS] Behavior analysis complete for {token_address}")
             return features
             
         except Exception as e:
-            logger.error(f"❌ Behavior analysis failed for {token_address}: {e}")
+            logger.error(f"[ERROR] Behavior analysis failed for {token_address}: {e}")
             return BehaviorFeatures()
     
     async def _analyze_liquidity(
@@ -700,7 +700,7 @@ class HoneypotDetector:
             return features
             
         except Exception as e:
-            logger.error(f"❌ Liquidity analysis failed for {token_address}: {e}")
+            logger.error(f"[ERROR] Liquidity analysis failed for {token_address}: {e}")
             return LiquidityFeatures()
     
     async def _analyze_ownership(
@@ -729,7 +729,7 @@ class HoneypotDetector:
             return features
             
         except Exception as e:
-            logger.error(f"❌ Ownership analysis failed for {token_address}: {e}")
+            logger.error(f"[ERROR] Ownership analysis failed for {token_address}: {e}")
             return OwnershipFeatures()
     
     def _generate_suspicious_opcodes(self) -> List[str]:
@@ -1011,33 +1011,33 @@ class HoneypotDetector:
         
         # Warning flags
         if bytecode.has_blacklist_patterns:
-            warnings.append("🚨 Blacklist functionality detected")
+            warnings.append("[ALERT] Blacklist functionality detected")
         if bytecode.has_hidden_mint:
-            warnings.append("🚨 Hidden mint function detected")
+            warnings.append("[ALERT] Hidden mint function detected")
         if not ownership.is_ownership_renounced:
-            warnings.append("⚠️ Contract ownership not renounced")
+            warnings.append("[WARN] Contract ownership not renounced")
         if behavior.sell_success_rate < 0.5:
-            warnings.append("🚨 Low sell success rate detected")
+            warnings.append("[ALERT] Low sell success rate detected")
         if liquidity.total_liquidity_usd < 10000:
-            warnings.append("⚠️ Low liquidity detected")
+            warnings.append("[WARN] Low liquidity detected")
         if ownership.emergency_functions:
-            warnings.append("⚠️ Emergency functions present")
+            warnings.append("[WARN] Emergency functions present")
         if behavior.failed_transactions_ratio > 0.3:
-            warnings.append("🚨 High transaction failure rate")
+            warnings.append("[ALERT] High transaction failure rate")
         
         # Safe indicators
         if ownership.is_ownership_renounced:
-            safe_indicators.append("✅ Contract ownership renounced")
+            safe_indicators.append("[OK] Contract ownership renounced")
         if liquidity.liquidity_locked_percentage > 50:
-            safe_indicators.append("✅ Significant liquidity locked")
+            safe_indicators.append("[OK] Significant liquidity locked")
         if bytecode.has_reentrancy_guards:
-            safe_indicators.append("✅ Reentrancy protection implemented")
+            safe_indicators.append("[OK] Reentrancy protection implemented")
         if behavior.sell_success_rate > 0.9:
-            safe_indicators.append("✅ High sell success rate")
+            safe_indicators.append("[OK] High sell success rate")
         if liquidity.total_liquidity_usd > 100000:
-            safe_indicators.append("✅ High liquidity pool")
+            safe_indicators.append("[OK] High liquidity pool")
         if ownership.multi_sig_setup:
-            safe_indicators.append("✅ Multi-signature setup detected")
+            safe_indicators.append("[OK] Multi-signature setup detected")
         
         return warnings, safe_indicators
     
@@ -1141,7 +1141,7 @@ class HoneypotDetector:
     async def _save_honeypot_signatures(self) -> None:
         """Save honeypot signatures to storage."""
         # In production, this would save to a database or file
-        logger.info("💾 Honeypot signatures saved")
+        logger.info("[DATA] Honeypot signatures saved")
     
     async def _calculate_ensemble_metrics(self, X: np.ndarray, y: np.ndarray) -> None:
         """Calculate ensemble performance metrics."""
@@ -1150,16 +1150,16 @@ class HoneypotDetector:
         self.false_positive_rate = 0.008
         self.false_negative_rate = 0.005
         
-        logger.info(f"📊 Ensemble metrics calculated - Accuracy: {self.ensemble_accuracy:.1%}")
+        logger.info(f"[STATS] Ensemble metrics calculated - Accuracy: {self.ensemble_accuracy:.1%}")
     
     async def _save_models(self) -> None:
         """Save trained models to disk."""
         # In production, this would save models to files
-        logger.info("💾 Honeypot detection models saved")
+        logger.info("[DATA] Honeypot detection models saved")
     
     async def _validate_models(self) -> None:
         """Validate model performance."""
         if self.ensemble_accuracy < 0.99:
-            logger.warning(f"⚠️ Ensemble accuracy {self.ensemble_accuracy:.1%} below 99% target")
+            logger.warning(f"[WARN] Ensemble accuracy {self.ensemble_accuracy:.1%} below 99% target")
         else:
-            logger.info(f"✅ Model validation passed - {self.ensemble_accuracy:.1%} accuracy achieved")
+            logger.info(f"[OK] Model validation passed - {self.ensemble_accuracy:.1%} accuracy achieved")

@@ -166,15 +166,15 @@ async def get_dashboard_stats() -> DashboardStatsResponse:
         HTTPException: If stats generation fails
     """
     try:
-        logger.info("📊 Generating dashboard statistics...")
+        logger.info("[STATS] Generating dashboard statistics...")
         
         stats = generate_sample_dashboard_stats()
         
-        logger.info(f"✅ Dashboard stats generated: {stats.total_opportunities} opportunities")
+        logger.info(f"[OK] Dashboard stats generated: {stats.total_opportunities} opportunities")
         return stats
         
     except Exception as error:
-        logger.error(f"❌ Failed to generate dashboard stats: {error}")
+        logger.error(f"[ERROR] Failed to generate dashboard stats: {error}")
         raise HTTPException(
             status_code=500,
             detail=f"Dashboard statistics generation failed: {str(error)}"
@@ -203,7 +203,7 @@ async def get_dashboard_health() -> Dict[str, Any]:
         }
         
     except Exception as error:
-        logger.error(f"❌ Dashboard health check failed: {error}")
+        logger.error(f"[ERROR] Dashboard health check failed: {error}")
         raise HTTPException(
             status_code=500,
             detail=f"Dashboard health check failed: {str(error)}"
@@ -233,7 +233,7 @@ async def discover_tokens(
         HTTPException: If token discovery fails
     """
     try:
-        logger.info(f"🔍 Discovering tokens: limit={limit}, network={network}, risk_level={risk_level}")
+        logger.info(f"[SEARCH] Discovering tokens: limit={limit}, network={network}, risk_level={risk_level}")
         
         # Generate sample tokens
         tokens = generate_sample_tokens(limit)
@@ -255,11 +255,11 @@ async def discover_tokens(
             supported_networks=["ethereum", "polygon", "bsc", "arbitrum", "avalanche", "fantom", "harmony", "moonriver"]
         )
         
-        logger.info(f"✅ Token discovery completed: {len(response.discovered_tokens)} tokens found")
+        logger.info(f"[OK] Token discovery completed: {len(response.discovered_tokens)} tokens found")
         return response
         
     except Exception as error:
-        logger.error(f"❌ Token discovery failed: {error}")
+        logger.error(f"[ERROR] Token discovery failed: {error}")
         raise HTTPException(
             status_code=500,
             detail=f"Token discovery failed: {str(error)}"
@@ -315,7 +315,7 @@ async def get_supported_networks() -> Dict[str, Any]:
         }
         
     except Exception as error:
-        logger.error(f"❌ Failed to get supported networks: {error}")
+        logger.error(f"[ERROR] Failed to get supported networks: {error}")
         raise HTTPException(
             status_code=500,
             detail=f"Network information retrieval failed: {str(error)}"
@@ -364,7 +364,7 @@ async def get_token_analytics() -> Dict[str, Any]:
         }
         
     except Exception as error:
-        logger.error(f"❌ Failed to get token analytics: {error}")
+        logger.error(f"[ERROR] Failed to get token analytics: {error}")
         raise HTTPException(
             status_code=500,
             detail=f"Analytics retrieval failed: {str(error)}"
@@ -398,7 +398,7 @@ async def get_tokens_health() -> Dict[str, Any]:
         }
         
     except Exception as error:
-        logger.error(f"❌ Token discovery health check failed: {error}")
+        logger.error(f"[ERROR] Token discovery health check failed: {error}")
         raise HTTPException(
             status_code=500,
             detail=f"Token discovery health check failed: {str(error)}"

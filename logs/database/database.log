@@ -1,0 +1,31 @@
+2025-08-09 08:37:20 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 08:39:44 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 08:40:08 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 08:44:07 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 08:44:12 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 08:46:18 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 08:46:20 - app.models.database - INFO - logger.py:204 - [LOG] Logger initialized for app.models.database (component: database)
+2025-08-09 08:47:54 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 08:47:55 - app.models.database - INFO - logger.py:204 - [LOG] Logger initialized for app.models.database (component: database)
+2025-08-09 08:47:55 - app.models.database - INFO - database.py:33 - [OK] Database models initialized
+2025-08-09 08:48:48 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 08:48:49 - app.models.database - INFO - logger.py:204 - [LOG] Logger initialized for app.models.database (component: database)
+2025-08-09 08:48:49 - app.models.database - INFO - database.py:33 - [OK] Database models initialized
+2025-08-09 08:50:08 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 08:50:09 - app.models.database - INFO - logger.py:204 - [LOG] Logger initialized for app.models.database (component: database)
+2025-08-09 08:50:09 - app.models.database - INFO - database.py:33 - [OK] Database models initialized
+2025-08-09 08:57:21 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 08:57:22 - app.models.database - INFO - logger.py:204 - [LOG] Logger initialized for app.models.database (component: database)
+2025-08-09 08:57:22 - app.models.database - INFO - database.py:33 - [OK] Database models initialized
+2025-08-09 08:58:53 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 08:58:54 - app.models.database - INFO - logger.py:204 - [LOG] Logger initialized for app.models.database (component: database)
+2025-08-09 08:58:54 - app.models.database - INFO - database.py:33 - [OK] Database models initialized
+2025-08-09 08:59:46 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 08:59:47 - app.models.database - INFO - logger.py:204 - [LOG] Logger initialized for app.models.database (component: database)
+2025-08-09 08:59:47 - app.models.database - INFO - database.py:33 - [OK] Database models initialized
+2025-08-09 09:00:43 - app.core.database.persistence_manager - INFO - logger.py:204 - [LOG] Logger initialized for app.core.database.persistence_manager (component: database)
+2025-08-09 09:00:44 - app.models.database - INFO - logger.py:204 - [LOG] Logger initialized for app.models.database (component: database)
+2025-08-09 09:00:44 - app.models.database - INFO - database.py:33 - [OK] Database models initialized
+2025-08-09 09:00:46 - app.core.database.persistence_manager - INFO - persistence_manager.py:179 - [DATA] Initializing persistence manager: data\trading_bot.db
+2025-08-09 09:00:47 - app.core.database.persistence_manager - INFO - persistence_manager.py:354 - [OK] Database tables created successfully
+2025-08-09 09:00:47 - app.core.database.persistence_manager - ERROR - persistence_manager.py:210 - [ERROR] Database initialization failed: 'PersistenceManager' object has no attribute '_verify_tables'

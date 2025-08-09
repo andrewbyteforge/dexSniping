@@ -177,7 +177,7 @@ class ApplicationSettings:
         self._load_from_environment()
         self._load_from_files()
         
-        logger.info(f"⚙️ Settings loaded for {environment.value} environment")
+        logger.info(f"[CONFIG] Settings loaded for {environment.value} environment")
     
     def _load_default_networks(self):
         """Load default network configurations."""
@@ -269,7 +269,7 @@ class ApplicationSettings:
                 # Replace first RPC URL with environment override
                 self.networks[network_name].rpc_urls[0] = os.getenv(env_key)
         
-        logger.info("✅ Environment variables loaded")
+        logger.info("[OK] Environment variables loaded")
     
     def _load_from_files(self):
         """Load configuration from files."""
@@ -282,10 +282,10 @@ class ApplicationSettings:
                     file_config = json.load(f)
                 
                 self._apply_file_config(file_config)
-                logger.info(f"✅ Configuration loaded from {config_file}")
+                logger.info(f"[OK] Configuration loaded from {config_file}")
                 
             except Exception as e:
-                logger.error(f"❌ Error loading config file {config_file}: {e}")
+                logger.error(f"[ERROR] Error loading config file {config_file}: {e}")
         
         # Load user-specific overrides
         user_config = self.config_dir / "user_config.json"
@@ -295,10 +295,10 @@ class ApplicationSettings:
                     user_overrides = json.load(f)
                 
                 self._apply_file_config(user_overrides)
-                logger.info("✅ User configuration overrides applied")
+                logger.info("[OK] User configuration overrides applied")
                 
             except Exception as e:
-                logger.error(f"❌ Error loading user config: {e}")
+                logger.error(f"[ERROR] Error loading user config: {e}")
     
     def _apply_file_config(self, config: Dict[str, Any]):
         """Apply configuration from file."""
@@ -387,11 +387,11 @@ class ApplicationSettings:
                 errors.append("PostgreSQL host and database name required")
         
         if errors:
-            logger.warning(f"⚠️ Configuration validation found {len(errors)} issues")
+            logger.warning(f"[WARN] Configuration validation found {len(errors)} issues")
             for error in errors:
                 logger.warning(f"   - {error}")
         else:
-            logger.info("✅ Configuration validation passed")
+            logger.info("[OK] Configuration validation passed")
         
         return errors
     
@@ -434,21 +434,21 @@ class ApplicationSettings:
             for key, value in updates.items():
                 if key in valid_keys:
                     setattr(self.trading, key, value)
-                    logger.info(f"✅ Updated trading.{key} = {value}")
+                    logger.info(f"[OK] Updated trading.{key} = {value}")
                 else:
-                    logger.warning(f"⚠️ Invalid trading config key: {key}")
+                    logger.warning(f"[WARN] Invalid trading config key: {key}")
                     return False
             
             # Validate updated configuration
             errors = self.validate_configuration()
             if errors:
-                logger.error("❌ Updated configuration is invalid")
+                logger.error("[ERROR] Updated configuration is invalid")
                 return False
             
             return True
             
         except Exception as e:
-            logger.error(f"❌ Error updating trading configuration: {e}")
+            logger.error(f"[ERROR] Error updating trading configuration: {e}")
             return False
     
     def save_configuration(self, include_sensitive: bool = False) -> bool:
@@ -487,11 +487,11 @@ class ApplicationSettings:
             with open(config_file, 'w') as f:
                 json.dump(config_data, f, indent=2, default=str)
             
-            logger.info(f"✅ Configuration saved to {config_file}")
+            logger.info(f"[OK] Configuration saved to {config_file}")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Error saving configuration: {e}")
+            logger.error(f"[ERROR] Error saving configuration: {e}")
             return False
     
     def get_configuration_summary(self) -> Dict[str, Any]:
@@ -616,13 +616,13 @@ METRICS_ENABLED=true
             with open(env_file, 'w') as f:
                 f.write(env_template)
             
-            logger.info("✅ Sample configuration files created")
+            logger.info("[OK] Sample configuration files created")
             logger.info(f"   - {dev_file}")
             logger.info(f"   - {prod_file}")
             logger.info(f"   - {env_file}")
             
         except Exception as e:
-            logger.error(f"❌ Error creating sample config files: {e}")
+            logger.error(f"[ERROR] Error creating sample config files: {e}")
 
 
 # Global settings instance
@@ -648,7 +648,7 @@ def get_settings(environment: Optional[Environment] = None) -> ApplicationSettin
             try:
                 environment = Environment(env_name)
             except ValueError:
-                logger.warning(f"⚠️ Invalid environment '{env_name}', using development")
+                logger.warning(f"[WARN] Invalid environment '{env_name}', using development")
                 environment = Environment.DEVELOPMENT
         
         _settings_instance = ApplicationSettings(environment)
@@ -678,11 +678,11 @@ def initialize_configuration(environment: Optional[Environment] = None) -> Appli
         if not (settings.config_dir / f"{settings.environment.value}.json").exists():
             settings.create_sample_config_files()
         
-        logger.info(f"✅ Configuration system initialized for {settings.environment.value}")
+        logger.info(f"[OK] Configuration system initialized for {settings.environment.value}")
         return settings
         
     except Exception as e:
-        logger.error(f"❌ Configuration initialization failed: {e}")
+        logger.error(f"[ERROR] Configuration initialization failed: {e}")
         raise
 
 

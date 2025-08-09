@@ -74,7 +74,7 @@ def get_wallet_manager() -> EnhancedWalletManager:
     try:
         return get_enhanced_wallet_manager()
     except Exception as e:
-        logger.error(f"❌ Failed to get wallet manager: {e}")
+        logger.error(f"[ERROR] Failed to get wallet manager: {e}")
         raise HTTPException(status_code=500, detail="Wallet manager unavailable")
 
 
@@ -91,7 +91,7 @@ async def connect_wallet(
     This endpoint initiates a wallet connection process and returns connection details.
     """
     try:
-        logger.info(f"🔗 API: Connecting {request.wallet_type.value} to {request.network_type.value}")
+        logger.info(f"[LINK] API: Connecting {request.wallet_type.value} to {request.network_type.value}")
         
         result = await wallet_manager.connect_wallet(
             wallet_type=request.wallet_type,
@@ -100,7 +100,7 @@ async def connect_wallet(
         )
         
         if result["success"]:
-            logger.info(f"✅ API: Wallet connected successfully - ID: {result['connection_id']}")
+            logger.info(f"[OK] API: Wallet connected successfully - ID: {result['connection_id']}")
             
             return WalletConnectionResponse(
                 success=True,
@@ -116,7 +116,7 @@ async def connect_wallet(
                 message=result["message"]
             )
         else:
-            logger.warning(f"⚠️ API: Wallet connection failed - {result['error']}")
+            logger.warning(f"[WARN] API: Wallet connection failed - {result['error']}")
             
             return WalletConnectionResponse(
                 success=False,
@@ -125,7 +125,7 @@ async def connect_wallet(
             
     except Exception as e:
         error_msg = f"Wallet connection API error: {e}"
-        logger.error(f"❌ {error_msg}")
+        logger.error(f"[ERROR] {error_msg}")
         
         return WalletConnectionResponse(
             success=False,
@@ -145,26 +145,26 @@ async def disconnect_wallet(
         connection_id: The connection ID to disconnect
     """
     try:
-        logger.info(f"🔌 API: Disconnecting wallet - ID: {connection_id}")
+        logger.info(f"[CONNECT] API: Disconnecting wallet - ID: {connection_id}")
         
         result = await wallet_manager.disconnect_wallet(connection_id)
         
         if result["success"]:
-            logger.info(f"✅ API: Wallet disconnected successfully")
+            logger.info(f"[OK] API: Wallet disconnected successfully")
             return {
                 "success": True,
                 "message": result["message"],
                 "connection_id": connection_id
             }
         else:
-            logger.warning(f"⚠️ API: Wallet disconnection failed - {result['error']}")
+            logger.warning(f"[WARN] API: Wallet disconnection failed - {result['error']}")
             raise HTTPException(status_code=404, detail=result["error"])
             
     except HTTPException:
         raise
     except Exception as e:
         error_msg = f"Wallet disconnection API error: {e}"
-        logger.error(f"❌ {error_msg}")
+        logger.error(f"[ERROR] {error_msg}")
         raise HTTPException(status_code=500, detail=error_msg)
 
 
@@ -191,7 +191,7 @@ async def get_active_connections(
         
     except Exception as e:
         error_msg = f"Get connections API error: {e}"
-        logger.error(f"❌ {error_msg}")
+        logger.error(f"[ERROR] {error_msg}")
         raise HTTPException(status_code=500, detail=error_msg)
 
 
@@ -215,7 +215,7 @@ async def get_supported_wallets(
         
     except Exception as e:
         error_msg = f"Get supported wallets API error: {e}"
-        logger.error(f"❌ {error_msg}")
+        logger.error(f"[ERROR] {error_msg}")
         raise HTTPException(status_code=500, detail=error_msg)
 
 
@@ -233,19 +233,19 @@ async def get_wallet_balance(
         connection_id: The connection ID to get balance for
     """
     try:
-        logger.info(f"💰 API: Getting wallet balance - ID: {connection_id}")
+        logger.info(f"[TRADE] API: Getting wallet balance - ID: {connection_id}")
         
         result = await wallet_manager.get_wallet_balance(connection_id)
         
         if result["success"]:
-            logger.info(f"✅ API: Balance retrieved successfully")
+            logger.info(f"[OK] API: Balance retrieved successfully")
             
             return WalletBalanceResponse(
                 success=True,
                 balance=result["balance"]
             )
         else:
-            logger.warning(f"⚠️ API: Balance retrieval failed - {result['error']}")
+            logger.warning(f"[WARN] API: Balance retrieval failed - {result['error']}")
             
             return WalletBalanceResponse(
                 success=False,
@@ -254,7 +254,7 @@ async def get_wallet_balance(
             
     except Exception as e:
         error_msg = f"Get balance API error: {e}"
-        logger.error(f"❌ {error_msg}")
+        logger.error(f"[ERROR] {error_msg}")
         
         return WalletBalanceResponse(
             success=False,
@@ -274,19 +274,19 @@ async def refresh_wallet_balance(
         connection_id: The connection ID to refresh balance for
     """
     try:
-        logger.info(f"🔄 API: Refreshing wallet balance - ID: {connection_id}")
+        logger.info(f"[UPDATE] API: Refreshing wallet balance - ID: {connection_id}")
         
         result = await wallet_manager.refresh_wallet_balance(connection_id)
         
         if result["success"]:
-            logger.info(f"✅ API: Balance refreshed successfully")
+            logger.info(f"[OK] API: Balance refreshed successfully")
             
             return WalletBalanceResponse(
                 success=True,
                 balance=result["balance"]
             )
         else:
-            logger.warning(f"⚠️ API: Balance refresh failed - {result['error']}")
+            logger.warning(f"[WARN] API: Balance refresh failed - {result['error']}")
             
             return WalletBalanceResponse(
                 success=False,
@@ -295,7 +295,7 @@ async def refresh_wallet_balance(
             
     except Exception as e:
         error_msg = f"Refresh balance API error: {e}"
-        logger.error(f"❌ {error_msg}")
+        logger.error(f"[ERROR] {error_msg}")
         
         return WalletBalanceResponse(
             success=False,
@@ -314,7 +314,7 @@ async def switch_wallet_network(
     Switch wallet to a different blockchain network.
     """
     try:
-        logger.info(f"🔄 API: Switching network - ID: {request.connection_id}, Network: {request.new_network.value}")
+        logger.info(f"[UPDATE] API: Switching network - ID: {request.connection_id}, Network: {request.new_network.value}")
         
         result = await wallet_manager.switch_network(
             connection_id=request.connection_id,
@@ -322,17 +322,17 @@ async def switch_wallet_network(
         )
         
         if result["success"]:
-            logger.info(f"✅ API: Network switched successfully")
+            logger.info(f"[OK] API: Network switched successfully")
             return result
         else:
-            logger.warning(f"⚠️ API: Network switch failed - {result['error']}")
+            logger.warning(f"[WARN] API: Network switch failed - {result['error']}")
             raise HTTPException(status_code=400, detail=result["error"])
             
     except HTTPException:
         raise
     except Exception as e:
         error_msg = f"Switch network API error: {e}"
-        logger.error(f"❌ {error_msg}")
+        logger.error(f"[ERROR] {error_msg}")
         raise HTTPException(status_code=500, detail=error_msg)
 
 
@@ -360,7 +360,7 @@ async def get_wallet_transactions(
         )
         
         if result["success"]:
-            logger.info(f"✅ API: Transaction history retrieved - {result['total_count']} transactions")
+            logger.info(f"[OK] API: Transaction history retrieved - {result['total_count']} transactions")
             
             return TransactionHistoryResponse(
                 success=True,
@@ -368,7 +368,7 @@ async def get_wallet_transactions(
                 total_count=result["total_count"]
             )
         else:
-            logger.warning(f"⚠️ API: Transaction history failed - {result['error']}")
+            logger.warning(f"[WARN] API: Transaction history failed - {result['error']}")
             
             return TransactionHistoryResponse(
                 success=False,
@@ -377,7 +377,7 @@ async def get_wallet_transactions(
             
     except Exception as e:
         error_msg = f"Get transactions API error: {e}"
-        logger.error(f"❌ {error_msg}")
+        logger.error(f"[ERROR] {error_msg}")
         
         return TransactionHistoryResponse(
             success=False,
@@ -416,13 +416,13 @@ async def wallet_system_health(
             "timestamp": datetime.utcnow().isoformat()
         }
         
-        logger.info("✅ API: Wallet system health check complete")
+        logger.info("[OK] API: Wallet system health check complete")
         
         return health_status
         
     except Exception as e:
         error_msg = f"Wallet health check API error: {e}"
-        logger.error(f"❌ {error_msg}")
+        logger.error(f"[ERROR] {error_msg}")
         
         return {
             "status": "error",
@@ -454,7 +454,7 @@ async def cleanup_expired_connections(
         connections_after = len(wallet_manager.get_active_connections())
         cleaned_count = connections_before - connections_after
         
-        logger.info(f"✅ API: Cleanup complete - removed {cleaned_count} expired connections")
+        logger.info(f"[OK] API: Cleanup complete - removed {cleaned_count} expired connections")
         
         return {
             "success": True,
@@ -466,7 +466,7 @@ async def cleanup_expired_connections(
         
     except Exception as e:
         error_msg = f"Cleanup API error: {e}"
-        logger.error(f"❌ {error_msg}")
+        logger.error(f"[ERROR] {error_msg}")
         raise HTTPException(status_code=500, detail=error_msg)
 
 

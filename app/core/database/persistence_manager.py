@@ -176,7 +176,7 @@ class PersistenceManager:
         self._connection: Optional[Any] = None
         self._initialized = False
         
-        logger.info(f"💾 Initializing persistence manager: {self.db_path}")
+        logger.info(f"[DATA] Initializing persistence manager: {self.db_path}")
     
     async def initialize(self) -> bool:
         """
@@ -189,8 +189,8 @@ class PersistenceManager:
             logger.info("📋 Setting up database schema...")
             
             if not AIOSQLITE_AVAILABLE:
-                logger.warning("⚠️ aiosqlite not available, using mock database")
-                logger.info("💡 Install with: pip install aiosqlite")
+                logger.warning("[WARN] aiosqlite not available, using mock database")
+                logger.info("[INFO] Install with: pip install aiosqlite")
                 # Continue with mock for graceful degradation
             
             # Create database connection
@@ -203,14 +203,14 @@ class PersistenceManager:
             table_count = await self._verify_tables()
             
             self._initialized = True
-            logger.info(f"✅ Database initialized: {table_count} tables ready")
+            logger.info(f"[OK] Database initialized: {table_count} tables ready")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Database initialization failed: {e}")
+            logger.error(f"[ERROR] Database initialization failed: {e}")
             return False
     
-        async def _create_tables(self) -> None:
+    async def _create_tables(self) -> None:
         """
         Create database tables with proper SQLite syntax.
         
@@ -351,8 +351,170 @@ class PersistenceManager:
             
             await self._connection.commit()
             
-            logger.info("✅ Database tables created successfully")
+            logger.info("[OK] Database tables created successfully")
             
         except Exception as error:
-            logger.error(f"❌ Failed to create database tables: {error}")
+            logger.error(f"[ERROR] Failed to create database tables: {error}")
             raise DatabaseError(f"Table creation failed: {error}")
+
+
+# Global persistence manager instance
+_persistence_manager_instance = None
+
+
+async def get_persistence_manager() -> PersistenceManager:
+    """
+    Get or create the global persistence manager instance.
+    
+    Returns:
+        PersistenceManager: The global persistence manager instance
+    """
+    global _persistence_manager_instance
+    
+    try:
+        if _persistence_manager_instance is None:
+            # Create new instance with default database path
+            db_path = "data/trading_bot.db"
+            _persistence_manager_instance = PersistenceManager(db_path)
+            await _persistence_manager_instance.initialize()
+        
+        return _persistence_manager_instance
+        
+    except Exception as error:
+        logger.error(f"[ERROR] Failed to get persistence manager: {error}")
+        # Return a new instance as fallback
+        db_path = "data/trading_bot.db"
+        fallback_manager = PersistenceManager(db_path)
+        try:
+            await fallback_manager.initialize()
+            _persistence_manager_instance = fallback_manager
+            return fallback_manager
+        except Exception as fallback_error:
+            logger.error(f"[ERROR] Fallback persistence manager failed: {fallback_error}")
+            raise RuntimeError(f"Cannot create persistence manager: {fallback_error}")
+
+
+async def initialize_persistence_system() -> bool:
+    """
+    Initialize the persistence system.
+    
+    Returns:
+        bool: True if initialization successful
+    """
+    try:
+        manager = await get_persistence_manager()
+        status = manager.get_database_status()
+        
+        if status.get("operational", False):
+            logger.info("[OK] Persistence system initialized successfully")
+            return True
+        else:
+            logger.error(f"[ERROR] Persistence system not operational: {status}")
+            return False
+            
+    except Exception as error:
+        logger.error(f"[ERROR] Failed to initialize persistence system: {error}")
+        return False
+
+
+def get_persistence_manager_sync() -> PersistenceManager:
+    """
+    Get persistence manager synchronously (for legacy compatibility).
+    
+    Returns:
+        PersistenceManager: Basic persistence manager instance
+    """
+    try:
+        db_path = "data/trading_bot.db"
+        manager = PersistenceManager(db_path)
+        return manager
+    except Exception as error:
+        logger.error(f"[ERROR] Failed to create sync persistence manager: {error}")
+        raise RuntimeError(f"Cannot create persistence manager: {error}")
+
+
+# Global persistence manager instance (legacy compatibility)
+persistence_manager = None
+
+
+async def initialize_global_persistence_manager():
+    """Initialize the global persistence manager for legacy compatibility."""
+    global persistence_manager
+    try:
+        persistence_manager = await get_persistence_manager()
+        return True
+    except Exception as e:
+        logger.error(f"[ERROR] Failed to initialize global persistence manager: {e}")
+        return False
+
+
+def get_global_persistence_manager():
+    """Get the global persistence manager (synchronous)."""
+    global persistence_manager
+    if persistence_manager is None:
+        # Create a basic fallback
+        persistence_manager = get_persistence_manager_sync()
+    return persistence_manager
+\n
+    
+    def get_database_status(self) -> Dict[str, Any]:
+        """
+        Get database status information.
+        
+        Returns:
+            Dict containing database status and statistics
+        """
+        try:
+            status = {
+                "operational": bool(self._connection),
+                "database_path": str(self.db_path),
+                "tables_created": True,
+                "connection_status": "connected" if self._connection else "disconnected",
+                "timestamp": datetime.utcnow().isoformat()
+            }
+            
+            if self._connection:
+                # Try to get some basic stats
+                try:
+                    cursor = self._connection.execute("SELECT COUNT(*) FROM sqlite_master WHERE type='table'")
+                    table_count = cursor.fetchone()[0]
+                    status["table_count"] = table_count
+                except:
+                    status["table_count"] = 0
+            
+            return status
+            
+        except Exception as error:
+            logger.error(f"[ERROR] Failed to get database status: {error}")
+            return {
+                "operational": False,
+                "error": str(error),
+                "timestamp": datetime.utcnow().isoformat()
+            }
+    
+    async def ensure_initialized(self) -> bool:
+        """
+        Ensure the database is properly initialized.
+        
+        Returns:
+            bool: True if initialized successfully
+        """
+        try:
+            if not self._connection:
+                success = await self.initialize()
+                if not success:
+                    logger.error("[ERROR] Database initialization failed")
+                    return False
+            
+            # Verify tables exist
+            try:
+                await self._create_tables()
+                logger.info("[OK] Database tables verified/created")
+                return True
+            except Exception as table_error:
+                logger.error(f"[ERROR] Table creation/verification failed: {table_error}")
+                return False
+                
+        except Exception as error:
+            logger.error(f"[ERROR] Database ensure_initialized failed: {error}")
+            return False
