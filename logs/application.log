@@ -2375,3 +2375,41 @@ pi.v1.endpoints.activity'
 20:21:01 - INFO - app.main - ============================================================
 20:21:01 - INFO - app.main - STARTUP: Application initialization complete!
 20:21:01 - INFO - app.main - INFO: Running in compatibility mode - Phase 4D features will be added as components become available
+20:21:01 - WARNING - app.main - SNIPE: Snipe trading controller not available
+20:21:02 - WARNING - app.main - AI: AI risk assessment engine not available
+20:21:02 - WARNING - app.main - WALLET: Enhanced wallet manager not available
+20:21:02 - INFO - app.main - TEMPLATE: Templates configured
+20:21:02 - INFO - app.main - STATIC: Static files mounted
+20:21:02 - INFO - app.main - ROUTER: Dashboard router included
+20:21:02 - INFO - app.main - ROUTER: Tokens router included
+20:21:02 - INFO - app.main - ROUTER: Trading router included
+20:21:02 - INFO - app.main - STARTUP: Starting DEX Sniper Pro - Phase 4D Enhanced
+20:21:02 - INFO - app.main - ============================================================
+20:21:02 - INFO - app.main - STARTUP: Application initialization complete!
+20:21:02 - INFO - app.main - INFO: Running in compatibility mode - Phase 4D features will be added as components become available
+20:21:02 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Ethereum', 'Polygon', 'Arbitrum'], limit=10
+20:21:02 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+20:21:04 - INFO - app.api.v1.endpoints.dashboard - [OK] Fetching dashboard statistics
+20:21:04 - INFO - app.api.v1.endpoints.dashboard - [OK] Dashboard statistics retrieved successfully
+20:21:04 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Fantom', 'Polygon', 'Ethereum', 'Avalanche', 'Optimism', 'BSC'], limit=10
+20:21:04 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+20:21:15 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Solana', 'Avalanche', 'Ethereum', 'Polygon', 'BSC'], limit=10
+20:21:15 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+20:21:25 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Avalanche', 'Arbitrum', 'Solana', 'Fantom'], limit=10
+20:21:25 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+20:21:35 - INFO - app.api.v1.endpoints.dashboard - [OK] Fetching dashboard statistics
+20:21:35 - INFO - app.api.v1.endpoints.dashboard - [OK] Dashboard statistics retrieved successfully
+20:21:35 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Arbitrum', 'BSC', 'Avalanche', 'Ethereum', 'Polygon', 'Fantom'], limit=10
+20:21:35 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+20:21:45 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['BSC', 'Ethereum', 'Solana', 'Polygon'], limit=10
+20:21:45 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+20:21:56 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Polygon', 'Avalanche', 'Solana', 'Fantom', 'Arbitrum'], limit=10
+20:21:56 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+20:22:06 - INFO - app.api.v1.endpoints.dashboard - [OK] Fetching dashboard statistics
+20:22:06 - INFO - app.api.v1.endpoints.dashboard - [OK] Dashboard statistics retrieved successfully
+20:22:07 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Arbitrum', 'Avalanche', 'Optimism', 'Polygon', 'BSC'], limit=10
+20:22:07 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+20:22:17 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Avalanche', 'Solana', 'BSC', 'Fantom'], limit=10
+20:22:17 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
+20:22:27 - INFO - app.api.v1.endpoints.tokens - [DEBUG] Token discovery request: networks=['Avalanche', 'Arbitrum', 'Ethereum', 'BSC', 'Optimism', 'Solana'], limit=10
+20:22:27 - INFO - app.api.v1.endpoints.tokens - [OK] Generated 10 enhanced tokens for discovery response
