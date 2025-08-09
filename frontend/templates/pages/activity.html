@@ -1,0 +1,378 @@
+{% extends "base/layout.html" %}
+
+{% block title %}Trading Activity{% endblock %}
+{% block page_title %}Trading Activity{% endblock %}
+{% block page_subtitle %}Complete history of your trading operations{% endblock %}
+
+{% block extra_css %}
+<style>
+    .activity-card {
+        transition: transform 0.2s ease-in-out;
+        border-left: 4px solid #e2e8f0;
+    }
+    
+    .activity-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .activity-card.success {
+        border-left-color: #10b981;
+    }
+    
+    .activity-card.loss {
+        border-left-color: #ef4444;
+    }
+    
+    .activity-card.pending {
+        border-left-color: #f59e0b;
+    }
+    
+    .profit-positive {
+        color: #10b981;
+        font-weight: 600;
+    }
+    
+    .profit-negative {
+        color: #ef4444;
+        font-weight: 600;
+    }
+    
+    .profit-pending {
+        color: #f59e0b;
+        font-weight: 600;
+    }
+    
+    .activity-stats {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+    }
+    
+    .filter-controls {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 1rem;
+    }
+    
+    .activity-timeline {
+        position: relative;
+    }
+    
+    .activity-timeline::before {
+        content: '';
+        position: absolute;
+        left: 30px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #e2e8f0;
+    }
+    
+    .activity-item {
+        position: relative;
+        padding-left: 70px;
+        margin-bottom: 2rem;
+    }
+    
+    .activity-icon {
+        position: absolute;
+        left: 20px;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+    }
+    
+    .activity-icon.success {
+        border-color: #10b981;
+        color: #10b981;
+    }
+    
+    .activity-icon.loss {
+        border-color: #ef4444;
+        color: #ef4444;
+    }
+    
+    .activity-icon.pending {
+        border-color: #f59e0b;
+        color: #f59e0b;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Activity Stats -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card activity-stats h-100">
+            <div class="card-body text-center">
+                <h3 class="mb-1" id="totalTrades">127</h3>
+                <small class="opacity-75">Total Trades</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card activity-stats h-100">
+            <div class="card-body text-center">
+                <h3 class="mb-1 text-success" id="successfulTrades">98</h3>
+                <small class="opacity-75">Successful</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card activity-stats h-100">
+            <div class="card-body text-center">
+                <h3 class="mb-1" id="totalProfit">$892.45</h3>
+                <small class="opacity-75">Total Profit</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="card activity-stats h-100">
+            <div class="card-body text-center">
+                <h3 class="mb-1" id="successRate">78.5%</h3>
+                <small class="opacity-75">Success Rate</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Controls -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="filter-controls">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Time Period</label>
+                    <select class="form-select" id="timePeriodFilter">
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month" selected>This Month</option>
+                        <option value="all">All Time</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Trade Type</label>
+                    <select class="form-select" id="tradeTypeFilter">
+                        <option value="all">All Trades</option>
+                        <option value="buy">Buy Orders</option>
+                        <option value="sell">Sell Orders</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-bold">Status</label>
+                    <select class="form-select" id="statusFilter">
+                        <option value="all">All Status</option>
+                        <option value="completed">Completed</option>
+                        <option value="pending">Pending</option>
+                        <option value="failed">Failed</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button class="btn btn-primary w-100" onclick="applyFilters()">
+                        <i class="bi bi-funnel"></i>
+                        Apply Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Activity Timeline -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+            <i class="bi bi-clock-history text-primary"></i>
+            Trading Activity Timeline
+        </h5>
+        <button class="btn btn-outline-primary btn-sm" onclick="refreshActivity()">
+            <i class="bi bi-arrow-clockwise"></i>
+            Refresh
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="activity-timeline" id="activityTimeline">
+            <!-- Activity items will be loaded here -->
+            <div class="activity-item">
+                <div class="activity-icon success">
+                    <i class="bi bi-check"></i>
+                </div>
+                <div class="activity-card card success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">PEPE Token Purchase</h6>
+                                <p class="text-muted mb-1">
+                                    Bought 1,000,000 PEPE at $0.00000123
+                                </p>
+                                <small class="text-muted">
+                                    <i class="bi bi-clock"></i>
+                                    2 hours ago
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                <div class="profit-positive">+$33.40</div>
+                                <small class="text-muted">+26.8%</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="activity-item">
+                <div class="activity-icon success">
+                    <i class="bi bi-arrow-up"></i>
+                </div>
+                <div class="activity-card card success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">WOJAK Token Sale</h6>
+                                <p class="text-muted mb-1">
+                                    Sold 500,000 WOJAK at $0.000045
+                                </p>
+                                <small class="text-muted">
+                                    <i class="bi bi-clock"></i>
+                                    4 hours ago
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                <div class="profit-positive">+$22.50</div>
+                                <small class="text-muted">+15.2%</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="activity-item">
+                <div class="activity-icon loss">
+                    <i class="bi bi-x"></i>
+                </div>
+                <div class="activity-card card loss">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">SHIB Token Purchase</h6>
+                                <p class="text-muted mb-1">
+                                    Bought 2,000,000 SHIB at $0.000008
+                                </p>
+                                <small class="text-muted">
+                                    <i class="bi bi-clock"></i>
+                                    6 hours ago
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                <div class="profit-negative">-$8.30</div>
+                                <small class="text-muted">-5.2%</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="activity-item">
+                <div class="activity-icon pending">
+                    <i class="bi bi-hourglass"></i>
+                </div>
+                <div class="activity-card card pending">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">DOGE Token Purchase</h6>
+                                <p class="text-muted mb-1">
+                                    Pending: 15,000 DOGE at $0.065
+                                </p>
+                                <small class="text-muted">
+                                    <i class="bi bi-clock"></i>
+                                    1 hour ago
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                <div class="profit-pending">Pending</div>
+                                <small class="text-muted">0.0%</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-4">
+            <button class="btn btn-outline-primary" onclick="loadMoreActivity()">
+                <i class="bi bi-plus-circle"></i>
+                Load More Activity
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    console.log('📊 Activity page loaded successfully');
+    
+    function applyFilters() {
+        const timePeriod = document.getElementById('timePeriodFilter').value;
+        const tradeType = document.getElementById('tradeTypeFilter').value;
+        const status = document.getElementById('statusFilter').value;
+        
+        console.log('🔍 Applying filters:', { timePeriod, tradeType, status });
+        
+        // Here you would normally filter the activity data
+        // For now, just show a message
+        alert(`Filters applied: ${timePeriod}, ${tradeType}, ${status}`);
+    }
+    
+    function refreshActivity() {
+        console.log('🔄 Refreshing activity data...');
+        
+        // Simulate refresh with API call
+        fetchActivityData();
+    }
+    
+    function loadMoreActivity() {
+        console.log('📈 Loading more activity...');
+        
+        // Simulate loading more data
+        alert('Loading more activity data...');
+    }
+    
+    async function fetchActivityData() {
+        try {
+            // This would normally call your activity API endpoint
+            console.log('📡 Fetching activity data from API...');
+            
+            // Update stats with mock data
+            updateActivityStats();
+            
+        } catch (error) {
+            console.error('❌ Failed to fetch activity data:', error);
+        }
+    }
+    
+    function updateActivityStats() {
+        // Update the stats with fresh data
+        document.getElementById('totalTrades').textContent = Math.floor(Math.random() * 50) + 100;
+        document.getElementById('successfulTrades').textContent = Math.floor(Math.random() * 20) + 80;
+        document.getElementById('totalProfit').textContent = '$' + (Math.random() * 500 + 500).toFixed(2);
+        document.getElementById('successRate').textContent = (Math.random() * 20 + 70).toFixed(1) + '%';
+    }
+    
+    // Auto-refresh activity every 2 minutes
+    setInterval(fetchActivityData, 120000);
+    
+    // Initial data load
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchActivityData();
+    });
+</script>
+{% endblock %}

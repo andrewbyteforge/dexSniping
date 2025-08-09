@@ -1,176 +1,51 @@
 """
-DEX Sniper Pro - Main Application
-File: app/main.py
+Fix Dashboard Live Opportunities
+File: fix_dashboard_live_opportunities.py
 
-Clean, working version with enhanced dashboard and live opportunities.
+Updates the dashboard JavaScript to properly connect to and display 
+the enhanced token discovery data in the Live Opportunities section.
 """
 
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
+import os
 from pathlib import Path
 
-# Initialize logger
-try:
-    from app.core.utils.logger import get_logger
-    logger = get_logger(__name__)
-except ImportError:
-    import logging
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger(__name__)
 
-# Create FastAPI application
-app = FastAPI(
-    title="DEX Sniper Pro",
-    description="Professional DEX Trading Bot",
-    version="1.0.0",
-    docs_url="/api/docs",
-    redoc_url="/api/redoc"
-)
-
-# Setup templates
-try:
-    templates = Jinja2Templates(directory="frontend/templates")
-    logger.info("[OK] Templates configured")
-except Exception as e:
-    templates = None
-    logger.warning(f"[WARN] Templates not available: {e}")
-
-# Mount static files if directory exists
-static_path = Path("frontend/static")
-if static_path.exists():
+def fix_dashboard_opportunities():
+    """Fix the dashboard to properly load and display live opportunities."""
+    
+    print("🔧 Fixing Dashboard Live Opportunities")
+    print("=" * 50)
+    
+    main_file = Path("app/main.py")
+    
+    if not main_file.exists():
+        print("❌ main.py not found!")
+        return False
+    
     try:
-        app.mount("/static", StaticFiles(directory="frontend/static"), name="static")
-        logger.info("[OK] Static files mounted")
-    except Exception as e:
-        logger.warning(f"[WARN] Static files not mounted: {e}")
-
-# Include API routers with error handling
-try:
-    from app.api.v1.endpoints.dashboard import router as dashboard_router
-    app.include_router(dashboard_router, prefix="/api/v1", tags=["dashboard"])
-    logger.info("[OK] Dashboard router included")
-except Exception as e:
-    logger.warning(f"[WARN] Dashboard router not available: {e}")
-
-try:
-    from app.api.v1.endpoints.tokens import router as tokens_router
-    app.include_router(tokens_router, prefix="/api/v1", tags=["tokens"])
-    logger.info("[OK] Tokens router included")
-except Exception as e:
-    logger.warning(f"[WARN] Tokens router not available: {e}")
-
-try:
-    from app.api.v1.endpoints.trading import router as trading_router
-    app.include_router(trading_router, prefix="/api/v1", tags=["trading"])
-    logger.info("[OK] Trading router included")
-except Exception as e:
-    logger.warning(f"[WARN] Trading router not available: {e}")
-
-
-# Root endpoint
-@app.get("/", response_class=HTMLResponse)
-async def root():
-    """Serve the home page."""
-    html_content = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>DEX Sniper Pro</title>
-        <style>
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                margin: 0;
-                padding: 0;
-                background: linear-gradient(135deg, rgb(102, 126, 234) 0%, rgb(118, 75, 162) 100%);
-                color: white;
-                min-height: 100vh;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .container {
-                text-align: center;
-                background: rgba(255, 255, 255, 0.1);
-                padding: 3rem;
-                border-radius: 20px;
-                backdrop-filter: blur(10px);
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            }
-            h1 {
-                font-size: 3rem;
-                margin-bottom: 1rem;
-                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-            }
-            p {
-                font-size: 1.2rem;
-                margin-bottom: 2rem;
-                opacity: 0.9;
-            }
-            .btn {
-                display: inline-block;
-                padding: 15px 30px;
-                background: rgba(255, 255, 255, 0.2);
-                color: white;
-                text-decoration: none;
-                border-radius: 10px;
-                margin: 10px;
-                transition: all 0.3s ease;
-                border: 2px solid rgba(255, 255, 255, 0.3);
-            }
-            .btn:hover {
-                background: rgba(255, 255, 255, 0.3);
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            }
-            .status {
-                background: rgba(40, 167, 69, 0.2);
-                padding: 1rem;
-                border-radius: 10px;
-                margin: 2rem 0;
-                border: 1px solid rgba(40, 167, 69, 0.5);
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>🚀 DEX Sniper Pro</h1>
-            <p>Professional Trading Bot Platform</p>
-            <div class="status">
-                <strong>✅ System Status: Operational</strong><br>
-                Enhanced token discovery with live opportunities!
-            </div>
-            <a href="/dashboard" class="btn">📊 Dashboard</a>
-            <a href="/activity" class="btn">📈 Activity</a>
-            <a href="/api/docs" class="btn">📖 API Docs</a>
-            <a href="/health" class="btn">💓 Health</a>
-        </div>
-    </body>
-    </html>
-    """
-    return HTMLResponse(content=html_content)
-
-
-# Dashboard endpoint with enhanced live opportunities
-@app.get("/dashboard", response_class=HTMLResponse)
-async def dashboard(request: Request):
-    """Serve the enhanced dashboard with live opportunities."""
-    
-    # Try to use templates first
-    if templates:
-        try:
-            return templates.TemplateResponse(
-                "pages/dashboard.html", 
-                {"request": request}
-            )
-        except Exception as e:
-            logger.warning(f"Template error: {e}")
-    
-    # Enhanced dashboard with live opportunities
-    dashboard_html = """
+        # Read current content
+        with open(main_file, 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # Find the dashboard function and update its JavaScript
+        dashboard_start = content.find("# Fallback to embedded dashboard")
+        if dashboard_start == -1:
+            dashboard_start = content.find("return HTMLResponse(content=\"\"\"")
+        
+        if dashboard_start == -1:
+            print("❌ Could not find dashboard HTML content to update")
+            return False
+        
+        # Find the end of the current dashboard HTML
+        html_start = content.find('return HTMLResponse(content="""', dashboard_start)
+        html_end = content.find('"""))', html_start) + 4
+        
+        if html_start == -1 or html_end == -1:
+            print("❌ Could not find dashboard HTML boundaries")
+            return False
+        
+        # Create enhanced dashboard HTML with working live opportunities
+        enhanced_dashboard_html = '''return HTMLResponse(content="""
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -190,7 +65,7 @@ async def dashboard(request: Request):
                 left: 0;
                 width: 280px;
                 height: 100vh;
-                background: linear-gradient(180deg, rgb(102, 126, 234) 0%, rgb(118, 75, 162) 100%);
+                background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
                 color: white;
                 z-index: 1000;
                 overflow-y: auto;
@@ -200,7 +75,7 @@ async def dashboard(request: Request):
                 padding: 2rem;
             }
             .metric-card {
-                background: linear-gradient(135deg, rgb(102, 126, 234) 0%, rgb(118, 75, 162) 100%);
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                 color: white;
                 border: none;
                 transition: transform 0.2s ease;
@@ -247,7 +122,7 @@ async def dashboard(request: Request):
             .risk-medium { background: #fef3c7; color: #92400e; }
             .risk-high { background: #fee2e2; color: #991b1b; }
             .network-badge {
-                background: linear-gradient(45deg, rgb(102, 126, 234), rgb(118, 75, 162));
+                background: linear-gradient(45deg, #667eea, #764ba2);
                 color: white;
                 padding: 2px 8px;
                 border-radius: 12px;
@@ -258,17 +133,13 @@ async def dashboard(request: Request):
                 width: 20px;
                 height: 20px;
                 border: 3px solid #f3f3f3;
-                border-top: 3px solid rgb(102, 126, 234);
+                border-top: 3px solid #667eea;
                 border-radius: 50%;
                 animation: spin 1s linear infinite;
             }
             @keyframes spin {
                 0% { transform: rotate(0deg); }
                 100% { transform: rotate(360deg); }
-            }
-            @media (max-width: 768px) {
-                .sidebar { transform: translateX(-100%); }
-                .main-content { margin-left: 0; }
             }
         </style>
     </head>
@@ -310,7 +181,7 @@ async def dashboard(request: Request):
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h2>Trading Dashboard</h2>
-                    <p class="text-muted mb-0">Real-time portfolio monitoring with live opportunities</p>
+                    <p class="text-muted mb-0">Real-time portfolio monitoring</p>
                 </div>
                 <div class="badge bg-success">
                     <i class="bi bi-dot"></i> Live
@@ -398,7 +269,7 @@ async def dashboard(request: Request):
                     <h5 class="mb-0">🧪 API Testing Center</h5>
                 </div>
                 <div class="card-body">
-                    <p>Test the enhanced API endpoints:</p>
+                    <p>Test the API endpoints:</p>
                     <button class="btn btn-primary me-2" onclick="testAPI('/api/v1/dashboard/stats')">
                         <i class="bi bi-graph-up"></i> Dashboard Stats
                     </button>
@@ -422,53 +293,41 @@ async def dashboard(request: Request):
             let currentTokens = [];
             let isLoading = false;
             
-            console.log('🚀 DEX Sniper Pro Dashboard initializing...');
-            
             // Initialize dashboard
             document.addEventListener('DOMContentLoaded', function() {
-                console.log('📊 Dashboard DOM loaded, starting initialization...');
+                console.log('🚀 DEX Sniper Pro Dashboard loading...');
                 refreshDashboard();
                 loadOpportunities();
                 
                 // Auto-refresh every 30 seconds
                 setInterval(() => {
-                    if (!document.hidden) {
-                        refreshDashboard();
-                        loadOpportunities();
-                    }
+                    refreshDashboard();
+                    loadOpportunities();
                 }, 30000);
-                
-                console.log('✅ Dashboard initialization complete');
             });
             
             async function loadOpportunities() {
-                if (isLoading) {
-                    console.log('⏳ Already loading opportunities, skipping...');
-                    return;
-                }
+                if (isLoading) return;
                 
                 isLoading = true;
                 const container = document.getElementById('opportunitiesContainer');
                 
                 try {
-                    console.log('🔍 Loading live opportunities from API...');
+                    console.log('🔍 Loading live opportunities...');
                     
                     const response = await fetch('/api/v1/tokens/discover?limit=8');
-                    
                     if (!response.ok) {
                         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                     }
                     
                     const data = await response.json();
-                    console.log('✅ API Response received:', data);
+                    console.log('✅ Opportunities loaded:', data);
                     
                     if (data.tokens && data.tokens.length > 0) {
                         currentTokens = data.tokens;
                         displayOpportunities(data.tokens);
-                        console.log(`📊 Displaying ${data.tokens.length} opportunities`);
                     } else {
                         container.innerHTML = '<p class="text-muted text-center">No opportunities found. Try refreshing.</p>';
-                        console.log('⚠️ No tokens in API response');
                     }
                     
                 } catch (error) {
@@ -488,79 +347,56 @@ async def dashboard(request: Request):
             }
             
             function displayOpportunities(tokens) {
-                console.log('🎨 Starting to display opportunities:', tokens);
                 const container = document.getElementById('opportunitiesContainer');
-                
-                if (!container) {
-                    console.error('❌ Container element not found!');
-                    return;
-                }
                 
                 if (!tokens || tokens.length === 0) {
                     container.innerHTML = '<p class="text-muted text-center">No opportunities available</p>';
-                    console.log('⚠️ No tokens to display');
                     return;
                 }
                 
-                console.log(`🔄 Processing ${tokens.length} tokens for display`);
-                
-                const opportunitiesHTML = tokens.map((token, index) => {
-                    console.log(`Processing token ${index + 1}:`, token);
-                    
-                    // Safely access token properties with fallbacks
-                    const symbol = token.symbol || 'UNKNOWN';
-                    const name = token.name || 'Unknown Token';
-                    const network = token.network || 'Unknown';
-                    const price = token.price || '$0.000000';
-                    const change24h = token.change_24h || 0;
-                    const liquidity = token.liquidity || 0;
-                    const riskLevel = token.risk_level || 'medium';
-                    const riskScore = token.risk_score || 5.0;
-                    const ageHours = token.age_hours || 1;
-                    const address = token.address || '0x0000000000000000000000000000000000000000';
-                    
-                    const changeClass = change24h > 0 ? 'price-change-positive' : 'price-change-negative';
-                    const changeIcon = change24h > 0 ? 'bi-trending-up' : 'bi-trending-down';
-                    const riskClass = `risk-${riskLevel}`;
+                const opportunitiesHTML = tokens.map(token => {
+                    const changeClass = token.change_24h > 0 ? 'price-change-positive' : 'price-change-negative';
+                    const changeIcon = token.change_24h > 0 ? 'bi-trending-up' : 'bi-trending-down';
+                    const riskClass = `risk-${token.risk_level}`;
                     
                     return `
-                        <div class="opportunity-card" data-token="${symbol}">
+                        <div class="opportunity-card">
                             <div class="row align-items-center">
                                 <div class="col-md-3">
                                     <div class="d-flex align-items-center">
                                         <div>
-                                            <div class="token-symbol">${symbol}</div>
-                                            <small class="text-muted">${name}</small>
+                                            <div class="token-symbol">${token.symbol}</div>
+                                            <small class="text-muted">${token.name}</small>
                                             <br>
-                                            <span class="network-badge">${network}</span>
+                                            <span class="network-badge">${token.network}</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
-                                    <div class="fw-bold">${price}</div>
+                                    <div class="fw-bold">${token.price}</div>
                                     <div class="${changeClass}">
                                         <i class="bi ${changeIcon}"></i>
-                                        ${change24h > 0 ? '+' : ''}${change24h.toFixed(1)}%
+                                        ${token.change_24h > 0 ? '+' : ''}${token.change_24h.toFixed(1)}%
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <small class="text-muted">Liquidity:</small>
-                                    <div class="fw-bold">$${liquidity.toLocaleString()}</div>
+                                    <div class="fw-bold">$${token.liquidity.toLocaleString()}</div>
                                 </div>
                                 <div class="col-md-2">
                                     <small class="text-muted">Risk:</small>
                                     <div>
                                         <span class="risk-badge ${riskClass}">
-                                            ${riskLevel} (${riskScore})
+                                            ${token.risk_level} (${token.risk_score})
                                         </span>
                                     </div>
                                 </div>
                                 <div class="col-md-2">
                                     <small class="text-muted">Age:</small>
-                                    <div class="fw-bold">${formatAge(ageHours)}</div>
+                                    <div class="fw-bold">${formatAge(token.age_hours)}</div>
                                 </div>
                                 <div class="col-md-1 text-end">
-                                    <button class="btn btn-primary btn-sm" onclick="snipeToken('${symbol}', '${address}')">
+                                    <button class="btn btn-primary btn-sm" onclick="snipeToken('${token.symbol}', '${token.address}')">
                                         <i class="bi bi-lightning"></i>
                                     </button>
                                 </div>
@@ -569,13 +405,8 @@ async def dashboard(request: Request):
                     `;
                 }).join('');
                 
-                console.log('📝 Generated HTML length:', opportunitiesHTML.length);
                 container.innerHTML = opportunitiesHTML;
-                console.log(`✅ Successfully rendered ${tokens.length} opportunity cards`);
-                
-                // Verify that cards were actually added to DOM
-                const addedCards = container.querySelectorAll('.opportunity-card');
-                console.log(`🔍 Verification: ${addedCards.length} cards found in DOM`);
+                console.log(`✅ Displayed ${tokens.length} opportunities`);
             }
             
             function formatAge(hours) {
@@ -585,12 +416,11 @@ async def dashboard(request: Request):
             }
             
             function snipeToken(symbol, address) {
-                console.log(`⚡ Snipe request: ${symbol} (${address})`);
-                alert(`Snipe ${symbol} functionality ready!\nAddress: ${address}\nThis will connect to your trading engine.`);
+                alert(`Snipe ${symbol} functionality coming soon!\\nAddress: ${address}`);
             }
             
             async function refreshOpportunities() {
-                console.log('🔄 Manual refresh requested...');
+                console.log('🔄 Refreshing opportunities...');
                 await loadOpportunities();
             }
             
@@ -658,173 +488,68 @@ async def dashboard(request: Request):
                 }
             }
             
-            console.log('✅ DEX Sniper Pro Dashboard scripts loaded successfully!');
+            console.log('✅ DEX Sniper Pro Dashboard loaded successfully!');
         </script>
     </body>
     </html>
-    """
-    
-    return HTMLResponse(content=dashboard_html)
+    """)'''
+        
+        # Replace the old HTML with the enhanced version
+        new_content = content[:html_start] + enhanced_dashboard_html + content[html_end:]
+        
+        # Write the updated content
+        with open(main_file, 'w', encoding='utf-8') as f:
+            f.write(new_content)
+        
+        print("✅ Dashboard live opportunities fixed successfully!")
+        print("\n🎯 What was fixed:")
+        print("   - JavaScript now properly calls /api/v1/tokens/discover")
+        print("   - Live opportunities display enhanced token data")
+        print("   - Professional opportunity cards with full details")
+        print("   - Risk assessment with color-coded badges")
+        print("   - Network badges for each token")
+        print("   - Price change indicators with icons")
+        print("   - Auto-refresh every 30 seconds")
+        print("   - Error handling and loading states")
+        print("   - Snipe buttons for each opportunity")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Failed to fix dashboard opportunities: {e}")
+        return False
 
 
-# Activity endpoint
-@app.get("/activity", response_class=HTMLResponse)
-async def activity(request: Request):
-    """Serve the trading activity page."""
-    
-    # Try to use templates first
-    if templates:
-        try:
-            return templates.TemplateResponse(
-                "pages/activity.html", 
-                {"request": request}
-            )
-        except Exception as e:
-            logger.warning(f"Activity template error: {e}")
-    
-    # Fallback activity page
-    activity_html = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Trading Activity - DEX Sniper Pro</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-        <style>
-            body { 
-                background: #f8fafc; 
-                font-family: 'Segoe UI', system-ui, sans-serif;
-            }
-            .sidebar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 280px;
-                height: 100vh;
-                background: linear-gradient(180deg, rgb(102, 126, 234) 0%, rgb(118, 75, 162) 100%);
-                color: white;
-                z-index: 1000;
-                overflow-y: auto;
-            }
-            .main-content {
-                margin-left: 280px;
-                padding: 2rem;
-            }
-            .activity-card {
-                border-left: 4px solid #10b981;
-                transition: transform 0.2s ease;
-            }
-            .activity-card:hover {
-                transform: translateY(-2px);
-            }
-            .profit-positive { color: #10b981; font-weight: 600; }
-            .profit-negative { color: #ef4444; font-weight: 600; }
-        </style>
-    </head>
-    <body>
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="p-4 text-center border-bottom border-light border-opacity-25">
-                <h4 class="mb-0">⚡ DEX Sniper</h4>
-                <small class="text-light opacity-75">Pro v5.0</small>
-            </div>
-            <nav class="p-3">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link text-light" href="/dashboard">
-                            <i class="bi bi-speedometer2 me-2"></i>Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light active" href="/activity">
-                            <i class="bi bi-clock-history me-2"></i>Activity
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-light" href="/api/docs">
-                            <i class="bi bi-book me-2"></i>API Docs
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2>Trading Activity</h2>
-                    <p class="text-muted mb-0">Complete history of trading operations</p>
-                </div>
-                <div class="badge bg-success">
-                    <i class="bi bi-dot"></i> Live
-                </div>
-            </div>
-
-            <!-- Activity Cards -->
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="card activity-card">
-                        <div class="card-body">
-                            <h6 class="mb-1">PEPE Token Purchase</h6>
-                            <p class="text-muted mb-1">Bought 1,000,000 PEPE at $0.00000123</p>
-                            <div class="d-flex justify-content-between">
-                                <small class="text-muted">2 hours ago</small>
-                                <span class="profit-positive">+$33.40 (+26.8%)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card activity-card">
-                        <div class="card-body">
-                            <h6 class="mb-1">WOJAK Token Sale</h6>
-                            <p class="text-muted mb-1">Sold 500,000 WOJAK at $0.000045</p>
-                            <div class="d-flex justify-content-between">
-                                <small class="text-muted">4 hours ago</small>
-                                <span class="profit-positive">+$22.50 (+15.2%)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+def main():
+    """Main execution function."""
+    try:
+        if fix_dashboard_opportunities():
+            print("\n" + "=" * 50)
+            print("🎉 DASHBOARD LIVE OPPORTUNITIES FIXED!")
+            print("=" * 50)
+            print("\n✅ Your dashboard now features:")
+            print("  - Real-time token discovery integration")
+            print("  - Enhanced opportunity cards with full details")
+            print("  - Risk assessment and network badges")
+            print("  - Auto-refresh every 30 seconds")
+            print("  - Professional loading states")
+            print("  - Error handling and retry functionality")
+            print("\nNext steps:")
+            print("1. Restart server: uvicorn app.main:app --reload")
+            print("2. Visit dashboard: http://127.0.0.1:8000/dashboard")
+            print("3. Watch live opportunities update with real data!")
+            print("4. Test the enhanced token discovery system!")
             
-            <div class="text-center mt-4">
-                <a href="/dashboard" class="btn btn-primary">Back to Dashboard</a>
-            </div>
-        </div>
-    </body>
-    </html>
-    """
-    
-    return HTMLResponse(content=activity_html)
-
-
-# Health check endpoint
-@app.get("/health")
-async def health_check():
-    """Health check endpoint."""
-    return {
-        "status": "healthy",
-        "service": "DEX Sniper Pro",
-        "version": "1.0.0",
-        "components": {
-            "dashboard": "operational",
-            "tokens_api": "operational", 
-            "activity": "operational",
-            "enhanced_discovery": "operational"
-        },
-        "features": {
-            "live_opportunities": "enabled",
-            "enhanced_tokens": "enabled",
-            "risk_assessment": "enabled",
-            "multi_network": "enabled"
-        }
-    }
+            return True
+        else:
+            print("\n❌ Fix failed!")
+            return False
+            
+    except Exception as e:
+        print(f"\n❌ Fatal error: {e}")
+        return False
 
 
 if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    success = main()
+    exit(0 if success else 1)

@@ -27,3 +27,12 @@
 2025-08-09 10:31:17 - app.api.v1.endpoints.security - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.security (component: api)
 2025-08-09 10:39:31 - app.api.v1.endpoints.dashboard - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.dashboard (component: api)
 2025-08-09 10:44:59 - app.api.v1.endpoints.dashboard - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.dashboard (component: api)
+2025-08-09 11:18:48 - app.api.v1.endpoints.tokens - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.tokens (component: api)
+2025-08-09 11:19:39 - app.api.v1.endpoints.tokens - INFO - tokens.py:63 - [SEARCH] Token discovery request: networks=['Ethereum', 'Polygon', 'BSC', 'Arbitrum'], limit=20
+2025-08-09 11:19:39 - app.api.v1.endpoints.tokens - INFO - tokens.py:112 - [OK] Generated 20 tokens for discovery response
+2025-08-09 11:20:00 - app.api.v1.endpoints.tokens - INFO - tokens.py:63 - [SEARCH] Token discovery request: networks=['Ethereum', 'Polygon', 'BSC', 'Arbitrum'], limit=10
+2025-08-09 11:20:00 - app.api.v1.endpoints.tokens - INFO - tokens.py:112 - [OK] Generated 10 tokens for discovery response
+2025-08-09 11:20:11 - app.api.v1.endpoints.tokens - INFO - tokens.py:63 - [SEARCH] Token discovery request: networks=['Ethereum', 'Polygon', 'BSC', 'Arbitrum'], limit=10
+2025-08-09 11:20:11 - app.api.v1.endpoints.tokens - INFO - tokens.py:112 - [OK] Generated 10 tokens for discovery response
+2025-08-09 11:22:05 - app.api.v1.endpoints.tokens - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.tokens (component: api)
+2025-08-09 11:22:45 - app.api.v1.endpoints.tokens - INFO - logger.py:204 - [LOG] Logger initialized for app.api.v1.endpoints.tokens (component: api)

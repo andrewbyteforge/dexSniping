@@ -1,4 +1,40 @@
 """
+Enhance Token Discovery System
+File: enhance_token_discovery.py
+
+Replaces the basic mock token data with a more sophisticated token generation
+system that provides realistic, varied, and interesting token data.
+"""
+
+import os
+from pathlib import Path
+
+
+def enhance_tokens_endpoint():
+    """Enhance the tokens endpoint with better mock data and more variety."""
+    
+    print("🚀 Enhancing Token Discovery System")
+    print("=" * 50)
+    
+    tokens_file = Path("app/api/v1/endpoints/tokens.py")
+    
+    if not tokens_file.exists():
+        print("❌ Tokens endpoint file not found!")
+        return False
+    
+    # Backup the current file
+    backup_file = Path("app/api/v1/endpoints/tokens.py.backup")
+    try:
+        with open(tokens_file, 'r', encoding='utf-8') as f:
+            current_content = f.read()
+        with open(backup_file, 'w', encoding='utf-8') as f:
+            f.write(current_content)
+        print(f"✅ Backup created: {backup_file}")
+    except Exception as e:
+        print(f"⚠️ Could not create backup: {e}")
+    
+    # Enhanced tokens endpoint with realistic data
+    enhanced_content = '''"""
 Enhanced Token Discovery API Endpoints
 File: app/api/v1/endpoints/tokens.py
 
@@ -372,3 +408,68 @@ async def get_token_info(network: str, address: str):
         "status": "Token details would be fetched from blockchain",
         "note": "This is a placeholder for individual token lookup"
     }
+'''
+    
+    try:
+        # Write the enhanced content
+        with open(tokens_file, 'w', encoding='utf-8') as f:
+            f.write(enhanced_content)
+        
+        print("✅ Token discovery system enhanced successfully!")
+        print("\n🎯 Enhancements applied:")
+        print("   - 35+ realistic token types (meme, DeFi, gaming, AI, etc.)")
+        print("   - 8 supported networks (Ethereum, Polygon, BSC, etc.)")
+        print("   - Realistic contract addresses per network")
+        print("   - Advanced risk assessment system")
+        print("   - Market metrics calculation")
+        print("   - Price volatility simulation")
+        print("   - Category and risk level filtering")
+        print("   - Trending/hot/new token indicators")
+        print("   - Discovery statistics and analytics")
+        print("\n📋 New API endpoints:")
+        print("   - /api/v1/tokens/categories")
+        print("   - /api/v1/tokens/networks")
+        print("   - /api/v1/tokens/trending")
+        print("   - /api/v1/tokens/stats")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Enhancement failed: {e}")
+        return False
+
+
+def main():
+    """Main execution function."""
+    try:
+        if enhance_tokens_endpoint():
+            print("\n" + "=" * 50)
+            print("🎉 TOKEN DISCOVERY ENHANCEMENT COMPLETE!")
+            print("=" * 50)
+            print("\n✅ Your token discovery now features:")
+            print("  - 35+ diverse token types across multiple categories")
+            print("  - Realistic price volatility and market data")
+            print("  - Advanced risk assessment with multiple factors")
+            print("  - Multi-network support with proper addresses")
+            print("  - Filtering by category, risk level, and network")
+            print("  - Trending, hot, and new token indicators")
+            print("  - Comprehensive discovery statistics")
+            print("\nNext steps:")
+            print("1. Restart server: uvicorn app.main:app --reload")
+            print("2. Visit dashboard: http://127.0.0.1:8000/dashboard")
+            print("3. Test token discovery: http://127.0.0.1:8000/api/v1/tokens/discover")
+            print("4. Enjoy much more varied and realistic token data!")
+            
+            return True
+        else:
+            print("\n❌ Enhancement failed!")
+            return False
+            
+    except Exception as e:
+        print(f"\n❌ Fatal error: {e}")
+        return False
+
+
+if __name__ == "__main__":
+    success = main()
+    exit(0 if success else 1)
