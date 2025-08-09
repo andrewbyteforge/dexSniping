@@ -15,6 +15,13 @@ import traceback
 import json
 from typing import Dict, Any, List
 from datetime import datetime
+import sys
+from pathlib import Path
+
+# Add the project root to Python path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+
 
 from app.utils.logger import setup_logger
 from app.core.blockchain.network_manager_fixed import (
