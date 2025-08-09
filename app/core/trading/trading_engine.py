@@ -9,6 +9,44 @@ from typing import Dict, Any, Optional
 from datetime import datetime
 from enum import Enum
 
+
+from dataclasses import dataclass, field
+from enum import Enum
+from decimal import Decimal
+from datetime import datetime
+from typing import Optional
+
+class OrderIntent(str, Enum):
+    """Order intent enumeration."""
+    BUY = "buy"
+    SELL = "sell"
+
+class StrategyType(str, Enum):
+    """Trading strategy types."""
+    ARBITRAGE = "arbitrage"
+    TREND_FOLLOWING = "trend_following"
+    MOMENTUM = "momentum"
+
+@dataclass
+class TradingSignal:
+    """Trading signal data structure."""
+    signal_id: str
+    strategy_type: StrategyType
+    token_address: str
+    symbol: str
+    intent: OrderIntent
+    confidence: float
+    suggested_amount: Decimal
+    reasoning: str
+    expires_at: datetime
+    created_at: datetime = field(default_factory=datetime.utcnow)
+    
+    @property
+    def is_expired(self) -> bool:
+        """Check if signal has expired."""
+        return datetime.utcnow() > self.expires_at
+
+
 from app.utils.logger import setup_logger
 
 logger = setup_logger(__name__)

@@ -8,6 +8,51 @@ Base blockchain interaction class.
 from typing import Dict, Any, Optional
 from abc import ABC, abstractmethod
 
+
+from enum import Enum
+
+class ChainType(str, Enum):
+    """Blockchain network types."""
+    ETHEREUM = "ethereum"
+    POLYGON = "polygon"
+    BSC = "bsc"
+    ARBITRUM = "arbitrum"
+    OPTIMISM = "optimism"
+    AVALANCHE = "avalanche"
+
+
+
+from dataclasses import dataclass, field
+from decimal import Decimal
+from datetime import datetime
+from typing import Optional, Dict, Any
+
+@dataclass
+class TokenInfo:
+    """Token information data structure."""
+    address: str
+    symbol: str
+    name: str
+    decimals: int
+    total_supply: Optional[Decimal] = None
+    created_at: Optional[datetime] = None
+    creator_address: Optional[str] = None
+    is_verified: bool = False
+    metadata: Dict[str, Any] = field(default_factory=dict)
+
+@dataclass
+class LiquidityInfo:
+    """Liquidity information data structure."""
+    pool_address: str
+    token0: str
+    token1: str
+    reserves0: Decimal
+    reserves1: Decimal
+    total_liquidity_usd: Decimal
+    price_per_token: Decimal
+    last_updated: datetime = field(default_factory=datetime.utcnow)
+
+
 from app.utils.logger import setup_logger
 
 logger = setup_logger(__name__)

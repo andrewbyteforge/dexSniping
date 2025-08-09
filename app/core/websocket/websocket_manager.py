@@ -41,6 +41,12 @@ class WebSocketMessage:
             'timestamp': self.timestamp.isoformat()
         }
 
+    def to_json(self) -> str:
+        """Convert message to JSON string."""
+        import json
+        return json.dumps(self.to_dict(), default=str)
+
+
 
 @dataclass
 class ClientConnection:

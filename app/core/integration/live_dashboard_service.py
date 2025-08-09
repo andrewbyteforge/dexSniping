@@ -21,6 +21,37 @@ from app.utils.exceptions import DexSnipingException
 
 logger = setup_logger(__name__, "application")
 
+from dataclasses import dataclass, field
+from decimal import Decimal
+from datetime import datetime
+
+@dataclass
+class PortfolioSnapshot:
+    """Portfolio snapshot for streaming."""
+    total_value_usd: Decimal
+    total_value_eth: Decimal
+    daily_pnl_usd: Decimal
+    daily_pnl_percentage: Decimal
+    active_positions: int
+    pending_orders: int
+    cash_balance_eth: Decimal
+    timestamp: datetime = field(default_factory=datetime.utcnow)
+    
+    def to_dict(self) -> dict:
+        """Convert to dictionary for WebSocket transmission."""
+        return {
+            "total_value_usd": float(self.total_value_usd),
+            "total_value_eth": float(self.total_value_eth),
+            "daily_pnl_usd": float(self.daily_pnl_usd),
+            "daily_pnl_percentage": float(self.daily_pnl_percentage),
+            "active_positions": self.active_positions,
+            "pending_orders": self.pending_orders,
+            "cash_balance_eth": float(self.cash_balance_eth),
+            "timestamp": self.timestamp.isoformat()
+        }
+
+
+
 
 class LiveDashboardServiceError(DexSnipingException):
     """Exception raised when live dashboard service operations fail."""
@@ -150,6 +181,21 @@ class LiveDashboardService:
         }
         
         logger.info("[OK] Live Dashboard Service initialized")
+
+    async def initialize(self) -> None:
+        """Initialize the live dashboard service."""
+        try:
+            # Initialize WebSocket service if not provided
+            if self.websocket_service is None:
+                from app.core.websocket.websocket_manager import get_websocket_service
+                self.websocket_service = await get_websocket_service()
+            
+            logger.info("✅ Live Dashboard Service initialized successfully")
+            
+        except Exception as error:
+            logger.error(f"❌ Failed to initialize Live Dashboard Service: {error}")
+            raise
+
     
     async def start(self) -> None:
         """Start the live dashboard service."""

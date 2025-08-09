@@ -1,180 +1,107 @@
 """
-DEX Sniper Pro Exception System
+Enhanced Exceptions Module
 File: app/core/exceptions.py
 
-Comprehensive exception handling for the trading bot.
+Comprehensive exception classes for the DEX Sniper Pro trading bot.
 """
 
-
-class DEXSniperError(Exception):
-    """Base exception class for DEX Sniper Pro."""
-    
-    def __init__(self, message: str, error_code: str = None, details: dict = None):
-        """Initialize exception with message, code, and details."""
-        super().__init__(message)
-        self.message = message
-        self.error_code = error_code or "UNKNOWN_ERROR"
-        self.details = details or {}
-        
-    def __str__(self):
-        return f"{self.error_code}: {self.message}"
-
-
-# ==================== SECURITY EXCEPTIONS ====================
-
-class SecurityError(DEXSniperError):
-    """Exception for security-related issues."""
+class DexSnipingException(Exception):
+    """Base exception for DEX sniping operations."""
     pass
 
-
-class AuthenticationError(DEXSniperError):
-    """Exception for authentication failures."""
+class TradingError(DexSnipingException):
+    """Exception raised when trading operations fail."""
     pass
 
-
-class AuthorizationError(DEXSniperError):
-    """Exception for authorization failures."""
+class ConfigurationError(DexSnipingException):
+    """Exception raised when configuration is invalid."""
     pass
 
-
-class ValidationError(DEXSniperError):
-    """Exception for data validation failures."""
+class WalletError(DexSnipingException):
+    """Exception raised when wallet operations fail."""
     pass
 
-
-class AccessDeniedError(SecurityError):
-    """Exception for access denied scenarios."""
+class NetworkError(DexSnipingException):
+    """Exception raised when network operations fail."""
     pass
 
-
-class CredentialError(AuthenticationError):
-    """Exception for credential-related issues."""
+class DatabaseError(DexSnipingException):
+    """Exception raised when database operations fail."""
     pass
 
-
-# ==================== WALLET EXCEPTIONS ====================
-
-class WalletError(DEXSniperError):
-    """Base class for wallet-related errors."""
+class ValidationError(DexSnipingException):
+    """Exception raised when data validation fails."""
     pass
 
-
-class WalletConnectionError(WalletError):
-    """Exception for wallet connection failures."""
+# AI and Analysis Exceptions
+class AIAnalysisError(DexSnipingException):
+    """Exception raised when AI analysis operations fail."""
     pass
 
-
-class InsufficientFundsError(WalletError):
-    """Exception for insufficient wallet funds."""
+class HoneypotDetectionError(AIAnalysisError):
+    """Exception raised when honeypot detection fails."""
     pass
 
-
-class InvalidAddressError(WalletError):
-    """Exception for invalid wallet addresses."""
+class RiskAssessmentError(AIAnalysisError):
+    """Exception raised when risk assessment fails."""
     pass
 
-
-# ==================== TRADING EXCEPTIONS ====================
-
-class TradingError(DEXSniperError):
-    """Base class for trading-related errors."""
+class ModelLoadError(AIAnalysisError):
+    """Exception raised when ML model loading fails."""
     pass
 
+# Strategy and Trading Exceptions
+class StrategyExecutionError(TradingError):
+    """Exception raised when strategy execution fails."""
+    pass
 
 class OrderExecutionError(TradingError):
-    """Exception for order execution failures."""
+    """Exception raised when order execution fails."""
     pass
 
-
-class RiskLimitExceededError(TradingError):
-    """Exception for risk limit violations."""
+class InsufficientFundsError(TradingError):
+    """Exception raised when insufficient funds for trading."""
     pass
 
-
-# ==================== NETWORK EXCEPTIONS ====================
-
-class NetworkError(DEXSniperError):
-    """Base class for network-related errors."""
+# Multi-chain and WebSocket Exceptions
+class MultiChainError(DexSnipingException):
+    """Exception raised when multi-chain operations fail."""
     pass
 
-
-class ConnectionError(NetworkError):
-    """Exception for network connection issues."""
+class WebSocketError(DexSnipingException):
+    """Exception raised when WebSocket operations fail."""
     pass
 
-
-class RPCError(NetworkError):
-    """Exception for RPC communication errors."""
+class ChainConnectionException(NetworkError):
+    """Exception raised when blockchain connection fails."""
     pass
 
+# Backwards compatibility aliases
+TokenScannerError = DexSnipingException
+ContractAnalysisError = AIAnalysisError
 
-# ==================== SERVICE EXCEPTIONS ====================
 
-class ServiceError(DEXSniperError):
-    """Base class for service-level errors."""
+# DEX and Trading Related Exceptions
+class DEXError(DexSnipingException):
+    """Exception raised when DEX operations fail."""
     pass
 
-
-class ServiceUnavailableError(ServiceError):
-    """Exception for unavailable services."""
+class SwapError(DEXError):
+    """Exception raised when swap operations fail."""
     pass
 
-
-class ConfigurationError(ServiceError):
-    """Exception for configuration issues."""
+class LiquidityError(DEXError):
+    """Exception raised when liquidity operations fail."""
     pass
 
-
-class InitializationError(ServiceError):
-    """Exception for initialization failures."""
+class SlippageError(DEXError):
+    """Exception raised when slippage is too high."""
     pass
 
-
-# ==================== DATA EXCEPTIONS ====================
-
-class DataError(DEXSniperError):
-    """Base class for data-related errors."""
+class PriceError(DEXError):
+    """Exception raised when price operations fail."""
     pass
 
-
-class ParseError(DataError):
-    """Exception for data parsing failures."""
+class PoolError(DEXError):
+    """Exception raised when pool operations fail."""
     pass
-
-
-class FormatError(DataError):
-    """Exception for data format issues."""
-    pass
-
-
-# Export all exceptions
-
-
-# ==================== ADDITIONAL EXCEPTIONS ====================
-
-class RateLimitError(DEXSniperError):
-    """Exception for rate limiting violations."""
-    pass
-
-
-class TimeoutError(DEXSniperError):
-    """Exception for operation timeouts."""
-    pass
-
-
-class APIError(DEXSniperError):
-    """Exception for API-related errors."""
-    pass
-
-
-__all__ = [
-    'DEXSniperError',
-    'SecurityError', 'AuthenticationError', 'AuthorizationError', 
-    'ValidationError', 'AccessDeniedError', 'CredentialError',
-    'WalletError', 'WalletConnectionError', 'InsufficientFundsError', 'InvalidAddressError',
-    'TradingError', 'OrderExecutionError', 'RiskLimitExceededError',
-    'NetworkError', 'ConnectionError', 'RPCError',
-    'ServiceError', 'ServiceUnavailableError', 'ConfigurationError', 'InitializationError',
-    'DataError', 'ParseError', 'FormatError',
-    'RateLimitError', 'TimeoutError', 'APIError'
-]
